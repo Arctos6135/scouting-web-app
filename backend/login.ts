@@ -74,7 +74,7 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 			await scout.save();
 		}
 
-		syncStatus();
+		setTimeout(syncStatus, 10);
 
 	};
 	
