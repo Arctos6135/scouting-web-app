@@ -14,6 +14,7 @@ import { UpdatePasswordModal } from './UpdatePasswordModal';
 import { FaPlus } from 'react-icons/fa';
 
 import './styles.css';
+import DataEntry from '../DataEntry';
 
 const {useState, useEffect} = React;
 
@@ -127,8 +128,8 @@ export default function AdminPage() {
 			<Card.Header>
 				<Card.Title>{form.name}</Card.Title>
 			</Card.Header>
-			<Card.Body>
-
+			<Card.Body style={{maxHeight: 200, overflow: "scroll"}}>
+				<DataEntry form={form} inputComponent={() => <hr style={{margin:0}}/>}></DataEntry>
 			</Card.Body>
 			<Card.Footer>
 				<Stack direction='horizontal' gap={3}>

@@ -70,19 +70,21 @@ function FormInput(props: {
 
 function FormGroup(props: { 
 	group: Group | FormRow;
+	inputComponent: any;
 }) {
 	if (props.group.type == 'row') {
 		const group = props.group as FormRow;
 		return <Row className='mb-3'>{group.components.map((group, i) => 
 			<FormGroup
+				inputComponent={props.inputComponent}
 				key={i}
 				group={group}></FormGroup>
 		)}</Row>
 	}
 	else {
 		const group = props.group as Group;
-		let component = <FormInput component={group.component}></FormInput>;
-		return <Form.Group as={Col}>
+		let component = <props.inputComponent component={group.component}></props.inputComponent>;
+		return <Form.Group className='mb-3' inputComponent={props.inputComponent} as={Col}>
 			<Form.Label>{group.label}</Form.Label>
 			{component}
 			{group.description ? <Form.Text>{group.description}</Form.Text> : <></>}
@@ -92,31 +94,25 @@ function FormGroup(props: {
 
 function FormSection(props: { 
 	section: Section;
+	inputComponent: any;
 }) {
 	const body = <>
 		{props.section.header ? <h2>{props.section.header}</h2> : <></>}
-		{props.section.groups.map((group, i) => <FormGroup key={i} group={group}></FormGroup>)}
+		{props.section.groups.map((group, i) => <FormGroup inputComponent={props.inputComponent} key={i} group={group}></FormGroup>)}
 	</>;
 
 	return body; 
 }
 
-function extractKeys(form: Section | Group | FormRow) {
-	if (form.type == 'group') return [(form as Group).component.valueID];
-	else if (form.type == 'row') return (form as FormRow).components.flatMap(extractKeys);
-	else if (form.type == 'section') return (form as Section).groups.flatMap(extractKeys);
-}
-
 export default function DataEntry(props: {
 	form: FormSchema;
 	formID?: string;
+	inputComponent?: any;
 }) {
-	const keys = props.form.sections.flatMap(extractKeys);
-
 	return <Form>
 		<FormIDContext.Provider value={props.formID ?? ''}>
 			<ListGroup variant="flush">
-				{ props.form.sections.map((section, i) => <ListGroup.Item key={i}><FormSection section={section}></FormSection></ListGroup.Item>) }
+				{ props.form.sections.map((section, i) => <ListGroup.Item key={i}><FormSection inputComponent={props.inputComponent ?? FormInput} section={section}></FormSection></ListGroup.Item>) }
 			</ListGroup>
 		</FormIDContext.Provider>
 	</Form>

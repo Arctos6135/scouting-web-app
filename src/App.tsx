@@ -13,6 +13,7 @@ import AdminPage from './Admin';
 import * as conn from './connection';
 import DataEntry from './DataEntry';
 import Text from '../formSchema/Text';
+import './styles.css';
 
 function App() {
 	return (<div>
