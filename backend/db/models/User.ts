@@ -23,6 +23,8 @@ export enum RegisterResult {
 };
 
 @pre<OrganizationClass>('save', async function() {
+	// Default initialize orgID to 24 random bytes
+	// This should be more than enough to prevent collisions
 	if (this.orgID == null) this.orgID = (await promisify(crypto.randomBytes)(24)).toString('base64').replace(/[/]/g, '-');
 })
 export class OrganizationClass {
