@@ -20,6 +20,7 @@ function App() {
 		<DataEntry formID='abc' form={{ 
 			ownerOrg: "abdfc", 
 			name: "test", 
+			id: 'dfijoefpaosidjf',
 			sections: [
 				{
 					type: 'section',
@@ -40,7 +41,7 @@ function App() {
 					]
 				}
 			]
-		}} builder={false}></DataEntry>
+		}}></DataEntry>
 	</div>
 	)
 }

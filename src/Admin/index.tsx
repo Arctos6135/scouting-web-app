@@ -1,20 +1,23 @@
 import * as React from 'react';
-import { Button, CloseButton, Container, Form, InputGroup, Table } from "react-bootstrap";
+import { Button, CloseButton, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
 import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { ScoutClass } from '../../backend/db/models/Scouting';
 import FormClass from '../../formSchema/Form';
 import * as conn from '../connection';
+import FormBuilder from '../FormBuilder';
 import { DeleteModal } from './DeleteModal';
 import { ErrorModal } from './ErrorModal';
 import { RegisterModal } from './RegisterModal';
 import { UpdatePasswordModal } from './UpdatePasswordModal';
 const {useState, useEffect} = React;
 
+const randomID = (len: number) => [...Array(len)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');
+
 function createForm(forms: FormClass[]) {
 	let nameSuffix = 0;
 	while (forms.some((form) => form.name == `Form #${nameSuffix}`)) nameSuffix++;
-	conn.socket.emit('organization:update form', { name: `Form #${nameSuffix}`, sections: [] })
+	conn.socket.emit('organization:update form', { id: randomID(32), name: `Form #${nameSuffix}`, sections: [] })
 }
 
 export default function AdminPage() {
@@ -66,6 +69,17 @@ export default function AdminPage() {
 	const [creatingScout, setCreatingScout] = useState(false);
 	const [editingForm, setEditingForm] = useState<FormClass>(null);
 
+	useEffect(() => {
+		if (editingForm) {
+			window.onbeforeunload = function() {
+				return "Data will be lost if you leave the page, are you sure?";
+			}
+		}
+		return () => {
+			window.onbeforeunload = () => {};
+		}
+	})
+
 	conn.useSocketEffect('organization:update password', (result: boolean) => {
 		if (!result) setErrorPopup('Password update failed');
 	}, [signedIn])
@@ -103,8 +117,6 @@ export default function AdminPage() {
 		</tbody>
 	</Table>;
 
-	console.log(forms);
-
 	const FormTable = <Table>
 		<thead>
 			<tr>
@@ -119,6 +131,9 @@ export default function AdminPage() {
 			</tr>)}
 		</tbody>
 	</Table>;
+
+	console.log(editingForm);
+
 	return <>
 		<DeleteModal bodyText={`All information related to this scout will be deleted. Username: ${deletingScout?.name}`} show={!!deletingScout} onClose={(del) => {
 			if (del) conn.socket.emit('organization:delete scout', deletingScout.login);
@@ -126,7 +141,7 @@ export default function AdminPage() {
 		}}/>
 
 		<DeleteModal bodyText={`All information related to this form will be deleted. Name: ${deletingForm?.name}`} show={!!deletingForm} onClose={(del) => {
-			if (del) conn.socket.emit('organization:delete form', {name: deletingForm.name});
+			if (del) conn.socket.emit('organization:delete form', {id: deletingForm.id});
 			setDeletingForm(null);
 		}}/>
 
@@ -144,6 +159,24 @@ export default function AdminPage() {
 			if (user) conn.socket.emit('organization:create scout', user);
 		}}/>
 
+		<Modal show={!!editingForm} centered fullscreen={true} onHide={() => setEditingForm(null)}>
+			<Modal.Header>
+				<Modal.Title>Editing Form</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				<FormBuilder form={editingForm} onChange={(update) => {
+					setEditingForm(update);
+					console.log(update);
+					conn.socket.emit('organization:update form', update)
+				}}></FormBuilder>
+			</Modal.Body>
+			<Modal.Footer>
+				<Button variant="primary" onClick={() => setEditingForm(null)}>
+					Close
+				</Button>
+			</Modal.Footer>
+		</Modal>
+		
 		<Container>
 			<InputGroup>
 				<InputGroup.Text>Organization login link</InputGroup.Text>

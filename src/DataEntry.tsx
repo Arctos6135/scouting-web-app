@@ -30,7 +30,8 @@ const formData = selectorFamily<string|number, string>({
 	  const [formName, propName] = id.split('/'); 
 	  if (!forms[formName]) forms[formName] = {};
 	  forms[formName][propName] = value;
-	  localStorage.setItem('formData', JSON.stringify(forms));
+	  // Don't save to local storage if form name is blank
+	  if (formName != '') localStorage.setItem('formData', JSON.stringify(forms));
   }
 });
 
@@ -108,13 +109,12 @@ function extractKeys(form: Section | Group | FormRow) {
 
 export default function DataEntry(props: {
 	form: FormSchema;
-	builder: boolean;
-	formID: string;
+	formID?: string;
 }) {
 	const keys = props.form.sections.flatMap(extractKeys);
 
 	return <Form>
-		<FormIDContext.Provider value={props.formID}>
+		<FormIDContext.Provider value={props.formID ?? ''}>
 			<ListGroup variant="flush">
 				{ props.form.sections.map((section, i) => <ListGroup.Item key={i}><FormSection section={section}></FormSection></ListGroup.Item>) }
 			</ListGroup>

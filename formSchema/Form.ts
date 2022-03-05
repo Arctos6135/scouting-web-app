@@ -39,6 +39,12 @@ export default class Form {
 	@prop()
 	ownerOrg: string;
 
+	@prop({
+		unique: true,
+		required: true
+	})
+	id: string;
+
 	@prop()
 	name: string
 };

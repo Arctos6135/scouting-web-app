@@ -35,6 +35,7 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 		}
 
 		const forms = await Form.find({ ownerOrg: req.session.scout.org });
+		console.log(forms);
 		socket.emit('organization:get forms', forms);
 	}
 
@@ -66,15 +67,24 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 		socket.emit('organization:delete scout', false);
 	});
 	
-	socket.on('organization:update form', async (form: {name: string; sections: Section[]}) => {
+	socket.on('organization:update form', async (form: {id: string; name: string; sections: Section[]}) => {
 		if (!admin()) return socket.emit('organization:update form', false);
-		const newForm = new Form({...form, ownerOrg: req.session.scout.org});
-		newForm.save();
+		console.log(form);
+		let oldForm = await Form.findOne({id: form.id, ownerOrg: req.session.scout.org});
+		if (!oldForm) oldForm = new Form({id: form.id, ownerOrg: req.session.scout.org});
+		oldForm.sections = form.sections;
+		oldForm.name = form.name;
+		try {
+			await oldForm.validate();
+			await oldForm.save();
+		}
+		catch (e) { }
 	});
 
-	socket.on('organization:delete form', async (form: {name: string}) => {
+	socket.on('organization:delete form', async (form: { id: string }) => {
 		if (!admin()) return socket.emit('organization:update form', false);
-		const current = await Form.findOne({ org: req.session.scout.org,name: form.name }).exec();
+		const current = await Form.findOne({ id: form.id, org: req.session.scout.org }).exec();
+		console.log(form, req.session.scout.org);
 		if (current) await current.delete();
 	});
 
