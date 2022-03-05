@@ -1,6 +1,7 @@
 import * as React from 'react';
 const {useState, useEffect} = React;
 import {Button, Container, Form, Row, InputGroup, ListGroup, ListGroupItem, Col, Table, CloseButton, Modal} from "react-bootstrap";
+import {useNavigate} from 'react-router';
 import {useRecoilValue} from 'recoil';
 import {ScoutClass} from '../backend/db/models/Scouting';
 import * as conn from './connection';
@@ -27,6 +28,7 @@ function DeleteModal(props: {
 	</Modal>
 }
 
+// Modal for updating scouts' passwords
 function UpdatePasswordModal(props: {
 	show: boolean; 
 	onClose: (result: { newPassword: string; update: boolean}) => any
@@ -34,6 +36,13 @@ function UpdatePasswordModal(props: {
 
 	const [pass, setPass] = useState<string>('');
 	const [passRepeat, setPassRepeat] = useState<string>('');
+	// Reset password when not shown
+	useEffect(() => {
+		if (!props.show) {
+			setPass('');
+			setPassRepeat('');
+		}
+	});
 	return <Modal centered show={props.show} onHide={() => props.onClose({ update: false, newPassword: '' })}>
 		<Modal.Header closeButton>
 			<Modal.Title>
@@ -76,6 +85,36 @@ function ErrorModal(props: {
 	</Modal>
 }
 
+function RegisterModal(props: {
+	show: boolean;
+	onClose: (user?: {login: string; name: string; password: string}) => any;
+}) {
+
+	const [login, setLogin] = useState<string>();
+	const [name, setName] = useState<string>();
+	return <Modal centered show={props.show} onHide={() => props.onClose()}>
+		<Modal.Header closeButton>
+			<Modal.Title>
+				Create scout
+			</Modal.Title>
+		</Modal.Header>
+		<Modal.Body>
+			<Form.Group>
+				<Form.Text>Login</Form.Text>
+				<Form.Control value={login} onChange={e => setLogin(e.target.value)}/>
+			</Form.Group>
+			<Form.Group>
+				<Form.Text>Name</Form.Text>
+				<Form.Control value={name} onChange={e => setName(e.target.value)}/>
+			</Form.Group>
+			Password is blank by default. You may change this once the scout is created.
+		</Modal.Body>
+		<Modal.Footer>
+			<Button onClick={() => props.onClose({ login, name, password: ''}) } variant="primary">Create</Button>
+		</Modal.Footer>
+	</Modal>
+}
+
 export default function AdminPage() {
 	const [loginLink, setLoginLink] = useState<string>("Loading...");
 	const signedIn = useRecoilValue(conn.signedIn);
@@ -83,39 +122,24 @@ export default function AdminPage() {
 	const [scouts, setScouts] = useState<ScoutClass[]>([]);
 	const selfScout = useRecoilValue(conn.scout);
 	console.log(scouts);
-
+	const navigate = useNavigate();
+	
 	useEffect(() => {
-		conn.socket.emit('organization:get scouts');
-		const listener = (scouts: ScoutClass[]) => {
-			setScouts(scouts);
+		if (!signedIn) {
+			navigate("/home", {replace: true});
 		}
+	});
 
-		conn.socket.on('organization:get scouts', listener);
-
-		return () => {
-			conn.socket.off('organization:get scout', listener);
-		}
-
-	}, [signedIn]);
+	conn.useSocketEffect('organization:get scouts', (scouts: ScoutClass[]) => {
+		setScouts(scouts);
+	});
 
 	useEffect(() => {
 		conn.socket.emit('organization:get url');
-		const listener = (url: string) => {
-			setLoginLink(url);
-		}
-		conn.socket.on('organization:get url', listener);
-		return () => {
-			conn.socket.off('organization:get url', listener);
-		}
 	}, [signedIn]);
-
-	if (!signedIn) {
-		return <Container>
-			<h1>
-				Log in to access your admin page
-			</h1>
-		</Container>
-	}
+	conn.useSocketEffect('organization:get url', (url: string) => {
+		setLoginLink(url);
+	});
 
 	const [deletingScout, setDeletingScout] = useState<ScoutClass>(null);
 
@@ -128,53 +152,37 @@ export default function AdminPage() {
 
 	const [creatingScout, setCreatingScout] = useState(false);
 
-	useEffect(() => {
-		const event = 'organization:update password';
-		const listener = (result: boolean) => {
-			if (!result) setErrorPopup('Password update failed');
-		}
-		conn.socket.on(event, listener);
-		return () => {
-			conn.socket.off(event, listener);
-		}
+	conn.useSocketEffect('organization:update password', (result: boolean) => {
+		if (!result) setErrorPopup('Password update failed');
 	}, [signedIn])
 
-	useEffect(() => {
-		const event = 'organization:delete scout';
-		const listener = (result: boolean) => {
-			if (!result) setErrorPopup('Failed to delete scout');
-		}
-		conn.socket.on(event, listener);
-		return () => {
-			conn.socket.off(event, listener);
-		}
+	conn.useSocketEffect('organization:delete scout', (result: boolean) => {
+		if (!result) setErrorPopup('Failed to delete scout');
 	}, [signedIn])
 	
-	useEffect(() => {
-		const event = 'organization:create scout';
-		const listener = (result: boolean) => {
-			if (!result) setErrorPopup('Failed to create scout');
-		}
-		conn.socket.on(event, listener);
-		return () => {
-			conn.socket.off(event, listener);
-		}
+	conn.useSocketEffect('organization:create scout', (result: boolean) => {
+		if (!result) setErrorPopup('Failed to create scout');
 	}, [signedIn]);
 
 	return <>
 		<DeleteModal bodyText={`All information related to this scout will be deleted (including assigned projects). Username: ${deletingScout?.name}`} show={!!deletingScout} onClose={(del) => {
-			if (del) conn.socket.emit('organization:delete scout', deletingScout.pin);
+			if (del) conn.socket.emit('organization:delete scout', deletingScout.login);
 			setDeletingScout(null);
 		}}/>
 
 		<UpdatePasswordModal show={!!updatingPassword} onClose={(result) => {
-			if (result.update) conn.socket.emit('organization:update password', { scout: updatingPassword.pin, password: result.newPassword });
+			if (result.update) conn.socket.emit('organization:update password', { login: updatingPassword.login, newPassword: result.newPassword });
 			setUpdatingPassword(null);
 		}}/>
 
 		<ErrorModal show={errorPopup != null} content={errorPopup} onClose={
 			() => setErrorPopup(null)
 		}/>
+
+		<RegisterModal show={creatingScout} onClose={(user) => {
+			setCreatingScout(false);
+			if (user) conn.socket.emit('organization:create scout', user);
+		}}/>
 
 		<Container>
 			<InputGroup>
@@ -195,13 +203,13 @@ export default function AdminPage() {
 					</tr>
 				</thead>
 				<tbody>
-					{scouts.map(scout => <tr className={scout.pin == selfScout.pin ? 'table-primary' : ''} key={scout.name}>
+					{scouts.map(scout => <tr className={scout.login == selfScout.login ? 'table-primary' : ''} key={scout.name}>
 						<th>{scout.name}</th>
-						<th>{scout.pin}</th>
+						<th>{scout.login}</th>
 						<th>{scout.connections}</th>
-						<th><Form.Check onClick={() => setAdmin(scout, !scout.admin)} type='switch' defaultChecked={scout.admin} disabled={scout.pin==selfScout.pin}/></th>
+						<th><Form.Check onClick={() => setAdmin(scout, !scout.admin)} type='switch' defaultChecked={scout.admin} disabled={scout.login==selfScout.login}/></th>
 						<th><Button onClick={() => setUpdatingPassword(scout)}>Update password</Button></th>
-						<th><CloseButton onClick={() => setDeletingScout(scout)} disabled={scout.pin==selfScout.pin} /></th>
+						<th><CloseButton onClick={() => setDeletingScout(scout)} disabled={scout.login==selfScout.login} /></th>
 					</tr>)}
 				</tbody>
 			</Table>
@@ -210,5 +218,4 @@ export default function AdminPage() {
 			</Button>
 		</Container>
 	</>
-	
 }

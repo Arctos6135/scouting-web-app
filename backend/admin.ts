@@ -19,31 +19,45 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 			return;
 		}
 
-		const scouts = await Scout.find({ org: req.session.scout.org }).exec();
+		const scouts = await Scout.find({ org: req.session.scout.org });
 		socket.emit('organization:get scouts', scouts);
 	}
+
+	const admin = () => !!req.session.scout?.admin;
 
 
 	socket.on('organization:get scouts', sendScouts);
 
-	socket.on('organization:update password', (update: {pin: string; newPassword: string;}) => {
-		socket.emit('organization:update password', false);
+	socket.on('organization:update password', async ({login, newPassword}: {login: string; newPassword: string;}) => {
+		// Don't allow operation for non-admins
+		// TODO: This method of controlling permissions is super scuffed
+		if (!admin()) return socket.emit('organization:update password', false);
+		
+		const scout = await Scout.findOne({ org: req.session.scout.org, login }).exec();
+		socket.emit('organization:update password', !!(await scout?.updatePassword?.(newPassword)));
 	});
 
-	socket.on('organization:create scout', (update: {pin: string; name: string; password: string;}) => {
-		socket.emit('organization:create scout', false);
+	socket.on('organization:create scout', async ({login, name}: {login: string; name: string}) => {
+		if (!admin()) return socket.emit('organization:create scout', false);
+
+		const result = await Scout.register(login, '', req.session.scout.org, name);
+
+		if (result != RegisterResult.Successful) socket.emit('organization:create scout', false);
+		else socket.emit('organization:create scout', true);
 	});
 
-	socket.on('organization:delete scout', () => {
+	socket.on('organization:delete scout', async (login) => {
+		if (!admin()) return socket.emit('organization:delete scout', false);
+		const scout = await Scout.findOne({org: req.session.scout.org, login}).exec();
+		if (scout && !scout.admin) if (await scout.delete()) return socket.emit('organization:delete scout', true); 
 		socket.emit('organization:delete scout', false);
-	});
+	})
 
 	const scoutEvents = Scout.watch();
-	scoutEvents.on('change', change => {
+	scoutEvents.on('change', async (change: any) => {
 		if (!req.session.scout?.admin) return;
 		sendScouts();
 	});
-
 
 	socket.on('disconnect', () => {
 		scoutEvents.close();

@@ -1,24 +1,16 @@
 import { prop, getModelForClass, DocumentType, ReturnModelType } from '@typegoose/typegoose';
 import FormComponent from './FormComponent';
 
-export enum NumTypes {
-	slide, click, default
-};
-
 class Num extends FormComponent {
 	@prop()
 	readonly type = 'num';
 	@prop()
-	min: Num
+	min: number
 	@prop()
-	max: Num
-
-	@prop()
-	numType: NumTypes;
+	max: number
 
 	@prop()
 	default?: string;
 }
 
 export default Num;
-

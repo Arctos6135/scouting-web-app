@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "predev": "mongod --replSet rs0 --dbpath ./data > /dev/null &",
+    "predev": "mongod --replSet rs0 --dbpath ./data > data/logfile &",
     "dev": "trap 'exit 0' SIGINT; ts-node-dev backend/dev-server.ts",
     "postdev": "mongo admin --eval 'db.shutdownServer()' > /dev/null",
     "prestart": "mongod --dbpath ./data > /dev/null &",

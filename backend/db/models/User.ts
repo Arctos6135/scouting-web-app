@@ -19,7 +19,7 @@ export enum RegisterResult {
 	Successful,
 	EmailTaken,
 	Invalid,
-	PinTaken
+	LoginTaken
 };
 
 @pre<OrganizationClass>('save', async function() {

@@ -14,7 +14,7 @@ export class ScoutClass {
 	@prop()
 	name: string;
 	@prop()
-	pin: string;
+	login: string;
 	@prop()
 	passwordHash: string;
 	@prop()
@@ -25,11 +25,17 @@ export class ScoutClass {
 	@prop({ default: 0 })
 	connections: number;
 
-	public static async login(this: ReturnModelType<typeof ScoutClass>, org: string, pin: string, password: string): Promise<LoginResult> {
+	public async updatePassword(this: DocumentType<ScoutClass>, newPassword: string): Promise<boolean> {
+		this.passwordHash = await bcrypt.hash(newPassword, 12);
+		await this.save();
+		return true;
+	}
+
+	public static async login(this: ReturnModelType<typeof ScoutClass>, org: string, login: string, password: string): Promise<LoginResult> {
 		const organization = await Organization.findOne({ orgID: org }).exec();
 		if (!organization) return LoginResult.NoOrg;
 		if (!organization.verified) return LoginResult.Unverified;
-		const user = await Scout.findOne({ pin, org }).exec();
+		const user = await Scout.findOne({ login: login, org }).exec();
 
 		if (!user) return LoginResult.NoUser;
 
@@ -39,11 +45,11 @@ export class ScoutClass {
 		}
 	}
 
-	public static async register(this: ReturnModelType<typeof ScoutClass>, pin: string, password: string, org: string, name: string): Promise<RegisterResult> {
-		if (await Scout.count({ pin, org }).exec() > 0) return RegisterResult.EmailTaken;
+	public static async register(this: ReturnModelType<typeof ScoutClass>, login: string, password: string, org: string, name: string): Promise<RegisterResult> {
+		if (await Scout.count({ login, org }).exec() > 0) return RegisterResult.LoginTaken;
 		const passwordHash = await bcrypt.hash(password, 12);
 		const user = new Scout({
-			name, passwordHash, pin, org
+			name, passwordHash, login, org
 		});
 		try {
 			if (!(await user.save())) return RegisterResult.Invalid;
@@ -58,4 +64,3 @@ export class ScoutClass {
 
 export const Scout = getModelForClass(ScoutClass);
 export const ScoutSchema = buildSchema(ScoutClass);
-Scout.updateMany({}, {connections: 0}).exec();

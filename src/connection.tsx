@@ -31,6 +31,15 @@ export const scout = atom<any>({
 	effects: [localStorageEffect('scout')]
 });
 
+export const useSocketEffect = (event: string, listener: (...args: any) => void, ...args: any[]) => {
+	return useEffect(() => {
+		socket.on(event, listener);
+		return () => {
+			socket.off(event, listener);
+		}
+	}, ...args);
+};
+
 // Get status from server every ten seconds
 // This is useful in case the session expires or something
 setInterval((() => socket.emit('status')), 10000);

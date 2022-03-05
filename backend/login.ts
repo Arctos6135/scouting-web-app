@@ -6,8 +6,14 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 	const req: any = socket.handshake;
 	if (req.session.scout) {
 		const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
-		scout.connections++;
-		await scout.save();
+		if (!scout) {
+			delete req.session.scout;
+			req.session.save();
+		}
+		else {
+			scout.connections++;
+			await scout.save();
+		}
 	}
 
 	const syncStatus = async () => {
@@ -18,20 +24,20 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 		let org: string;
 		if (data.org) org = data.org;
 		else {
-			const organization = await models.Organization.findOne({ email: data.pin }).exec();
+			const organization = await models.Organization.findOne({ email: data.login }).exec();
 			if (organization) org = organization.orgID;
 			else {
 				socket.emit('login:failed');
 				return;
 			}
 		}
-		const result = await models.Scout.login(org, data.pin, data.password);
+		const result = await models.Scout.login(org, data.login, data.password);
 		switch (result) {
 			case LoginResult.Successful:
-				const scout = await models.Scout.findOne({ pin: data.pin, org }).exec();
+				const scout = await models.Scout.findOne({ login: data.login, org }).exec();
 				scout.connections++;
 				await scout.save();
-				req.session.scout = await models.Scout.findOne({ pin: data.pin, org }).lean().exec();
+				req.session.scout = await models.Scout.findOne({ login: data.login, org }).lean().exec();
 				
 				req.session.save();
 				break;
@@ -69,9 +75,10 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 	const cleanup = async () => {
 		req.session.loggedIn = false;
 		if (req.session.scout) {
-			const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
-			scout.connections--;
-			await scout.save();
+			//const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
+			//scout.connections--;
+			//await scout.save();
+			await models.Scout.updateOne({_id: req.session.scout._id}, { $inc: { 'connections': -1 } }).exec();
 		}
 
 		setTimeout(syncStatus, 10);

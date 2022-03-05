@@ -6,20 +6,29 @@ import Text from './Text';
 
 type Component = Num | Picker | Text;
 export class Row {
+	@prop()
 	readonly type: string = 'row';
+	@prop()
 	components: Group[];
 }
 
 export class Group {
+	@prop()
 	readonly type: string = 'group';
+	@prop()
 	label: string;
+	@prop()
 	component: Component;
+	@prop()
 	description?: string;
 };
 
 export class Section {
+	@prop()
 	readonly type: string = 'section';
+	@prop()
 	header?: string;
+	@prop()
 	groups: (Group | Row)[];
 };
 
@@ -28,8 +37,7 @@ export default class Form {
 	sections: Section[];
 
 	@prop()
-	// orgID
-	ownerOrgID: string;
+	ownerOrg: string;
 
 	@prop()
 	name: string

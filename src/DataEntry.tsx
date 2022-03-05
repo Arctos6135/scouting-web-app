@@ -48,12 +48,22 @@ function FormInput(props: {
 				case 'num':
 					setValue(0);
 					break;
+				case 'picker':
+					setValue((props.component as any)?.default ?? (props.component as any).options[0]);
+					break;
 			}
 		}
 	});
+	const component = props.component as any;
 	switch (props.component.type) {
 		case 'text':
 			return <Form.Control value={value??''} onChange={(value) => (setValue(value.target.value))}></Form.Control>;
+		case 'picker':
+			return <Form.Select value={value??''} onChange={(value) => setValue(value.target.value)}>
+				{component.options.map(opt => <option key={opt}>{opt}</option>)}
+			</Form.Select>
+		case 'num':
+			return <Form.Control value={value??0} onChange={value => setValue(value.target.value)} type='number' ></Form.Control>
 	}
 }
 

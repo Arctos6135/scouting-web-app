@@ -13,7 +13,7 @@ export default function LoginPage() {
 	const navigate = useNavigate();
 	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace(' ', '+');
 	const onSubmit = (e) => {
-		conn.socket.emit('login', { pin: e.target?.email?.value, password: e.target?.password?.value, org });
+		conn.socket.emit('login', { login: e.target?.email?.value, password: e.target?.password?.value, org });
 
 		e.preventDefault();
 		return false;

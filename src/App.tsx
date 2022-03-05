@@ -17,15 +17,16 @@ import Text from '../formSchema/Text';
 function App() {
 	return (<div>
 		<h1>Scouting app</h1>
-		<DataEntry formID={'abc'} form={{ 
-			ownerOrgID: "abdfc", 
+		<DataEntry formID='abc' form={{ 
+			ownerOrg: "abdfc", 
 			name: "test", 
 			sections: [
 				{
 					type: 'section',
 					groups: [
 						{component: { type: 'text', valueID: 'test1' }, label: "Test", description: "test", type: 'group'}, 
-						{component: { type: 'text', valueID: 'test2' }, label: "Test 2", type: 'group'}
+						{component: { type: 'text', valueID: 'test2' }, label: "Test 2", type: 'group'},
+						{component: { type: 'picker', options: ['a', 'b', 'c'], default: 'b', valueID: 'pick' }, label: 'Picker test', type: 'group' }
 					], 
 					header: "Hello"
 				},
@@ -34,6 +35,8 @@ function App() {
 					header: "Hello",
 					groups: [
 						{components: [{ component: {type: 'text', valueID: 'test3'}, label: 'test3', type:'group' }, { component: {type: 'text', valueID: 'test4'}, type:'group', label: 'test4', description: 'description in row looks like this' }], type: 'row'}, 
+						{component: { type: 'num', valueID: 'numberInput', min: 0, max: 100 }, label: "Test 2", type: 'group'},
+
 					]
 				}
 			]

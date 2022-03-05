@@ -10,8 +10,10 @@ import * as bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import login from './login';
 import admin from './admin';
+import {Scout} from './db/models/Scouting';
 
 const mongoUrl = process.env.MONGO_URL + "/" + process.env.DB_NAME
+console.log(mongoUrl);
 mongoose.connect(mongoUrl);
 
 const sess = session({
@@ -44,3 +46,18 @@ app.get('*', function(req, res) {
 	res.sendFile(path.resolve(process.cwd(), './dist/index.html'));
 });
 
+['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+    'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+].forEach(function (sig) {
+    process.on(sig, async () => {
+		server.close();
+		console.log('removing connections');
+		await Scout.updateMany({}, {connections: 0}).exec();
+		console.log('removed connections');
+		process.exit(0);
+    });
+});
+console.log('test');
+
+process.on('exit', () => {
+});
