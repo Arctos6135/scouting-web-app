@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, CloseButton, Container, Form, InputGroup, Modal, Table } from "react-bootstrap";
+import { Button, Card, CardGroup, CloseButton, Col, Container, Form, InputGroup, Modal, Row, Stack, Table } from "react-bootstrap";
 import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { ScoutClass } from '../../backend/db/models/Scouting';
@@ -10,6 +10,11 @@ import { DeleteModal } from './DeleteModal';
 import { ErrorModal } from './ErrorModal';
 import { RegisterModal } from './RegisterModal';
 import { UpdatePasswordModal } from './UpdatePasswordModal';
+
+import { FaPlus } from 'react-icons/fa';
+
+import './styles.css';
+
 const {useState, useEffect} = React;
 
 const randomID = (len: number) => [...Array(len)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');
@@ -107,30 +112,32 @@ export default function AdminPage() {
 		</thead>
 		<tbody>
 			{scouts.map(scout => <tr className={scout.login == selfScout.login ? 'table-primary' : ''} key={scout.name}>
-				<th>{scout.name}</th>
-				<th>{scout.login}</th>
-				<th>{scout.connections}</th>
-				<th><Form.Check onClick={() => setAdmin(scout, !scout.admin)} type='switch' defaultChecked={scout.admin} disabled={scout.login == selfScout.login} /></th>
-				<th><Button onClick={() => setUpdatingPassword(scout)}>Update password</Button></th>
-				<th><CloseButton onClick={() => setDeletingScout(scout)} disabled={scout.login == selfScout.login} /></th>
+				<td className='truncate'>{scout.name}</td>
+				<td className='truncate'>{scout.login}</td>
+				<td className='truncate'>{scout.connections}</td>
+				<td className='truncate'><Form.Check onClick={() => setAdmin(scout, !scout.admin)} type='switch' defaultChecked={scout.admin} disabled={scout.login == selfScout.login} /></td>
+				<td><Button size="sm" onClick={() => setUpdatingPassword(scout)} variant='outline-primary'>Update password</Button></td>
+				<td><CloseButton onClick={() => setDeletingScout(scout)} disabled={scout.login == selfScout.login} /></td>
 			</tr>)}
 		</tbody>
 	</Table>;
 
-	const FormTable = <Table>
-		<thead>
-			<tr>
-				<th>Name</th>
-			</tr>
-		</thead>
-		<tbody>
-			{forms.map(form => <tr key={form.name}>
-				<th>{form.name}</th>
-				<th><Button onClick={() => setEditingForm(form)}>Edit</Button></th>
-				<th><CloseButton onClick={() => setDeletingForm(form)} /></th>
-			</tr>)}
-		</tbody>
-	</Table>;
+	const FormTable = <Row xs={2} md={3} lg={4} className="g-4">
+		{forms.map(form => <Col key={form.name}><Card>
+			<Card.Header>
+				<Card.Title>{form.name}</Card.Title>
+			</Card.Header>
+			<Card.Body>
+
+			</Card.Body>
+			<Card.Footer>
+				<Stack direction='horizontal' gap={3}>
+				<Button size="sm" onClick={() => setEditingForm(form)} variant='secondary'>Edit</Button>
+				<Button size="sm" onClick={() => setDeletingForm(form)} variant='outline-secondary'>Delete</Button>
+				</Stack>
+			</Card.Footer>
+		</Card></Col>)}
+	</Row>;
 
 	console.log(editingForm);
 
@@ -183,17 +190,35 @@ export default function AdminPage() {
 				<Form.Control id="login-link" readOnly={true} value={loginLink}></Form.Control>
 				<Button onClick={() => navigator.clipboard.writeText(loginLink)}>Copy</Button>
 			</InputGroup>
-			<h2>Scouts</h2>
-			{ScoutTable}
-			<Button onClick={() => setCreatingScout(true)}>
-				Add scout
-			</Button>
+			<br/>
+			<Card>
+				<Card.Header>
+					<Card.Title as='h2'>Scouts</Card.Title>
+				</Card.Header>
+				<Card.Body>
+					{ScoutTable}
+				</Card.Body>
+				<Card.Footer>
+					<Button onClick={() => setCreatingScout(true)}>
+						Add scout <FaPlus size={10} style={{marginLeft: 8}}/>
+					</Button>
+				</Card.Footer>
+			</Card>
 
-			<h2>Forms</h2>
-			{FormTable}
-			<Button onClick={() => createForm(forms)}>
-				Add form
-			</Button>
+			<br/>
+			<Card>
+				<Card.Header>
+					<Card.Title as='h2'>Forms</Card.Title>
+				</Card.Header>
+				<Card.Body>
+					{FormTable}
+				</Card.Body>
+				<Card.Footer>
+					<Button onClick={() => createForm(forms)}>
+						Add form <FaPlus size={10} style={{marginLeft: 8}}/>
+					</Button>
+				</Card.Footer>
+			</Card>
 		</Container>
 	</>
 }

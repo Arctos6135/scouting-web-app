@@ -1,0 +1,14 @@
+h2:not(:first-child) {
+    margin-top: 4rem;
+}
+
+body {
+    background-color: grey;
+}
+
+.truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 0;
+}

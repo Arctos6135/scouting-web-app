@@ -56,11 +56,11 @@ export class OrganizationClass {
 		return await Organization.count({ $or: [{ email }] }).exec() == 1;
 	}
 
-	public static async register(this: ReturnModelType<typeof OrganizationClass>, email: string, password: string): Promise<RegisterResult> {
+	public static async register(this: ReturnModelType<typeof OrganizationClass>, email: string, password: string, name: string): Promise<RegisterResult> {
 		if (await Organization.hasUser(email)) return RegisterResult.EmailTaken;
-		const passwordHash = await bcrypt.hash(password, 12);
+		const passwordHash = await bcrypt.hash(password, 10);
 		const user = new Organization({
-			email
+			email, orgName: name
 		});
 		try {
 			if (!(await user.save())) return RegisterResult.Invalid;

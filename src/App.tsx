@@ -59,6 +59,7 @@ function Routing() {
 ReactDOM.render((<RecoilRoot>
 	<BrowserRouter>
 		<Nav/>
+		<br/>
 		<Routing/>
 	</BrowserRouter>
 	<SocketConnection />

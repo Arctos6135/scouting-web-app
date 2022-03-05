@@ -26,7 +26,7 @@ export class ScoutClass {
 	connections: number;
 
 	public async updatePassword(this: DocumentType<ScoutClass>, newPassword: string): Promise<boolean> {
-		this.passwordHash = await bcrypt.hash(newPassword, 12);
+		this.passwordHash = await bcrypt.hash(newPassword, 10);
 		await this.save();
 		return true;
 	}
@@ -47,7 +47,7 @@ export class ScoutClass {
 
 	public static async register(this: ReturnModelType<typeof ScoutClass>, login: string, password: string, org: string, name: string): Promise<RegisterResult> {
 		if (await Scout.count({ login, org }).exec() > 0) return RegisterResult.LoginTaken;
-		const passwordHash = await bcrypt.hash(password, 12);
+		const passwordHash = await bcrypt.hash(password, 10);
 		const user = new Scout({
 			name, passwordHash, login, org
 		});

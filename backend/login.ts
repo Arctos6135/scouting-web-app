@@ -53,7 +53,7 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 	});
 
 	socket.on('register', async (data) => {
-		const result = await models.Organization.register(data.email, data.password);
+		const result = await models.Organization.register(data.email, data.password, data.name);
 		switch (result) {
 			case RegisterResult.Successful:
 				socket.emit('register', true);

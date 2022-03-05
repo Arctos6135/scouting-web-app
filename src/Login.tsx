@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import * as conn from './connection';
-import {Form, Button, Container} from 'react-bootstrap';
+import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
 import {useRecoilValue} from 'recoil';
 import { useNavigate } from "react-router-dom";
 
@@ -44,19 +44,32 @@ export default function LoginPage() {
 
 
 	return (<Container>
-		{!org ? <h3>Are you looking to log in as a scout? Ask your organization for a link.</h3> : <></>}
-		{failedLogin ? (<h3 style={{color: "red"}}>Failed login, please try again</h3>) : ""}
-		{unverified ? (<h3 style={{color: "red"}}>This account has not been verified yet. Please check your email.</h3>) : ""}
-		<Form onSubmit={onSubmit}>
-			<Form.Group>
-				<Form.Label htmlFor="emailInput">Email</Form.Label>
-				<Form.Control type="text" id="emailInput" name="email"></Form.Control>
-			</Form.Group>
-			<Form.Group>
-				<Form.Label htmlFor="passwordInput">Password</Form.Label>
-				<Form.Control type="password" id="passwordInput" name="password"></Form.Control>
-			</Form.Group>
-			<Button type="submit">Submit</Button>
-		</Form>
+		<Alert variant='danger' dismissible show={failedLogin} onClose={() => setFailedLogin(false)}>
+			<Alert.Heading>Failed login, please try again</Alert.Heading>
+		</Alert>
+		<Alert variant='danger' dismissible show={unverified} onClose={() => setUnverified(false)}>
+			<Alert.Heading>This account has not been verified yet. Please check your email.</Alert.Heading>
+		</Alert>
+		<Card>
+			<Form onSubmit={onSubmit}>
+				<Card.Header>
+					<Card.Title>Login</Card.Title>
+					{!org ? <Card.Subtitle>Are you looking to log in as a scout? Ask your organization for a link.</Card.Subtitle> : <></>}
+				</Card.Header>
+				<Card.Body>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="emailInput">Email</Form.Label>
+						<Form.Control type="text" id="emailInput" name="email"></Form.Control>
+					</Form.Group>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="passwordInput">Password</Form.Label>
+						<Form.Control type="password" id="passwordInput" name="password"></Form.Control>
+					</Form.Group>
+				</Card.Body>
+				<Card.Footer>
+					<Button type="submit">Submit</Button>
+				</Card.Footer>
+			</Form>
+		</Card>
 	</Container>)
 }

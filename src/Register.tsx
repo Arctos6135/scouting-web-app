@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import * as conn from './connection';
-import {Form, Button, Container} from 'react-bootstrap';
+import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
 
 export default function RegisterPage() {
 	const [emailTaken, setEmailTaken] = useState<boolean>(false);
@@ -49,24 +49,44 @@ export default function RegisterPage() {
 	});
 
 	return (<Container>
-		{emailTaken ? (<h3 style={{color: "red"}}>That email is taken, please try again</h3>) : ""}
-		{failed ? (<h3 style={{color: "red"}}>Email or password is invalid</h3>) : ""}
-		{success ? (<h3>An email has been sent to this address.</h3>) : ""}
-		<Form onSubmit={onSubmit}>
-			<Form.Group>
-				<Form.Label htmlFor="emailInput">Email</Form.Label>
-				<Form.Control type="text" id="emailInput" name="email"></Form.Control>
-			</Form.Group>
-			<Form.Group>
-				<Form.Label htmlFor="passwordInput">Password</Form.Label>
-				<Form.Control type="password" id="passwordInput" name="password" value={password} onChange={(e)=>setPassword(e.target.value)}></Form.Control>
-			</Form.Group>
-			<Form.Group>
-				<Form.Label htmlFor="repeatPasswordInput">Repeat Password</Form.Label>
-				<Form.Control type="password" id="repeatPasswordInput" value={password2} onChange={(e)=>setPassword2(e.target.value)}></Form.Control>
-			</Form.Group>
-			<Button type="submit" disabled={password!=password2}>Submit</Button>
-		</Form>
+		<Alert variant='danger' dismissible show={emailTaken} onClose={() => setEmailTaken(false)}>
+			<Alert.Heading>That email is taken, please try again</Alert.Heading>
+		</Alert>
+		<Alert variant='danger' dismissible show={failed} onClose={() => setFailed(false)}>
+			<Alert.Heading>Email or password is invalid</Alert.Heading>
+		</Alert>
+		<Alert variant='success' dismissible show={success} onClose={() => setSuccess(false)}>
+			<Alert.Heading>An email has been sent to that address</Alert.Heading>
+		</Alert>
+		<Card>
+			<Form onSubmit={onSubmit}>
+				<Card.Header>
+					<Card.Title>Register a new team</Card.Title>
+				</Card.Header>
+				<Card.Body>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="nameInput">Team Name</Form.Label>
+						<Form.Control type="text" id="nameInput" name="Team"></Form.Control>
+					</Form.Group>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="emailInput">Email</Form.Label>
+						<Form.Control type="text" id="emailInput" name="email"></Form.Control>
+					</Form.Group>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="passwordInput">Password</Form.Label>
+						<Form.Control type="password" id="passwordInput" name="password" value={password} onChange={(e) => setPassword(e.target.value)}></Form.Control>
+					</Form.Group>
+					<Form.Group className="mb-3" >
+						<Form.Label htmlFor="repeatPasswordInput">Repeat Password</Form.Label>
+						<Form.Control type="password" id="repeatPasswordInput" value={password2} onChange={(e) => setPassword2(e.target.value)}></Form.Control>
+					</Form.Group>
+				</Card.Body>
+				<Card.Footer>
+					<Button type="submit" disabled={password != password2}>Submit</Button>
+				</Card.Footer>
+			</Form>
+
+		</Card>
 	</Container>)
 }
 
