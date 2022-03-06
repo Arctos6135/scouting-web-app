@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 import * as conn from './connection';
 import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
 import {useRecoilValue} from 'recoil';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
 	const [failedLogin, setFailedLogin] = useState<boolean>(false);
@@ -21,24 +21,24 @@ export default function LoginPage() {
 	useEffect(() => {
 		const listen = () => {
 			setFailedLogin(true);
-		}
+		};
 		conn.socket.on('login:failed', listen);
 		return () => {
 			conn.socket.off('login:failed', listen);
-		}
+		};
 	});
 	useEffect(() => {
 		const listen = () => {
 			setUnverified(true);
-		}
+		};
 		conn.socket.on('login:unverified', listen);
 		return () => {
 			conn.socket.off('login:unverified', listen);
-		}
+		};
 	});
 	useEffect(() => {
 		if (loggedIn) {
-			navigate("/home", {replace: true});
+			navigate('/home', {replace: true});
 		}
 	}, [loggedIn]);
 
@@ -71,5 +71,5 @@ export default function LoginPage() {
 				</Card.Footer>
 			</Form>
 		</Card>
-	</Container>)
+	</Container>);
 }

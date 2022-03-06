@@ -8,22 +8,22 @@ export enum LoginResult {
 	NoUser,
 	Unverified,
 	NoOrg
-};
+}
 
 export class ScoutClass {
 	@prop()
-	name: string;
+		name: string;
 	@prop()
-	login: string;
+		login: string;
 	@prop()
-	passwordHash: string;
+		passwordHash: string;
 	@prop()
-	org: string;
+		org: string;
 	@prop()
-	admin: boolean;
+		admin: boolean;
 
 	@prop({ default: 0 })
-	connections: number;
+		connections: number;
 
 	public async updatePassword(this: DocumentType<ScoutClass>, newPassword: string): Promise<boolean> {
 		this.passwordHash = await bcrypt.hash(newPassword, 10);

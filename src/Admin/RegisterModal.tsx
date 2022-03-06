@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal } from 'react-bootstrap';
 
 export function RegisterModal(props: {
 	show: boolean;

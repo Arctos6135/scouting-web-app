@@ -4,7 +4,7 @@ import { atom, RecoilRoot, useRecoilValue } from 'recoil';
 import * as conn from './connection';
 import {Navbar, Nav, Container} from 'react-bootstrap';
 
-export default function() {
+export default function TopNav() {
 	const signedIn: boolean = useRecoilValue(conn.signedIn);
 	return (<Navbar bg="light" expand="lg">
 		<Container>

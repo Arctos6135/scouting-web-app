@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, CardGroup, CloseButton, Col, Container, Form, InputGroup, Modal, Row, Stack, Table } from "react-bootstrap";
+import { Button, Card, CardGroup, CloseButton, Col, Container, Form, InputGroup, Modal, Row, Stack, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { ScoutClass } from '../../backend/db/models/Scouting';
@@ -23,11 +23,11 @@ const randomID = (len: number) => [...Array(len)].map(()=>Math.floor(Math.random
 function createForm(forms: FormClass[]) {
 	let nameSuffix = 0;
 	while (forms.some((form) => form.name == `Form #${nameSuffix}`)) nameSuffix++;
-	conn.socket.emit('organization:update form', { id: randomID(32), name: `Form #${nameSuffix}`, sections: [] })
+	conn.socket.emit('organization:update form', { id: randomID(32), name: `Form #${nameSuffix}`, sections: [] });
 }
 
 export default function AdminPage() {
-	const [loginLink, setLoginLink] = useState<string>("Loading...");
+	const [loginLink, setLoginLink] = useState<string>('Loading...');
 	const signedIn = useRecoilValue(conn.signedIn);
 
 	const [scouts, setScouts] = useState<ScoutClass[]>([]);
@@ -40,7 +40,7 @@ export default function AdminPage() {
 	
 	useEffect(() => {
 		if (!signedIn) {
-			navigate("/home", {replace: true});
+			navigate('/home', {replace: true});
 		}
 		else {
 			conn.socket.emit('organization:get scouts');
@@ -67,7 +67,7 @@ export default function AdminPage() {
 	const [deletingForm, setDeletingForm] = useState<FormClass>(null);
 
 	const setAdmin = (scout: ScoutClass, admin: boolean) => {
-
+		return;
 	};
 
 	const [updatingPassword, setUpdatingPassword] = useState<ScoutClass>(null);
@@ -78,21 +78,21 @@ export default function AdminPage() {
 	useEffect(() => {
 		if (editingForm) {
 			window.onbeforeunload = function() {
-				return "Data will be lost if you leave the page, are you sure?";
-			}
+				return 'Data will be lost if you leave the page, are you sure?';
+			};
 		}
 		return () => {
-			window.onbeforeunload = () => {};
-		}
-	})
+			window.onbeforeunload = () => {return;};
+		};
+	});
 
 	conn.useSocketEffect('organization:update password', (result: boolean) => {
 		if (!result) setErrorPopup('Password update failed');
-	}, [signedIn])
+	}, [signedIn]);
 
 	conn.useSocketEffect('organization:delete scout', (result: boolean) => {
 		if (!result) setErrorPopup('Failed to delete scout');
-	}, [signedIn])
+	}, [signedIn]);
 	
 	conn.useSocketEffect('organization:create scout', (result: boolean) => {
 		if (!result) setErrorPopup('Failed to create scout');
@@ -128,7 +128,7 @@ export default function AdminPage() {
 			<Card.Header>
 				<Card.Title>{form.name}</Card.Title>
 			</Card.Header>
-			<Card.Body style={{maxHeight: 200, overflow: "scroll", fontSize:10}}>
+			<Card.Body style={{maxHeight: 200, overflow: 'scroll', fontSize:10}}>
 				<DataEntry form={form} inputComponent={() => <hr style={{margin:0, height:6,color:'#d0d0d0'}}/>}></DataEntry>
 			</Card.Body>
 			<Card.Footer>
@@ -175,7 +175,7 @@ export default function AdminPage() {
 				<FormBuilder form={editingForm} onChange={(update) => {
 					setEditingForm(update);
 					console.log(update);
-					conn.socket.emit('organization:update form', update)
+					conn.socket.emit('organization:update form', update);
 				}}></FormBuilder>
 			</Modal.Body>
 			<Modal.Footer>
@@ -221,5 +221,5 @@ export default function AdminPage() {
 				</Card.Footer>
 			</Card>
 		</Container>
-	</>
+	</>;
 }

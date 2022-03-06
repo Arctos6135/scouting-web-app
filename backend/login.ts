@@ -32,22 +32,22 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 			}
 		}
 		const result = await models.Scout.login(org, data.login, data.password);
+		const scout = await models.Scout.findOne({ login: data.login, org }).exec();
 		switch (result) {
-			case LoginResult.Successful:
-				const scout = await models.Scout.findOne({ login: data.login, org }).exec();
-				scout.connections++;
-				await scout.save();
-				req.session.scout = await models.Scout.findOne({ login: data.login, org }).lean().exec();
+		case LoginResult.Successful:
+			scout.connections++;
+			await scout.save();
+			req.session.scout = await models.Scout.findOne({ login: data.login, org }).lean().exec();
 				
-				req.session.save();
-				break;
+			req.session.save();
+			break;
 
-			case LoginResult.Unverified:
-				socket.emit('login:unverified');
-				break;
-			default:
-				socket.emit('login:failed', );
-				break;
+		case LoginResult.Unverified:
+			socket.emit('login:unverified');
+			break;
+		default:
+			socket.emit('login:failed', );
+			break;
 		}
 		syncStatus();
 	});
@@ -55,17 +55,17 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 	socket.on('register', async (data) => {
 		const result = await models.Organization.register(data.email, data.password, data.name);
 		switch (result) {
-			case RegisterResult.Successful:
-				socket.emit('register', true);
-				break;
+		case RegisterResult.Successful:
+			socket.emit('register', true);
+			break;
 
-			case RegisterResult.EmailTaken:
-				socket.emit('register:email taken');
-				break;
+		case RegisterResult.EmailTaken:
+			socket.emit('register:email taken');
+			break;
 
-			default:
-				socket.emit('register:failed');
-				break;
+		default:
+			socket.emit('register:failed');
+			break;
 		}
 	});
 

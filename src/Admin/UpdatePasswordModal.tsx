@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal } from 'react-bootstrap';
 
 // Modal for updating scouts' passwords
 export function UpdatePasswordModal(props: {

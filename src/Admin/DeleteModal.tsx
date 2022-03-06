@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal } from 'react-bootstrap';
 
 // "Are you sure you want to delete" modal
 // Input to onClose is a boolean for whether the delete was cancelled

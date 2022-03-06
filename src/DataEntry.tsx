@@ -20,19 +20,19 @@ const formDataAtom = atomFamily({
 });
 
 const formData = selectorFamily<string|number, string>({
-  key: 'formData',
-  get:  (id) => ({ get }) => {
-      const atom = get(formDataAtom(id));
-      return atom;
-  },
-  set: (id) => ({set}, value) => {
-	  set(formDataAtom(id), value);
-	  const [formName, propName] = id.split('/'); 
-	  if (!forms[formName]) forms[formName] = {};
-	  forms[formName][propName] = value;
-	  // Don't save to local storage if form name is blank
-	  if (formName != '') localStorage.setItem('formData', JSON.stringify(forms));
-  }
+	key: 'formData',
+	get:  (id) => ({ get }) => {
+		const atom = get(formDataAtom(id));
+		return atom;
+	},
+	set: (id) => ({set}, value) => {
+		set(formDataAtom(id), value);
+		const [formName, propName] = id.split('/'); 
+		if (!forms[formName]) forms[formName] = {};
+		forms[formName][propName] = value;
+		// Don't save to local storage if form name is blank
+		if (formName != '') localStorage.setItem('formData', JSON.stringify(forms));
+	}
 });
 
 function FormInput(props: { 
@@ -43,28 +43,28 @@ function FormInput(props: {
 	useEffect(() => {
 		if (value == undefined) {
 			switch (props.component.type) {
-				case 'text':
-					setValue('');
-					break;
-				case 'num':
-					setValue(0);
-					break;
-				case 'picker':
-					setValue((props.component as any)?.default ?? (props.component as any).options[0]);
-					break;
+			case 'text':
+				setValue('');
+				break;
+			case 'num':
+				setValue(0);
+				break;
+			case 'picker':
+				setValue((props.component as any)?.default ?? (props.component as any).options[0]);
+				break;
 			}
 		}
 	});
 	const component = props.component as any;
 	switch (props.component.type) {
-		case 'text':
-			return <Form.Control value={value??''} onChange={(value) => (setValue(value.target.value))}></Form.Control>;
-		case 'picker':
-			return <Form.Select value={value??''} onChange={(value) => setValue(value.target.value)}>
-				{component.options.map(opt => <option key={opt}>{opt}</option>)}
-			</Form.Select>
-		case 'num':
-			return <Form.Control value={value??0} onChange={value => setValue(value.target.value)} type='number' ></Form.Control>
+	case 'text':
+		return <Form.Control value={value??''} onChange={(value) => (setValue(value.target.value))}></Form.Control>;
+	case 'picker':
+		return <Form.Select value={value??''} onChange={(value) => setValue(value.target.value)}>
+			{component.options.map(opt => <option key={opt}>{opt}</option>)}
+		</Form.Select>;
+	case 'num':
+		return <Form.Control value={value??0} onChange={value => setValue(value.target.value)} type='number' ></Form.Control>;
 	}
 }
 
@@ -79,16 +79,16 @@ function FormGroup(props: {
 				inputComponent={props.inputComponent}
 				key={i}
 				group={group}></FormGroup>
-		)}</Row>
+		)}</Row>;
 	}
 	else {
 		const group = props.group as Group;
-		let component = <props.inputComponent component={group.component}></props.inputComponent>;
+		const component = <props.inputComponent component={group.component}></props.inputComponent>;
 		return <Form.Group className='mb-3' inputComponent={props.inputComponent} as={Col}>
 			<Form.Label>{group.label}</Form.Label>
 			{component}
 			{group.description ? <Form.Text>{group.description}</Form.Text> : <></>}
-		</Form.Group>
+		</Form.Group>;
 	}
 }
 
@@ -115,5 +115,5 @@ export default function DataEntry(props: {
 				{ props.form.sections.map((section, i) => <ListGroup.Item key={i}><FormSection inputComponent={props.inputComponent ?? FormInput} section={section}></FormSection></ListGroup.Item>) }
 			</ListGroup>
 		</FormIDContext.Provider>
-	</Form>
+	</Form>;
 }

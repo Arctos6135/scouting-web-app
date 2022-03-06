@@ -18,22 +18,22 @@ export default function RegisterPage() {
 		const listen = () => {
 			setEmailTaken(true);
 			setFailed(false);
-		}
+		};
 		conn.socket.on('register:email taken', listen);
 		return () => {
 			conn.socket.off('register:email taken', listen);
-		}
+		};
 	});
 
 	useEffect(() => {
 		const listen = () => {
 			setFailed(true);
 			setEmailTaken(false);
-		}
+		};
 		conn.socket.on('register:failed', listen);
 		return () => {
 			conn.socket.off('register:failed', listen);
-		}
+		};
 	});
 
 	useEffect(() => {
@@ -41,11 +41,11 @@ export default function RegisterPage() {
 			setSuccess(true);
 			setFailed(false);
 			setEmailTaken(false);
-		}
+		};
 		conn.socket.on('register', listen);
 		return () => {
 			conn.socket.off('register', listen);
-		}
+		};
 	});
 
 	return (<Container>
@@ -87,6 +87,6 @@ export default function RegisterPage() {
 			</Form>
 
 		</Card>
-	</Container>)
+	</Container>);
 }
 

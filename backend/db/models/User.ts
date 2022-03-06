@@ -20,7 +20,7 @@ export enum RegisterResult {
 	EmailTaken,
 	Invalid,
 	LoginTaken
-};
+}
 
 @pre<OrganizationClass>('save', async function() {
 	// Default initialize orgID to 24 random bytes
@@ -40,7 +40,7 @@ export class OrganizationClass {
 	public verified: boolean;
 
 	@prop()
-	orgID: string;
+		orgID: string;
 
 	public async verify(this: DocumentType<OrganizationClass>, password: string): Promise<boolean> {
 		if (this.verified) return true;
@@ -82,9 +82,9 @@ export class VerificationCodeClass {
 	public email: string;
 
 	@prop()
-	public code: string
+	public code: string;
 	@prop({
-		expires: "24h",
+		expires: '24h',
 		default: Date.now
 	})
 	public createdAt: Date;

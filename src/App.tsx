@@ -19,32 +19,32 @@ function App() {
 	return (<div>
 		<h1>Scouting app</h1>
 		<DataEntry formID='abc' form={{ 
-			ownerOrg: "abdfc", 
-			name: "test", 
+			ownerOrg: 'abdfc', 
+			name: 'test', 
 			id: 'dfijoefpaosidjf',
 			sections: [
 				{
 					type: 'section',
 					groups: [
-						{component: { type: 'text', valueID: 'test1' }, label: "Test", description: "test", type: 'group'}, 
-						{component: { type: 'text', valueID: 'test2' }, label: "Test 2", type: 'group'},
+						{component: { type: 'text', valueID: 'test1' }, label: 'Test', description: 'test', type: 'group'}, 
+						{component: { type: 'text', valueID: 'test2' }, label: 'Test 2', type: 'group'},
 						{component: { type: 'picker', options: ['a', 'b', 'c'], default: 'b', valueID: 'pick' }, label: 'Picker test', type: 'group' }
 					], 
-					header: "Hello"
+					header: 'Hello'
 				},
 				{
 					type: 'section',
-					header: "Hello",
+					header: 'Hello',
 					groups: [
 						{components: [{ component: {type: 'text', valueID: 'test3'}, label: 'test3', type:'group' }, { component: {type: 'text', valueID: 'test4'}, type:'group', label: 'test4', description: 'description in row looks like this' }], type: 'row'}, 
-						{component: { type: 'num', valueID: 'numberInput', min: 0, max: 100 }, label: "Test 2", type: 'group'},
+						{component: { type: 'num', valueID: 'numberInput', min: 0, max: 100 }, label: 'Test 2', type: 'group'},
 
 					]
 				}
 			]
 		}}></DataEntry>
 	</div>
-	)
+	);
 }
 
 function Routing() {
@@ -54,7 +54,7 @@ function Routing() {
 		<Route path="/login" element={<LoginPage/>}/>
 		<Route path="/register" element={<RegisterPage/>}/>
 		<Route path="/admin" element={scout?.admin ? <AdminPage/> : <LoginPage/>}/>
-	</Routes>
+	</Routes>;
 }
 
 ReactDOM.render((<RecoilRoot>

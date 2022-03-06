@@ -9,42 +9,42 @@ export class Row {
 	@prop()
 	readonly type: string = 'row';
 	@prop()
-	components: Group[];
+		components: Group[];
 }
 
 export class Group {
 	@prop()
 	readonly type: string = 'group';
 	@prop()
-	label: string;
+		label: string;
 	@prop()
-	component: Component;
+		component: Component;
 	@prop()
-	description?: string;
-};
+		description?: string;
+}
 
 export class Section {
 	@prop()
 	readonly type: string = 'section';
 	@prop()
-	header?: string;
+		header?: string;
 	@prop()
-	groups: (Group | Row)[];
-};
+		groups: (Group | Row)[];
+}
 
 export default class Form {
 	@prop()
-	sections: Section[];
+		sections: Section[];
 
 	@prop()
-	ownerOrg: string;
+		ownerOrg: string;
 
 	@prop({
 		unique: true,
 		required: true
 	})
-	id: string;
+		id: string;
 
 	@prop()
-	name: string
-};
+		name: string;
+}

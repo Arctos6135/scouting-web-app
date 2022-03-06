@@ -26,7 +26,7 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 
 		const scouts = await Scout.find({ org: req.session.scout.org });
 		socket.emit('organization:get scouts', scouts);
-	}
+	};
 
 	const sendForms = async () => {
 		if (!admin()) {
@@ -37,7 +37,7 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 		const forms = await Form.find({ ownerOrg: req.session.scout.org });
 		console.log(forms);
 		socket.emit('organization:get forms', forms);
-	}
+	};
 
 	socket.on('organization:get scouts', sendScouts);
 	socket.on('organization:get forms', sendForms);
@@ -78,7 +78,9 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 			await oldForm.validate();
 			await oldForm.save();
 		}
-		catch (e) { }
+		catch (e) {
+			// ignore errors
+		}
 	});
 
 	socket.on('organization:delete form', async (form: { id: string }) => {
