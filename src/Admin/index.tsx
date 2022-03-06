@@ -128,13 +128,13 @@ export default function AdminPage() {
 			<Card.Header>
 				<Card.Title>{form.name}</Card.Title>
 			</Card.Header>
-			<Card.Body style={{maxHeight: 200, overflow: "scroll"}}>
-				<DataEntry form={form} inputComponent={() => <hr style={{margin:0}}/>}></DataEntry>
+			<Card.Body style={{maxHeight: 200, overflow: "scroll", fontSize:10}}>
+				<DataEntry form={form} inputComponent={() => <hr style={{margin:0, height:6,color:'#d0d0d0'}}/>}></DataEntry>
 			</Card.Body>
 			<Card.Footer>
 				<Stack direction='horizontal' gap={3}>
-				<Button size="sm" onClick={() => setEditingForm(form)} variant='secondary'>Edit</Button>
-				<Button size="sm" onClick={() => setDeletingForm(form)} variant='outline-secondary'>Delete</Button>
+					<Button size="sm" onClick={() => setEditingForm(form)} variant='secondary'>Edit</Button>
+					<Button size="sm" onClick={() => setDeletingForm(form)} variant='outline-secondary'>Delete</Button>
 				</Stack>
 			</Card.Footer>
 		</Card></Col>)}
