@@ -75,10 +75,10 @@ export default function GroupBuilder(props: GroupBuilderProps) {
 			{group.component.type === 'num' ? (
 				<NumberChange
 					label='Max'
-					number={group.component.min}
+					number={group.component.max}
 					onChange={(value) => {
 						if (group.component.type === 'num') {
-							group.component.min = Number.parseInt(value);
+							group.component.max = Number.parseInt(value);
 							onChange(group);
 						}
 					}}
