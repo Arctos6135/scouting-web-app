@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import DataEntry from '../DataEntry';
-import FormClass from '../../formSchema/Form';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
+import FormClass from '../../shared/dataClasses/FormClass';
 
 class ErrorBoundary extends React.Component {
 	constructor(props) {
