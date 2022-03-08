@@ -1,4 +1,4 @@
-import FormClass, { Group, Row, Section } from '../../formSchema/Form';
+import FormClass, { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 
 export type FormBuilderProps = {
 	form: FormClass;

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
-import { Group, Row, Section } from '../../formSchema/Form';
+import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 import { Button, ListGroup } from 'react-bootstrap';
 import { useState } from 'react';
 import { createComponent, options } from './helpers';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Group, Row as RowType } from '../../formSchema/Form';
+import { Group, Row as RowType } from '../../shared/dataClasses/FormClass';
 import { Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { createComponent, options } from './helpers';

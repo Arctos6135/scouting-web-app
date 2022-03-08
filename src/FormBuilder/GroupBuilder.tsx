@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Group } from '../../formSchema/Form';
+import { Group } from '../../shared/dataClasses/FormClass';
 import { useState } from 'react';
 import { createComponent, options } from './helpers';
 import { GroupBuilderProps } from './types';

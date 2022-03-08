@@ -1,9 +1,9 @@
-import Num from '../../formSchema/Number';
-import Picker from '../../formSchema/Picker';
-import Text from '../../formSchema/Text';
-import FormComponent from '../../formSchema/FormComponent';
+import Num from '../../shared/dataClasses/FormClass/Number';
+import Picker from '../../shared/dataClasses/FormClass/Picker';
+import Text from '../../shared/dataClasses/FormClass/Text';
+import FormComponent from '../../shared/dataClasses/FormClass/FormComponent';
 import { atom } from 'recoil';
-import FormClass from '../../formSchema/Form';
+import FormClass from '../../shared/dataClasses/FormClass';
 
 export const editingForm = atom<FormClass>({
 	key: 'editingForm',
