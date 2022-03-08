@@ -13,7 +13,7 @@ export default function LoginPage() {
 	const navigate = useNavigate();
 	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace(' ', '+');
 	const onSubmit = (e) => {
-		conn.socket.emit('login', { login: e.target?.email?.value, password: e.target?.password?.value, org });
+		conn.socket.emit('login', { login: e.target?.email?.value as string | undefined, password: e.target?.password?.value as string | undefined, org });
 
 		e.preventDefault();
 		return false;
@@ -51,7 +51,7 @@ export default function LoginPage() {
 			<Alert.Heading>This account has not been verified yet. Please check your email.</Alert.Heading>
 		</Alert>
 		<Card>
-			<Form onSubmit={onSubmit}>
+			<Form onSubmit={(e) => onSubmit(e)}>
 				<Card.Header>
 					<Card.Title>Login</Card.Title>
 					{!org ? <Card.Subtitle>Are you looking to log in as a scout? Ask your organization for a link.</Card.Subtitle> : <></>}

@@ -12,7 +12,7 @@ import RegisterPage from './Register';
 import AdminPage from './Admin';
 import * as conn from './connection';
 import DataEntry from './DataEntry';
-import Text from '../formSchema/Text';
+import Text from '../shared/dataClasses/FormClass/Text';
 import './styles.css';
 
 function App() {

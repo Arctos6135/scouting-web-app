@@ -1,4 +1,4 @@
-import {prop} from "@typegoose/typegoose";
+import {prop} from '@typegoose/typegoose';
 
 export default abstract class FormComponent {
 	abstract readonly type: string;
@@ -6,4 +6,4 @@ export default abstract class FormComponent {
 		unique: true
 	})
 	readonly valueID: string;
-};
+}

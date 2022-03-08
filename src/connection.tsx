@@ -1,13 +1,14 @@
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import { atom, useSetRecoilState } from 'recoil';
 import { useEffect } from 'react';
 import * as React from 'react';
+import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
 
-export const socket = io();
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 socket.connect();
 
 const localStorageEffect = key => ({setSelf, onSet}) => {
-	const savedValue = localStorage.getItem(key)
+	const savedValue = localStorage.getItem(key);
 	if (savedValue != null && savedValue != 'undefined') {
 		setSelf(JSON.parse(savedValue));
 	}
@@ -31,12 +32,12 @@ export const scout = atom<any>({
 	effects: [localStorageEffect('scout')]
 });
 
-export const useSocketEffect = (event: string, listener: (...args: any) => void, ...args: any[]) => {
+export const useSocketEffect = (event: keyof ServerToClientEvents, listener: (...args: any) => void, ...args: any[]) => {
 	return useEffect(() => {
 		socket.on(event, listener);
 		return () => {
 			socket.off(event, listener);
-		}
+		};
 	}, ...args);
 };
 
@@ -45,7 +46,7 @@ export const useSocketEffect = (event: string, listener: (...args: any) => void,
 setInterval((() => socket.emit('status')), 10000);
 
 // Invisible component that listens for changes
-export default function () {
+export default function LoginSitter() {
 	const setSignedIn = useSetRecoilState(signedIn);
 	const setScout = useSetRecoilState(scout);
 	useEffect(() => {
@@ -54,12 +55,12 @@ export default function () {
 			setSignedIn(!!val.scout);
 			setScout(val.scout);
 			console.log(val);
-		}
+		};
 		socket.on('status', lis);
 		return () => {
 			socket.off('status', lis);
-		}
+		};
 	});
 
-	return <></>
+	return <></>;
 }

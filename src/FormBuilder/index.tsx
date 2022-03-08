@@ -16,7 +16,7 @@ import { useRecoilState } from 'recoil';
 import { editingForm } from './helpers';
 import { FormBuilderProps, OnChangeParams } from './types';
 import SectionBuilder from './SectionBuilder';
-import { Row as RowType } from '../../formSchema/Form';
+import { Row as RowType } from '../../shared/dataClasses/FormClass';
 
 class ErrorBoundary extends React.Component {
 	constructor(props) {

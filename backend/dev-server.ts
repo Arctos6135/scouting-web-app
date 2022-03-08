@@ -1,8 +1,8 @@
 import app from './server';
 import webpack from 'webpack';
 import dev from 'webpack-dev-middleware';
+import config from '../webpack.config.js';
 
-const compiler = webpack(require('../webpack.config.js'));
+const compiler = webpack(config);
 
 app.use(dev(compiler, {writeToDisk: true}));
-console.log('running');
