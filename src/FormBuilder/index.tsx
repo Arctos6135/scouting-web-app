@@ -1,14 +1,22 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import DataEntry from '../DataEntry';
-import {Button, Col, Container, Form, Row, Spinner, Tab, Tabs} from 'react-bootstrap';
+import {
+	Button,
+	Col,
+	Container,
+	Form,
+	Row,
+	Spinner,
+	Tab,
+	Tabs,
+} from 'react-bootstrap';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { editingForm } from './helpers';
-import { FormBuilderProps} from './propTypes';
+import { FormBuilderProps, OnChangeParams } from './types';
 import SectionBuilder from './SectionBuilder';
-
-
+import { Row as RowType } from '../../formSchema/Form';
 
 class ErrorBoundary extends React.Component {
 	constructor(props) {
@@ -26,9 +34,37 @@ class ErrorBoundary extends React.Component {
 export default function FormBuilder(props: FormBuilderProps) {
 	const [form, setForm] = useRecoilState(editingForm);
 	useEffect(() => setForm(props.form), [props.form]);
+	const onChange = React.useCallback((params: OnChangeParams) => {
+		setForm((form) => {
+			switch (params.type) {
+			case ('group'): {
+				if (params.indices.rowIndex) {
+					(
+							form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
+					).components[params.indices.index] = params.update;
+				} else {
+					form.sections[params.indices.sectionIndex].groups[params.indices.index] = params.update;
+				}
+				break;
+			}
+			case ('section'): {
+				form.sections[params.indices.index] = params.update;
+				break;
+			}
+			case ('row'): {
+				form.sections[params.indices.sectionIndex].groups[params.indices.index] = params.update;
+				break;
+			}
+			default: break;
+			}
+			props.onChange(form);
+			return form;
+		});
+	}, []);
 	if (!form || Object.keys(form).length === 0) {
 		return <Spinner animation="grow" />;
 	}
+
 	return (
 		<Container className="h-100">
 			<Row className="h-100">
@@ -58,7 +94,8 @@ export default function FormBuilder(props: FormBuilderProps) {
 							>
 								<SectionBuilder
 									index={index}
-									onChange={props.onChange}
+									onChange={onChange}
+									section={section}
 									className="mb-2"
 								/>
 							</Tab>

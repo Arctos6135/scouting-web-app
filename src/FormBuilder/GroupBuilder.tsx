@@ -1,37 +1,22 @@
 import * as React from 'react';
-import { Row, Group } from '../../formSchema/Form';
+import { Group } from '../../formSchema/Form';
 import { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { createComponent, options, editingForm } from './helpers';
-import { GroupBuilderProps } from './propTypes';
+import { createComponent, options } from './helpers';
+import { GroupBuilderProps } from './types';
 import TextChange from './TextChange';
 import SelectChange from './SelectChange';
 import NumberChange from './NumberChange';
 import ToggleChange from './ToggleChange';
 import TextWithButtonChange from './TextWithButtonChange';
 
-export default function GroupBuilder(props: GroupBuilderProps) {
-	const [form, setForm] = useRecoilState(editingForm);
-	const [group, setGroup] = useState(
-		(props.rowIndex !== undefined
-			? (form.sections[props.sectionIndex].groups[props.rowIndex] as Row)
-				.components[props.index]
-			: form.sections[props.sectionIndex].groups[props.index]) as Group
-	);
-	console.log(group);
+function GroupBuilder(props: GroupBuilderProps) {
+	const [group, setGroup] = useState(props.group);
 	const onChange = (group: Group) => {
-		setGroup(group);
-		if (props.rowIndex) {
-			(
-				form.sections[props.sectionIndex].groups[props.rowIndex] as Row
-			).components[props.index] = group;
-		} else {
-			form.sections[props.sectionIndex].groups[props.index] = group;
-		}
-		setForm(form);
-		props.onChange(form);
+		const groupUpdate = Object.assign({}, group);
+		setGroup(groupUpdate);
+		props.onChange({ indices: { index: props.index, sectionIndex: props.sectionIndex, rowIndex: props.rowIndex }, update: groupUpdate, type: 'group' });
 	};
-
+	console.log('rerender group');
 	return (
 		<div className={props.className}>
 			<TextChange
@@ -169,3 +154,5 @@ export default function GroupBuilder(props: GroupBuilderProps) {
 		</div>
 	);
 }
+
+export default React.memo(GroupBuilder);

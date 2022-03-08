@@ -1,43 +1,43 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
-import { Group } from '../../formSchema/Form';
+import { Group, Row, Section } from '../../formSchema/Form';
 import { Button, ListGroup } from 'react-bootstrap';
 import { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { createComponent, options, editingForm } from './helpers';
-import { SectionBuilderProps } from './propTypes';
+import { createComponent, options } from './helpers';
+import { SectionBuilderProps } from './types';
 import RowBuilder from './RowBuilder';
 import GroupBuilder from './GroupBuilder';
 import TextChange from './TextChange';
 import SelectChange from './SelectChange';
 
-export default function SectionBuilder(props: SectionBuilderProps) {
-	const [form, setForm] = useRecoilState(editingForm);
-	const [section, setSection] = useState(form.sections[props.index]);
+function SectionBuilder(props: SectionBuilderProps) {
+	const [section, setSection] = useState(props.section);
 
 	const builders = {
-		row: (index: number) => (
+		row: (row: Row, index: number) => (
 			<RowBuilder
 				sectionIndex={props.index}
 				index={index}
+				row={row}
 				onChange={props.onChange}
 			/>
 		),
-		group: (index: number) => (
+		group: (group: Group, index: number) => (
 			<GroupBuilder
 				sectionIndex={props.index}
 				index={index}
+				group={group}
 				onChange={props.onChange}
 			/>
 		),
 	};
 
-	function onChange(section) {
-		setSection(section);
-		form.sections[props.index] = section;
-		setForm(form);
-		props.onChange(form);
+	function onChange(section: Section) {
+		const sectionUpdate = Object.assign({}, section);
+		setSection(sectionUpdate);
+		props.onChange({ indices: { index: props.index }, update: sectionUpdate, type: 'section' });
 	}
+	console.log('rerender section');
 
 	return (
 		<div className={props.className}>
@@ -54,7 +54,7 @@ export default function SectionBuilder(props: SectionBuilderProps) {
 			<ListGroup>
 				{section.groups.map((group, index) => (
 					<ListGroup.Item key={index}>
-						{builders[group.type](index)}
+						{builders[group.type](group, index)}
 					</ListGroup.Item>
 				))}
 			</ListGroup>
@@ -89,3 +89,5 @@ export default function SectionBuilder(props: SectionBuilderProps) {
 		</div>
 	);
 }
+
+export default React.memo(SectionBuilder);

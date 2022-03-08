@@ -1,30 +1,34 @@
-import FormClass from '../../formSchema/Form';
+import FormClass, { Group, Row, Section } from '../../formSchema/Form';
 
 export type FormBuilderProps = {
 	form: FormClass;
 	onChange: (param: FormClass) => void;
-}
-
-export type SectionBuilderProps = {
+};
+type BuilderProps = {
 	index: number;
-	onChange: (param: FormClass) => void;
+	onChange: (param: OnChangeParams) => void;
 	className?: string;
 }
+export type SectionBuilderProps = {
+	section: Section;
+} & BuilderProps;
 
 export type GroupBuilderProps = {
 	sectionIndex: number;
 	rowIndex?: number;
-} & SectionBuilderProps
+	group: Group;
+} & BuilderProps;
 
 export type RowBuilderProps = {
 	sectionIndex: number;
-} & SectionBuilderProps
+	row: Row;
+} & BuilderProps;
 
 export type ChangeProps = {
 	label: string;
 	onChange: (value: string) => void;
 	className?: string;
-}
+};
 
 export type TextChangeProps = {
 	text: string;
@@ -47,3 +51,23 @@ export type ToggleChangeProps = {
 	checked: boolean;
 	onChange: () => void;
 } & ChangeProps;
+
+export type SectionParams = {
+	indices: { index: number; };
+	type: 'section';
+	update: Section
+}
+
+export type RowParams = {
+	indices: { index: number; sectionIndex: number; };
+	type: 'row';
+	update: Row;
+};
+
+export type GroupParams = {
+	indices: { index: number; sectionIndex: number; rowIndex?: number };
+	type: 'group';
+	update: Group;
+};
+
+export type OnChangeParams = SectionParams | RowParams | GroupParams;

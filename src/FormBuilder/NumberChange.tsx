@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { NumberChangeProps } from './propTypes';
+import { NumberChangeProps } from './types';
 
 export default function TextChange(props: NumberChangeProps) {
 	return (

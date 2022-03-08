@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { TextChangeProps } from './propTypes';
+import { TextChangeProps } from './types';
 
 export default function TextChange(props: TextChangeProps) {
 	return (

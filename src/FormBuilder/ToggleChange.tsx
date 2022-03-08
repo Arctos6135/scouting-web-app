@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { ToggleChangeProps } from './propTypes';
+import { ToggleChangeProps } from './types';
 
 export default function ToggleChange(props: ToggleChangeProps) {
 	return (

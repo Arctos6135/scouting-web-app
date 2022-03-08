@@ -2,18 +2,19 @@ import * as React from 'react';
 import { Group, Row as RowType } from '../../formSchema/Form';
 import { Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { createComponent, editingForm, options } from './helpers';
-import { RowBuilderProps } from './propTypes';
+import { createComponent, options } from './helpers';
+import { RowBuilderProps } from './types';
 import GroupBuilder from './GroupBuilder';
 import SelectChange from './SelectChange';
 
-export default function RowBuilder(props: RowBuilderProps) {
-	const [form, setForm] = useRecoilState(editingForm);
-	const [row, setRow] = useState(
-		form.sections[props.sectionIndex].groups[props.index] as RowType
-	);
-	console.log(row);
+function RowBuilder(props: RowBuilderProps) {
+	const [row, setRow] = useState(props.row);
+	function onChange(row: RowType) {
+		const rowUpdate = Object.assign({}, row);
+		setRow(rowUpdate);
+		props.onChange({ indices: { index: props.index, sectionIndex: props.sectionIndex }, update: rowUpdate, type: 'row' });
+	}
+	console.log('rerender row');
 	return (
 		<div className={props.className}>
 			<Row>
@@ -23,6 +24,7 @@ export default function RowBuilder(props: RowBuilderProps) {
 							sectionIndex={props.sectionIndex}
 							index={index}
 							rowIndex={props.index}
+							group={component}
 							onChange={props.onChange} />
 					</Col>
 				))}
@@ -42,10 +44,7 @@ export default function RowBuilder(props: RowBuilderProps) {
 						component: component,
 					};
 					row.components.push(group);
-					setRow(row);
-					form.sections[props.sectionIndex].groups[props.index] = row;
-					setForm(form);
-					props.onChange(form);
+					onChange(row);
 				}}
 				label=" New Group"
 				buttonText="Add Group"
@@ -53,3 +52,4 @@ export default function RowBuilder(props: RowBuilderProps) {
 		</div>
 	);
 }
+export default React.memo(RowBuilder);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
-import { SelectChangeProps } from './propTypes';
+import { SelectChangeProps } from './types';
 
 export default function SelectChange(props: SelectChangeProps) {
 	const [selection, setSelection] = useState(

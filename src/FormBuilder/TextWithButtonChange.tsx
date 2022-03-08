@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
-import { TextWithButtonChangeProps } from './propTypes';
+import { TextWithButtonChangeProps } from './types';
 
 export default function SelectChange(props: TextWithButtonChangeProps) {
 	const [value, setValue] = useState('');
