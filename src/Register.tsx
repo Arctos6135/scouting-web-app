@@ -10,7 +10,7 @@ export default function RegisterPage() {
 	const [password, setPassword] = useState<string>('');
 	const [password2, setPassword2] = useState<string>('');
 	const onSubmit = (e) => {
-		conn.socket.emit('register', {email: e.target?.email?.value, password: e.target?.password?.value});
+		conn.socket.emit('register', {email: e.target?.email?.value, password: e.target?.password?.value, name: e.target?.team?.value});
 		e.preventDefault();
 		return false;
 	};
@@ -66,7 +66,7 @@ export default function RegisterPage() {
 				<Card.Body>
 					<Form.Group className="mb-3" >
 						<Form.Label htmlFor="nameInput">Team Name</Form.Label>
-						<Form.Control type="text" id="nameInput" name="Team"></Form.Control>
+						<Form.Control type="text" id="nameInput" name="team"></Form.Control>
 					</Form.Group>
 					<Form.Group className="mb-3" >
 						<Form.Label htmlFor="emailInput">Email</Form.Label>

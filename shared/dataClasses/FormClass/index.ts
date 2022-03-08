@@ -8,43 +8,33 @@ type Component = Num | Picker | Text;
 export class Row {
 	@prop()
 	readonly type: string = 'row';
-	@prop()
-		components: Group[];
+	@prop() components: Group[];
 }
 
 export class Group {
 	@prop()
 	readonly type: string = 'group';
-	@prop()
-		label: string;
-	@prop()
-		component: Component;
-	@prop()
-		description?: string;
+	@prop() label: string;
+	@prop() component: Component;
+	@prop() description?: string;
 }
 
 export class Section {
 	@prop()
 	readonly type: string = 'section';
-	@prop()
-		header?: string;
-	@prop()
-		groups: (Group | Row)[];
+	@prop() header?: string;
+	@prop() groups: (Group | Row)[];
 }
 
-export default class Form {
-	@prop()
-		sections: Section[];
+export default class FormClass {
+	@prop() sections: Section[];
 
-	@prop()
-		ownerOrg: string;
+	@prop() ownerOrg: string;
 
 	@prop({
 		unique: true,
 		required: true
-	})
-		id: string;
+	}) id: string;
 
-	@prop()
-		name: string;
+	@prop() name: string;
 }

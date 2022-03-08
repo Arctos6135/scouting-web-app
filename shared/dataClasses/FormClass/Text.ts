@@ -4,20 +4,16 @@ import FormComponent from './FormComponent';
 class Text extends FormComponent {
 	@prop()
 	readonly type = 'text';
-	@prop()
-	minlength?: number;
+	@prop() minlength?: number;
 	@prop({
 		max: 10000
-	})
-	maxlength?: number;
+	}) maxlength?: number;
 
-	@prop()
-	password?: boolean;
+	@prop() password?: boolean;
 
 	@prop({
 		validate: ((charset: string) => (new Set(charset)).size == charset.length)
-	})
-	charset?: string;
+	}) charset?: string;
 }
 
 export default Text;

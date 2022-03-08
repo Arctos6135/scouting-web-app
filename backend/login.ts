@@ -1,8 +1,9 @@
 import * as socketio from 'socket.io';
 import models from './db';
-import {RegisterResult} from './db/models/User';
-import {LoginResult} from './db/models/Scouting';
-export default async function addListeners(socket: socketio.Socket, io: socketio.Server) {
+import { LoginResult } from '../shared/dataClasses/ScoutClass';
+import { IOServer, Socket } from './server';
+import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
+export default async function addListeners(socket: Socket, io: IOServer) {
 	const req: any = socket.handshake;
 	if (req.session.scout) {
 		const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
@@ -85,13 +86,13 @@ export default async function addListeners(socket: socketio.Socket, io: socketio
 
 	};
 	
-	socket.on('logout', async (data) => {
+	socket.on('logout', async () => {
 		await cleanup();
 		delete req.session.scout;
 		req.session.save();
 	});
 
-	socket.on('disconnect', async (data) => {
+	socket.on('disconnect', async () => {
 		await cleanup();
 	});
 }

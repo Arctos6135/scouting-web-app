@@ -7,10 +7,8 @@ class Picker extends FormComponent {
 	@prop({
 		minlength: 1,
 		maxlength: 50
-	})
-		options: string[];
-	@prop()
-		default?: string;
+	}) options: string[];
+	@prop() default?: string;
 }
 
 export default Picker;
