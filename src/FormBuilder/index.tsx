@@ -38,7 +38,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 		setForm((form) => {
 			switch (params.type) {
 			case ('group'): {
-				if (params.indices.rowIndex) {
+				if (typeof params.indices.rowIndex === 'number') {
 					(
 							form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
 					).components[params.indices.index] = params.update;
@@ -57,8 +57,9 @@ export default function FormBuilder(props: FormBuilderProps) {
 			}
 			default: break;
 			}
-			props.onChange(form);
-			return form;
+			const updateForm = Object.assign({}, form);
+			props.onChange(updateForm);
+			return updateForm;
 		});
 	}, []);
 	if (!form || Object.keys(form).length === 0) {
@@ -70,7 +71,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 			<Row className="h-100">
 				<Col>
 					<ErrorBoundary>
-						<DataEntry form={props.form}></DataEntry>
+						<DataEntry form={form}></DataEntry>
 					</ErrorBoundary>
 				</Col>
 				<Col>
