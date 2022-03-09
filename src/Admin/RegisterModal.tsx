@@ -1,33 +1,42 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
 
 export function RegisterModal(props: {
 	show: boolean;
 	onClose: (user?: { login: string; name: string; password: string; }) => any;
 }) {
 
-	const [login, setLogin] = useState<string>();
-	const [name, setName] = useState<string>();
-	return <Modal centered show={props.show} onHide={() => props.onClose()}>
+	const [login, setLogin] = useState<string>('');
+	const [name, setName] = useState<string>('');
+
+	const handleClose = (res?: any) => {
+		props.onClose(res);
+		setTimeout(() => {
+			setLogin('');
+			setName('');
+		}, 500);
+	};
+	return <Modal centered show={props.show} onHide={() => handleClose()}>
 		<Modal.Header closeButton>
 			<Modal.Title>
 				Create scout
 			</Modal.Title>
 		</Modal.Header>
 		<Modal.Body>
-			<Form.Group>
-				<Form.Text>Login</Form.Text>
+			<InputGroup className='mb-3'>
+				<InputGroup.Text>Login</InputGroup.Text>
 				<Form.Control value={login} onChange={e => setLogin(e.target.value)} />
-			</Form.Group>
-			<Form.Group>
-				<Form.Text>Name</Form.Text>
+			</InputGroup>
+
+			<InputGroup className='mb-3'>
+				<InputGroup.Text>Name</InputGroup.Text>
 				<Form.Control value={name} onChange={e => setName(e.target.value)} />
-			</Form.Group>
+			</InputGroup>
 			Password is blank by default. You may change this once the scout is created.
 		</Modal.Body>
 		<Modal.Footer>
-			<Button onClick={() => props.onClose({ login, name, password: '' })} variant="primary">Create</Button>
+			<Button onClick={() => handleClose({ login, name, password: '' })} variant="primary">Create</Button>
 		</Modal.Footer>
 	</Modal>;
 }

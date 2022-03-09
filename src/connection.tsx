@@ -3,6 +3,9 @@ import { atom, useSetRecoilState } from 'recoil';
 import { useEffect } from 'react';
 import * as React from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
+import ScoutClass from '../shared/dataClasses/ScoutClass';
+import AssignmentClass from '../shared/dataClasses/AssignmentClass';
+import FormClass from '../shared/dataClasses/FormClass';
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 socket.connect();
@@ -26,12 +29,31 @@ export const signedIn = atom<boolean>({
 	effects: [localStorageEffect('loggedIn')]
 });
 // Store whether or not the currently logged in account is a scout or an admin
-export const scout = atom<any>({
+export const scout = atom<ScoutClass>({
 	key: 'scout',
-	default: {},
+	default: new ScoutClass(), 
 	effects: [localStorageEffect('scout')]
 });
 
+export const assignments = atom<AssignmentClass[]>({
+	key: 'assignments',
+	default: [],
+	effects: [localStorageEffect('assignments')]
+});
+
+export const scouts = atom<ScoutClass[]>({
+	key: 'scouts',
+	default: [], 
+	effects: [localStorageEffect('scouts')]
+});
+
+export const forms = atom<FormClass[]>({
+	key: 'forms',
+	default: [], 
+	effects: [localStorageEffect('forms')]
+});
+
+// TODO: Figure out how to make the listener argument have correct types
 export const useSocketEffect = (event: keyof ServerToClientEvents, listener: (...args: any) => void, ...args: any[]) => {
 	return useEffect(() => {
 		socket.on(event, listener);
@@ -49,12 +71,13 @@ setInterval((() => socket.emit('status')), 10000);
 export default function LoginSitter() {
 	const setSignedIn = useSetRecoilState(signedIn);
 	const setScout = useSetRecoilState(scout);
+	const setAssignments = useSetRecoilState(assignments);
+	const setScouts = useSetRecoilState(scouts);
+	const setForms = useSetRecoilState(forms);
 	useEffect(() => {
 		const lis = (val: any) => {
-			console.log(val);
 			setSignedIn(!!val.scout);
 			setScout(val.scout);
-			console.log(val);
 		};
 		socket.on('status', lis);
 		return () => {
@@ -62,5 +85,14 @@ export default function LoginSitter() {
 		};
 	});
 
+	useSocketEffect('organization:get assignments', (assignments) => {
+		setAssignments(assignments);
+	});
+	useSocketEffect('organization:get scouts', (scouts: ScoutClass[]) => {
+		setScouts(scouts);
+	});
+	useSocketEffect('organization:get forms', (forms: FormClass[]) => {
+		setForms(forms);
+	});
 	return <></>;
 }

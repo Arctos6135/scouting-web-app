@@ -84,7 +84,7 @@ function FormGroup(props: {
 	else {
 		const group = props.group as Group;
 		const component = <props.inputComponent component={group.component}></props.inputComponent>;
-		return <Form.Group className='mb-3' inputComponent={props.inputComponent} as={Col}>
+		return <Form.Group className='mb-3' as={Col}>
 			<Form.Label>{group.label}</Form.Label>
 			{component}
 			{group.description ? <Form.Text>{group.description}</Form.Text> : <></>}

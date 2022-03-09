@@ -7,11 +7,12 @@ export function DeleteModal(props: {
 	onClose: (result: boolean) => any;
 	show: boolean;
 	bodyText: string;
+	titleText?: string;
 }) {
 	return <Modal centered show={props.show} onHide={props.onClose.bind(false)}>
 		<Modal.Header closeButton>
 			<Modal.Title>
-				Are you sure you want to delete this scout?
+				{props.titleText ?? 'Are you sure you want to delete?'}
 			</Modal.Title>
 		</Modal.Header>
 		<Modal.Body>

@@ -34,7 +34,6 @@ export default function FormBuilder(props: { form: FormClass; onChange: (param: 
 					setFormJSON(newText);
 					try {
 						const obj = JSON.parse(newText);
-						console.log(obj);
 						props.onChange(obj);
 					}
 					catch (e) {

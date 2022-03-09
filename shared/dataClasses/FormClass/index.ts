@@ -1,5 +1,4 @@
-import { prop, getModelForClass, DocumentType, ReturnModelType, Ref } from '@typegoose/typegoose';
-import FormComponent from './FormComponent';
+import { prop } from '@typegoose/typegoose';
 import Num from './Number';
 import Picker from './Picker';
 import Text from './Text';

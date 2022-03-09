@@ -4,9 +4,9 @@ import { LoginResult } from '../shared/dataClasses/ScoutClass';
 import { IOServer, Socket } from './server';
 import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 export default async function addListeners(socket: Socket, io: IOServer) {
-	const req: any = socket.handshake;
+	const req = socket.request;
 	if (req.session.scout) {
-		const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
+		const scout = await models.Scout.findOne({login: req.session.scout.login, org: req.session.scout.org}).exec();
 		if (!scout) {
 			delete req.session.scout;
 			req.session.save();
@@ -79,7 +79,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			//const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
 			//scout.connections--;
 			//await scout.save();
-			await models.Scout.updateOne({_id: req.session.scout._id}, { $inc: { 'connections': -1 } }).exec();
+			await models.Scout.updateOne(req.session.scout, { $inc: { 'connections': -1 } }).exec();
 		}
 
 		setTimeout(syncStatus, 10);
