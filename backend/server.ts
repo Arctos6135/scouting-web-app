@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import * as path from 'path';
-import session from 'express-session';
+import session, { Session, SessionData } from 'express-session';
 import MongoStore from 'connect-mongo';
 import socketio from 'socket.io';
-import sharedsession from 'express-socket.io-session';
 import * as http from 'http';
 import * as bodyParser from 'body-parser';
 import mongoose from 'mongoose';
@@ -12,14 +11,18 @@ import login from './login';
 import admin from './admin';
 import {ScoutModel} from './db/models/Scouting';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
+import ScoutClass from '../shared/dataClasses/ScoutClass';
+import {IncomingMessage} from 'http';
 
 const mongoUrl = process.env.MONGO_URL + '/' + process.env.DB_NAME;
-console.log(mongoUrl);
 mongoose.connect(mongoUrl);
 
 const sess = session({
 	secret: process.env.SECRET,
-	store: MongoStore.create({ mongoUrl })
+	store: MongoStore.create({ mongoUrl }),
+	cookie: {
+		maxAge: 60000*60*24
+	}
 });
 
 const app = express();
@@ -30,9 +33,10 @@ app.use(express.static('./dist'));
 app.use(sess);
 app.use(bodyParser.urlencoded());
 
-io.use(sharedsession(sess, {
-	autoSave: true
-}));
+io.use((socket, next) => {
+	const req = socket.request as any;
+	sess(req, req.res || {}, next as any);
+});
 
 io.on('connection', (socket) => {
 	login(socket, io);
@@ -42,10 +46,21 @@ io.on('connection', (socket) => {
 server.listen(8080, '0.0.0.0');
 
 export default app;
-export type Socket = socketio.Socket<ClientToServerEvents, ServerToClientEvents>;
+export type Socket = socketio.Socket<ClientToServerEvents, ServerToClientEvents> & {
+	get request(): IncomingMessage & {
+		session?: Session & Partial<SessionData>;
+	}
+};
 export type IOServer = typeof io;
 
-app.get('*', function(req, res) {
+declare module 'express-session' {
+	interface SessionData {
+		scout: ScoutClass;
+		loggedIn: boolean;
+	}
+}
+
+app.get('*', function (req, res) {
 	res.sendFile(path.resolve(process.cwd(), './dist/index.html'));
 });
 
@@ -54,9 +69,7 @@ app.get('*', function(req, res) {
 ].forEach(function (sig) {
 	process.on(sig, async () => {
 		server.close();
-		console.log('removing connections');
 		await ScoutModel.updateMany({}, {connections: 0}).exec();
-		console.log('removed connections');
 		process.exit(0);
 	});
 });

@@ -1,8 +1,12 @@
-import { prop, Ref } from '@typegoose/typegoose';
-import { Scout } from '../../backend/db/models/Scouting';
-import GameClass from './GameClass';
+import { prop } from '@typegoose/typegoose';
 
 export default class AssignmentClass {
-	@prop() game: Ref<GameClass>;
-	@prop() scout: Ref<Scout>;
+	@prop() name: string;
+	@prop({
+		// Ensure each scout is only assigned once
+		validate: ((scouts: string[]) => (new Set(scouts)).size == scouts.length)
+	}) scouts: string[];
+    @prop() due?: string;
+    @prop() id: string;
+	@prop() form: string;
 }

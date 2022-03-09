@@ -1,27 +1,30 @@
+import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 import models from './db';
 import { IOServer, Socket } from './server';
 
-export default async function addListeners(socket: Socket, io: IOServer) {
-	const req: any = socket.handshake;
+const scoutEvents = models.Scout.watch();
+const formEvents = models.Form.watch();
+const assignmentEvents = models.Assignment.watch();
 
+export default async function addListeners(socket: Socket, io: IOServer) {
+	const session = socket.request.session;
 	socket.on('organization:get url', async () => {
-		if (req.session.scout) {
-			const code = (await models.Organization.findOne({ orgID: req.session.scout.org })).orgID;
+		if (session.scout) {
+			const code = (await models.Organization.findOne({ orgID: session.scout.org })).orgID;
 			//TODO: Maybe change to https
-			socket.emit('organization:get url', 'http://' + req.headers.host + '/login?orgID=' + code);
+			socket.emit('organization:get url', 'http://' + socket.request.headers.host + '/login?orgID=' + code);
 		}
 	});
 
-	const admin = () => !!req.session.scout?.admin;
+	const admin = () => !!session.scout?.admin;
 
 	const sendScouts = async () => {
 		if (!admin()) {
 			socket.emit('organization:get scouts', []);
 			return;
 		}
-
-		const scouts = await models.Scout.find({ org: req.session.scout.org });
+		const scouts = await models.Scout.find({ org: session.scout.org }).lean().exec();
 		socket.emit('organization:get scouts', scouts);
 	};
 
@@ -30,10 +33,14 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			socket.emit('organization:get forms', []);
 			return;
 		}
-
-		const forms = await models.Form.find({ ownerOrg: req.session.scout.org });
-		console.log(forms);
+		const forms = await models.Form.find({ ownerOrg: session.scout.org }).lean().exec();
 		socket.emit('organization:get forms', forms);
+	};
+
+	const sendAssignments = async () => {
+		if (!session.scout) return;
+		const assignments = await models.Assignment.find({ org: session.scout.org, scout: session.scout.admin ? undefined : session.scout.login }).lean().exec();
+		socket.emit('organization:get assignments', assignments);
 	};
 
 	socket.on('organization:get scouts', sendScouts);
@@ -44,14 +51,14 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		// TODO: This method of controlling permissions is super scuffed
 		if (!admin()) return socket.emit('organization:update password', false);
 		
-		const scout = await models.Scout.findOne({ org: req.session.scout.org, login }).exec();
+		const scout = await models.Scout.findOne({ org: session.scout.org, login }).exec();
 		socket.emit('organization:update password', !!(await scout?.updatePassword?.(newPassword)));
 	});
 
 	socket.on('organization:create scout', async ({login, name}: {login: string; name: string}) => {
 		if (!admin()) return socket.emit('organization:create scout', false);
 
-		const result = await models.Scout.register(login, '', req.session.scout.org, name);
+		const result = await models.Scout.register(login, '', session.scout.org, name);
 
 		if (result != RegisterResult.Successful) socket.emit('organization:create scout', false);
 		else socket.emit('organization:create scout', true);
@@ -59,16 +66,15 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 
 	socket.on('organization:delete scout', async (login) => {
 		if (!admin()) return socket.emit('organization:delete scout', false);
-		const scout = await models.Scout.findOne({org: req.session.scout.org, login}).exec();
+		const scout = await models.Scout.findOne({org: session.scout.org, login}).exec();
 		if (scout && !scout.admin) if (await scout.delete()) return socket.emit('organization:delete scout', true); 
 		socket.emit('organization:delete scout', false);
 	});
 	
 	socket.on('organization:update form', async (form) => {
 		if (!admin()) return socket.emit('organization:update form', false);
-		console.log(form);
-		let oldForm = await models.Form.findOne({id: form.id, ownerOrg: req.session.scout.org});
-		if (!oldForm) oldForm = new models.Form({id: form.id, ownerOrg: req.session.scout.org});
+		let oldForm = await models.Form.findOne({id: form.id, ownerOrg: session.scout.org});
+		if (!oldForm) oldForm = new models.Form({id: form.id, ownerOrg: session.scout.org});
 		oldForm.sections = form.sections;
 		oldForm.name = form.name;
 		try {
@@ -82,26 +88,64 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 
 	socket.on('organization:delete form', async (form: { id: string }) => {
 		if (!admin()) return socket.emit('organization:update form', false);
-		const current = await models.Form.findOne({ id: form.id, org: req.session.scout.org }).exec();
-		console.log(form, req.session.scout.org);
+		const current = await models.Form.findOne({ id: form.id, org: session.scout.org }).exec();
 		if (current) await current.delete();
+	});
+
+	socket.on('organization:assign', async (assignment: AssignmentClass) => {
+		if (!admin()) return socket.emit('organization:update form', false);
+		const prev = await models.Assignment.findOne({id: assignment.id}).exec();
+		if (prev && assignment.id) {
+			for (const k in assignment) prev[k] = assignment[k];
+			try {
+				await prev.save();
+			}
+			catch (e) {
+				socket.emit('organization:assign', false);
+			}
+		}
+		else {
+			const obj = new models.Assignment(assignment);
+			try {
+				await obj.save();
+			}
+			catch (e) {
+				socket.emit('organization:assign', false);
+			}
+		}
+	});
+
+	socket.on('organization:get assignments', async () => {
+		if (!admin()) return;
+		await sendAssignments();
+	});
+
+	socket.on('organization:delete assignment', async (id) => {
+		if (!admin()) return;
+		await models.Assignment.findOneAndDelete({ id }).exec();
 	});
 
 	// TODO: There should only be one set of these listeners in the server
 	// New connections can subscribe to relevant listeners
-	const scoutEvents = models.Scout.watch();
-	scoutEvents.on('change', async (change: any) => {
-		if (!req.session.scout?.admin) return;
+	const scoutListener = async (change: any) => {
+		if (!session.scout?.admin) return;
 		sendScouts();
-	});
+	};
+	scoutEvents.on('change', scoutListener);
 
-	const formEvents = models.Form.watch();
-	formEvents.on('change', async () => {
-		if (!req.session.scout?.admin) return;
+	const formListener = async () => {
+		if (!session.scout?.admin) return;
 		sendForms();
-	});
+	};
+	formEvents.on('change', formListener);
+
+	const assignmentListener = async () => {
+		sendAssignments();
+	};
+	assignmentEvents.on('change', assignmentListener);
 
 	socket.on('disconnect', () => {
-		scoutEvents.close();
+		scoutEvents.off('change', scoutListener);
+		formEvents.off('change', formListener);
 	});
 }
