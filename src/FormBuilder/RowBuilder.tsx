@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { Group, Row as RowType } from '../../shared/dataClasses/FormClass';
-import { Row, Col } from 'react-bootstrap';
-import { useState } from 'react';
-import { createComponent, options } from './helpers';
+import { Row, Col, Button } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { createComponent, options, rowsPropsAreEqual } from './helpers';
 import { RowBuilderProps } from './types';
 import GroupBuilder from './GroupBuilder';
 import SelectChange from './SelectChange';
 
 function RowBuilder(props: RowBuilderProps) {
 	const [row, setRow] = useState(props.row);
+	useEffect(() => setRow(props.row), [props.row]);
+
 	function onChange(row: RowType) {
 		const rowUpdate = Object.assign({}, row);
 		setRow(rowUpdate);
@@ -20,6 +22,10 @@ function RowBuilder(props: RowBuilderProps) {
 			<Row>
 				{row.components.map((component, index) => (
 					<Col key={index}>
+						<Button onClick={() => {
+							row.components.splice(index, 1);
+							onChange(row);
+						}}>Delete Group</Button>
 						<GroupBuilder
 							sectionIndex={props.sectionIndex}
 							index={index}
@@ -52,4 +58,4 @@ function RowBuilder(props: RowBuilderProps) {
 		</div>
 	);
 }
-export default React.memo(RowBuilder);
+export default React.memo(RowBuilder, rowsPropsAreEqual);

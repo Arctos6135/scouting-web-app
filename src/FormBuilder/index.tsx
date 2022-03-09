@@ -62,6 +62,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 			return updateForm;
 		});
 	}, []);
+	console.log('re-render builder');
 	if (!form || Object.keys(form).length === 0) {
 		return <Spinner animation="grow" />;
 	}
@@ -93,6 +94,11 @@ export default function FormBuilder(props: FormBuilderProps) {
 								title={section.header ? section.header : `Section ${index + 1}`}
 								key={index}
 							>
+								<Button onClick={() => {
+									form.sections.splice(index, 1);
+									setForm(form);
+									props.onChange(form);
+								}}>Delete {section.header ? section.header : `Section ${index + 1}`}</Button>
 								<SectionBuilder
 									index={index}
 									onChange={onChange}

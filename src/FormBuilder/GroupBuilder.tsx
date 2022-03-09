@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Group } from '../../shared/dataClasses/FormClass';
-import { useState } from 'react';
-import { createComponent, options } from './helpers';
+import { useState, useEffect } from 'react';
+import { createComponent, groupsPropsAreEqual, options } from './helpers';
 import { GroupBuilderProps } from './types';
 import TextChange from './TextChange';
 import SelectChange from './SelectChange';
@@ -11,6 +11,7 @@ import TextWithButtonChange from './TextWithButtonChange';
 
 function GroupBuilder(props: GroupBuilderProps) {
 	const [group, setGroup] = useState(props.group);
+	useEffect(() => setGroup(props.group), [props.group]);
 	const onChange = (group: Group) => {
 		const groupUpdate = Object.assign({}, group);
 		setGroup(groupUpdate);
@@ -155,4 +156,4 @@ function GroupBuilder(props: GroupBuilderProps) {
 	);
 }
 
-export default React.memo(GroupBuilder);
+export default React.memo(GroupBuilder, groupsPropsAreEqual);

@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 import { Button, ListGroup } from 'react-bootstrap';
-import { useState } from 'react';
-import { createComponent, options } from './helpers';
+import { useState, useEffect } from 'react';
+import { createComponent, options, sectionsPropsAreEqual } from './helpers';
 import { SectionBuilderProps } from './types';
 import RowBuilder from './RowBuilder';
 import GroupBuilder from './GroupBuilder';
@@ -12,6 +12,7 @@ import SelectChange from './SelectChange';
 
 function SectionBuilder(props: SectionBuilderProps) {
 	const [section, setSection] = useState(props.section);
+	useEffect(() => setSection(props.section), [props.section]);
 
 	const builders = {
 		row: (row: Row, index: number) => (
@@ -41,7 +42,6 @@ function SectionBuilder(props: SectionBuilderProps) {
 
 	return (
 		<div className={props.className}>
-			<h4>Section {props.index + 1}</h4>
 			<TextChange
 				className="mb-2"
 				text={section.header}
@@ -54,6 +54,10 @@ function SectionBuilder(props: SectionBuilderProps) {
 			<ListGroup>
 				{section.groups.map((group, index) => (
 					<ListGroup.Item key={index}>
+						<Button className='mb-2' onClick={() => {
+							section.groups.splice(index, 1);
+							onChange(section);
+						}}>Delete {group.type}</Button>
 						{builders[group.type](group, index)}
 					</ListGroup.Item>
 				))}
@@ -90,4 +94,4 @@ function SectionBuilder(props: SectionBuilderProps) {
 	);
 }
 
-export default React.memo(SectionBuilder);
+export default React.memo(SectionBuilder, sectionsPropsAreEqual);
