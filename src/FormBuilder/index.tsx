@@ -30,17 +30,16 @@ class ErrorBoundary extends React.Component {
 		return this.props.children;
 	}
 }
-
 export default function FormBuilder(props: FormBuilderProps) {
 	const [form, setForm] = useRecoilState(editingForm);
-	useEffect(() => setForm(props.form), [props.form]);
+	useEffect(() => setForm(JSON.parse(JSON.stringify(props.form))), [props.form]);
 	const onChange = React.useCallback((params: OnChangeParams) => {
 		setForm((form) => {
 			switch (params.type) {
 			case ('group'): {
 				if (typeof params.indices.rowIndex === 'number') {
 					(
-							form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
+                            form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
 					).components[params.indices.index] = params.update;
 				} else {
 					form.sections[params.indices.sectionIndex].groups[params.indices.index] = params.update;
@@ -115,7 +114,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 							props.onChange(form);
 						}}
 					>
-						Add Section
+                        Add Section
 					</Button>
 				</Col>
 			</Row>

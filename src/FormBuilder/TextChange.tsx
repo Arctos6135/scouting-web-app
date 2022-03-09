@@ -7,7 +7,7 @@ export default function TextChange(props: TextChangeProps) {
 		<Form.Group className={props.className}>
 			<Form.Label>{props.label}</Form.Label>
 			<Form.Control
-				value={props.text}
+				value={props.text || ''}
 				onChange={(e) => props.onChange(e.target.value)}
 				className="form-control-sm" />
 		</Form.Group>

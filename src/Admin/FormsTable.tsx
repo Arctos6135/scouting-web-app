@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useState, useEffect} from 'react';
 import { Button, Card, Col, Modal, Row, Stack } from 'react-bootstrap';
 import { useRecoilValue } from 'recoil';
-import FormClass from '../../shared/DataClasses/FormClass';
+import FormClass from '../../shared/dataClasses/FormClass';
 import * as conn from '../connection';
 import FormBuilder from '../FormBuilder';
 import { DeleteModal } from './DeleteModal';
