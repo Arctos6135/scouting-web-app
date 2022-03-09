@@ -8,6 +8,8 @@ import FormBuilder from '../FormBuilder';
 import { DeleteModal } from './DeleteModal';
 import DataEntry from '../DataEntry';
 
+import './forms-table-styles.css';
+
 export function FormsTable() {
 	const forms = useRecoilValue(conn.forms);
 
@@ -49,7 +51,7 @@ export function FormsTable() {
 			</Modal.Footer>
 		</Modal>
 
-		<Row xs={2} md={3} lg={4} className="g-4">
+		<Row xs={2} md={3} lg={4} className="g-4 form-card">
 			{forms.map((form, idx) => <Col key={idx}><Card>
 				<Card.Header>
 					<Card.Title>{form.name}</Card.Title>
