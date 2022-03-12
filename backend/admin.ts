@@ -30,7 +30,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 
 	const sendForms = async () => {
 		const forms = await models.Form.find({ ownerOrg: session.scout.org }).lean().exec();
-		console.log('sending forms', JSON.stringify(forms), session.scout.org);
 		socket.emit('organization:get forms', forms);
 	};
 
@@ -39,7 +38,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		const query: Record<string, any> = { org: session.scout.org };
 		if (!session.scout.admin) query.scouts = session.scout.login;
 		const assignments = await models.Assignment.find(query).lean().exec();
-		console.log(assignments);
 		socket.emit('organization:get assignments', assignments);
 	};
 
