@@ -29,17 +29,17 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	};
 
 	const sendForms = async () => {
-		if (!admin()) {
-			socket.emit('organization:get forms', []);
-			return;
-		}
 		const forms = await models.Form.find({ ownerOrg: session.scout.org }).lean().exec();
+		console.log('sending forms', JSON.stringify(forms), session.scout.org);
 		socket.emit('organization:get forms', forms);
 	};
 
 	const sendAssignments = async () => {
 		if (!session.scout) return;
-		const assignments = await models.Assignment.find({ org: session.scout.org, scout: session.scout.admin ? undefined : session.scout.login }).lean().exec();
+		const query: Record<string, any> = { org: session.scout.org };
+		if (!session.scout.admin) query.scouts = session.scout.login;
+		const assignments = await models.Assignment.find(query).lean().exec();
+		console.log(assignments);
 		socket.emit('organization:get assignments', assignments);
 	};
 
@@ -116,7 +116,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:get assignments', async () => {
-		if (!admin()) return;
 		await sendAssignments();
 	});
 
@@ -134,7 +133,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	scoutEvents.on('change', scoutListener);
 
 	const formListener = async () => {
-		if (!session.scout?.admin) return;
+		//if (!session.scout?.admin) return;
 		sendForms();
 	};
 	formEvents.on('change', formListener);

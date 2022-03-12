@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { CloseButton, Dropdown, Form, Table } from 'react-bootstrap';
+import { CloseButton, Dropdown, Table } from 'react-bootstrap';
 import { useRecoilValue } from 'recoil';
 import * as conn from '../connection';
 
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import ScoutClass from '../../shared/dataClasses/ScoutClass';
 
 export function AssignmentsTable() {
 	const scouts = useRecoilValue(conn.scouts);

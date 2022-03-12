@@ -3,7 +3,7 @@ import { Button, Modal } from 'react-bootstrap';
 
 export function ErrorModal(props: {
 	show: boolean;
-	onClose: () => any;
+	onClose: () => void;
 	content: string;
 }) {
 	return <Modal centered show={props.show} onHide={() => props.onClose()}>

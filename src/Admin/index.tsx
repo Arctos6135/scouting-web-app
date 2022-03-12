@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, CardGroup, Container, Form, InputGroup } from 'react-bootstrap';
+import { Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import * as conn from '../connection';
@@ -9,7 +9,6 @@ import { RegisterModal } from './RegisterModal';
 import { BsPlus } from 'react-icons/bs';
 
 import './styles.css';
-import AssignmentClass from '../../shared/dataClasses/AssignmentClass';
 
 import { ScoutsTable } from './ScoutsTable';
 import { AssignmentsTable } from './AssignmentsTable';

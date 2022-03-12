@@ -53,8 +53,7 @@ export const forms = atom<FormClass[]>({
 	effects: [localStorageEffect('forms')]
 });
 
-// TODO: Figure out how to make the listener argument have correct types
-export const useSocketEffect = (event: keyof ServerToClientEvents, listener: (...args: any) => void, ...args: any[]) => {
+export const useSocketEffect = (event: keyof ServerToClientEvents, listener: ServerToClientEvents[typeof event], ...args: any[]) => {
 	return useEffect(() => {
 		socket.on(event, listener);
 		return () => {
@@ -66,6 +65,8 @@ export const useSocketEffect = (event: keyof ServerToClientEvents, listener: (..
 // Get status from server every ten seconds
 // This is useful in case the session expires or something
 setInterval((() => socket.emit('status')), 10000);
+socket.emit('organization:get assignments');
+socket.emit('organization:get forms');
 
 // Invisible component that listens for changes
 export default function LoginSitter() {
@@ -92,6 +93,7 @@ export default function LoginSitter() {
 		setScouts(scouts);
 	});
 	useSocketEffect('organization:get forms', (forms: FormClass[]) => {
+		console.log(forms);
 		setForms(forms);
 	});
 	return <></>;
