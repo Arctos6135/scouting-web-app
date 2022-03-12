@@ -1,4 +1,4 @@
-import { prop, getModelForClass, DocumentType, ReturnModelType } from '@typegoose/typegoose';
+import { prop } from '@typegoose/typegoose';
 import FormComponent from './FormComponent';
 
 class Num extends FormComponent {
