@@ -18,7 +18,7 @@ import AssignmentsList from './AssignmentsList';
 
 function App() {
 	return (<div>
-		<AssignmentsList />
+		<Container><AssignmentsList /></Container>
 	</div>
 	);
 }
