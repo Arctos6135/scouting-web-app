@@ -7,6 +7,10 @@ const scoutEvents = models.Scout.watch();
 const formEvents = models.Form.watch();
 const assignmentEvents = models.Assignment.watch();
 
+scoutEvents.setMaxListeners(Infinity);
+formEvents.setMaxListeners(Infinity);
+assignmentEvents.setMaxListeners(Infinity);
+
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const session = socket.request.session;
 	socket.on('organization:get url', async () => {
