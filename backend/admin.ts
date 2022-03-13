@@ -29,6 +29,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	};
 
 	const sendForms = async () => {
+		if (!session.scout) return;
 		const forms = await models.Form.find({ ownerOrg: session.scout.org }).lean().exec();
 		socket.emit('organization:get forms', forms);
 	};
@@ -142,6 +143,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	assignmentEvents.on('change', assignmentListener);
 
 	socket.on('disconnect', () => {
+		console.log('disconnect');
 		scoutEvents.off('change', scoutListener);
 		formEvents.off('change', formListener);
 	});
