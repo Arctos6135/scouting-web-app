@@ -103,7 +103,7 @@ export default function AdminPage() {
 				<Card.Header>
 					<Card.Title as='h2'>Scouts</Card.Title>
 				</Card.Header>
-				<Card.Body>
+				<Card.Body style={{overflow:'scroll'}}>
 					<ScoutsTable></ScoutsTable>
 				</Card.Body>
 				<Card.Footer>
@@ -133,7 +133,7 @@ export default function AdminPage() {
 				<Card.Header>
 					<Card.Title as='h2'>Assignments</Card.Title>
 				</Card.Header>
-				<Card.Body>
+				<Card.Body style={{overflow:'scroll'}}>
 					{AssignmentTable}
 				</Card.Body>
 				<Card.Footer>
