@@ -9,6 +9,7 @@ import NumberInput from './inputs/Number';
 import Toggle from './inputs/Toggle';
 import TextWithConfirm from './inputs/TextWithConfirm';
 import EditSelection from './inputs/EditSelection';
+import Picker from '../../shared/dataClasses/FormClass/Picker';
 
 function GroupBuilder(props: GroupBuilderProps) {
 	const [group, setGroup] = useState(props.group);
@@ -49,7 +50,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 			/>
 			{group.component.type === 'num' ? (
 				<NumberInput
-					label='Min'									
+					label='Min'
 					number={group.component.min}
 					onChange={(value) => {
 						if (group.component.type === 'num') {
@@ -141,6 +142,19 @@ function GroupBuilder(props: GroupBuilderProps) {
 					onChange={(value) => {
 						if (group.component.type === 'picker') {
 							group.component.options.splice(group.component.options.indexOf(value), 1);
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+			{group.component.type === 'picker' ? (
+				<Select
+					label='Default Option'
+					buttonText='Set Default'
+					options={group.component.options.map(option => ({ value: option, selected: option === (group.component as Picker).default }))}
+					onChange={(value) => {
+						if (group.component.type === 'picker') {
+							group.component.default = value;
 							onChange(group);
 						}
 					}}

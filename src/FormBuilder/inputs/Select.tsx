@@ -5,8 +5,9 @@ import { SelectProps } from '../types';
 
 export default function Select(props: SelectProps) {
 	const [selection, setSelection] = useState(
-		props.options.find((value) => value.selected)?.value ||
-		props.options[0].value
+		props.options.length !== 0
+			? props.options.find((value) => value.selected)?.value || props.options[0].value
+			: undefined
 	);
 
 	return (

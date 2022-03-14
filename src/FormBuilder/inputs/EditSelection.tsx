@@ -5,8 +5,9 @@ import { EditSelectionProps } from '../types';
 
 export default function EditSelection(props: EditSelectionProps) {
 	const [selection, setSelection] = useState(
-		props.options.length !== 0 ? props.options.find((value) => value.selected)?.value ||
-			props.options[0].value : undefined
+		props.options.length !== 0
+			? props.options.find((value) => value.selected)?.value || props.options[0].value
+			: undefined
 	);
 	const [edit, setEdit] = useState('');
 
