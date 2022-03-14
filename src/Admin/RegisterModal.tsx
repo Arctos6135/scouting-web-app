@@ -4,13 +4,13 @@ import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
 
 export function RegisterModal(props: {
 	show: boolean;
-	onClose: (user?: { login: string; name: string; password: string; }) => any;
+	onClose: (user?: { login: string; name: string; password: string; }) => void;
 }) {
 
 	const [login, setLogin] = useState<string>('');
 	const [name, setName] = useState<string>('');
 
-	const handleClose = (res?: any) => {
+	const handleClose = (res?) => {
 		props.onClose(res);
 		setTimeout(() => {
 			setLogin('');

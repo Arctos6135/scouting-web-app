@@ -14,5 +14,4 @@ export default class ScoutClass {
     @prop() passwordHash: string;
     @prop() org: string;
     @prop() admin: boolean;
-    @prop({ default: 0 }) connections: number;
 }

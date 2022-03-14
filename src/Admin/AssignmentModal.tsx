@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Form, Modal, InputGroup } from 'react-bootstrap';
 import { useRecoilValue } from 'recoil';
 
@@ -7,7 +7,7 @@ import * as conn from '../connection';
 
 export function AssignmentModal(props: {
 	show: boolean;
-	onClose: (user?: { form: string; name: string; due: string; }) => any;
+	onClose: (user?: { form: string; name: string; due: string; }) => void;
 }) {
 
 	const forms = useRecoilValue(conn.forms);
@@ -15,7 +15,7 @@ export function AssignmentModal(props: {
 	const [name, setName] = useState<string>('');
 	//const [due, setDue] = useState<string>('');
 
-	const handleClose = (res?: any) => {
+	const handleClose = (res?) => {
 		props.onClose(res);
 		setTimeout(() => {
 			setForm('');

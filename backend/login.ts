@@ -11,10 +11,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			delete req.session.scout;
 			req.session.save();
 		}
-		else {
-			scout.connections++;
-			await scout.save();
-		}
 	}
 
 	const syncStatus = async () => {
@@ -36,8 +32,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		const scout = await models.Scout.findOne({ login: data.login, org }).exec();
 		switch (result) {
 		case LoginResult.Successful:
-			scout.connections++;
-			await scout.save();
 			req.session.scout = await models.Scout.findOne({ login: data.login, org }).lean().exec();
 				
 			req.session.save();
@@ -75,13 +69,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 
 	const cleanup = async () => {
 		req.session.loggedIn = false;
-		if (req.session.scout) {
-			//const scout = await models.Scout.findOne({_id: req.session.scout._id}).exec();
-			//scout.connections--;
-			//await scout.save();
-			await models.Scout.updateOne(req.session.scout, { $inc: { 'connections': -1 } }).exec();
-		}
-
 		setTimeout(syncStatus, 10);
 
 	};

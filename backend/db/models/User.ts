@@ -29,7 +29,6 @@ export class Organization extends OrganizationClass {
 
 	public static async register(this: ReturnModelType<typeof Organization>, email: string, password: string, name: string): Promise<RegisterResult> {
 		if (await OrganizationModel.hasUser(email)) return RegisterResult.EmailTaken;
-		const passwordHash = await bcrypt.hash(password, 10);
 		const user = new OrganizationModel({
 			email, orgName: name
 		});

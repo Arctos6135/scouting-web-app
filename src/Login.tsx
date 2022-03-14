@@ -11,7 +11,7 @@ export default function LoginPage() {
 	const loggedIn = useRecoilValue(conn.signedIn);
 	const scout = useRecoilValue(conn.scout);
 	const navigate = useNavigate();
-	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace(' ', '+');
+	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace?.(/ /g, '+');
 	const onSubmit = (e) => {
 		conn.socket.emit('login', { login: e.target?.email?.value as string | undefined, password: e.target?.password?.value as string | undefined, org });
 

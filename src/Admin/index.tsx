@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Card, CardGroup, Container, Form, InputGroup } from 'react-bootstrap';
+import { Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import * as conn from '../connection';
@@ -9,7 +9,6 @@ import { RegisterModal } from './RegisterModal';
 import { BsPlus } from 'react-icons/bs';
 
 import './styles.css';
-import AssignmentClass from '../../shared/dataClasses/AssignmentClass';
 
 import { ScoutsTable } from './ScoutsTable';
 import { AssignmentsTable } from './AssignmentsTable';
@@ -104,7 +103,7 @@ export default function AdminPage() {
 				<Card.Header>
 					<Card.Title as='h2'>Scouts</Card.Title>
 				</Card.Header>
-				<Card.Body>
+				<Card.Body style={{overflow:'scroll'}}>
 					<ScoutsTable></ScoutsTable>
 				</Card.Body>
 				<Card.Footer>
@@ -134,7 +133,7 @@ export default function AdminPage() {
 				<Card.Header>
 					<Card.Title as='h2'>Assignments</Card.Title>
 				</Card.Header>
-				<Card.Body>
+				<Card.Body style={{overflow:'scroll'}}>
 					{AssignmentTable}
 				</Card.Body>
 				<Card.Footer>

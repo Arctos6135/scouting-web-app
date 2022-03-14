@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { CloseButton, Dropdown, Form, Table } from 'react-bootstrap';
+import { CloseButton, Dropdown, Table } from 'react-bootstrap';
 import { useRecoilValue } from 'recoil';
 import * as conn from '../connection';
 
 import { Typeahead } from 'react-bootstrap-typeahead';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import ScoutClass from '../../shared/dataClasses/ScoutClass';
+import FormClass from '../../shared/dataClasses/FormClass';
 
 export function AssignmentsTable() {
 	const scouts = useRecoilValue(conn.scouts);
@@ -22,7 +22,7 @@ export function AssignmentsTable() {
 			</tr>
 		</thead>
 		<tbody>
-			{assignments.map((assignment, idx) => <tr key={idx}>
+			{assignments.map((assignment, idx) => ((selected: FormClass | undefined) => <tr key={idx}>
 				<td>{assignment.name}</td>
 				<td>
 					<Dropdown onSelect={(val) => {
@@ -32,7 +32,7 @@ export function AssignmentsTable() {
 						});
 					}}>
 						<Dropdown.Toggle variant='outline' id='dropdown-basic'>
-							{forms.find((form) => form.id == assignment.form).name}
+							{selected?.name ?? 'Unknown form'}
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
 							{forms.map((form, idx) => <Dropdown.Item key={idx} eventKey={form.id}>{form.name}</Dropdown.Item>)}
@@ -53,7 +53,7 @@ export function AssignmentsTable() {
 				}
 				} options={scouts.map(s=>s.login)} multiple id={`user-selector-${idx}`}></Typeahead></td>
 				<td><CloseButton onClick={() => conn.socket.emit('organization:delete assignment', assignment.id)} /></td>
-			</tr>)}
+			</tr>)(forms.find((form) => form.id == assignment.form)))}
 		</tbody>
 	</Table>;
 }

@@ -9,6 +9,7 @@ import * as bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import login from './login';
 import admin from './admin';
+import assignments from './assignments';
 import {ScoutModel} from './db/models/Scouting';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
@@ -41,6 +42,7 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
 	login(socket, io);
 	admin(socket, io);
+	assignments(socket, io);
 });
 
 server.listen(8080, '0.0.0.0');
