@@ -25,19 +25,7 @@ export function AssignmentsTable() {
 			{assignments.map((assignment, idx) => ((selected: FormClass | undefined) => <tr key={idx}>
 				<td>{assignment.name}</td>
 				<td>
-					<Dropdown onSelect={(val) => {
-						conn.socket.emit('organization:assign', {
-							...assignment,
-							form: val
-						});
-					}}>
-						<Dropdown.Toggle variant='outline' id='dropdown-basic'>
-							{selected?.name ?? 'Unknown form'}
-						</Dropdown.Toggle>
-						<Dropdown.Menu>
-							{forms.map((form, idx) => <Dropdown.Item key={idx} eventKey={form.id}>{form.name}</Dropdown.Item>)}
-						</Dropdown.Menu>
-					</Dropdown>
+					{selected?.name ?? 'Unknown form'}
 				</td>
 				{/*<td>*/}
 				{/* TODO: Make date editing work*/}
