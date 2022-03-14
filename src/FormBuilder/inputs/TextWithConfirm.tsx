@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
-import { TextWithButtonChangeProps } from './types';
+import { TextWithConfirmProps } from '../types';
 
-export default function SelectChange(props: TextWithButtonChangeProps) {
+export default function TextWithConfirm(props: TextWithConfirmProps) {
 	const [value, setValue] = useState('');
 
 	return (

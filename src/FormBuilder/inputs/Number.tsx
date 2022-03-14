@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { NumberChangeProps } from './types';
+import { NumberProps } from '../types';
 
-export default function TextChange(props: NumberChangeProps) {
+export default function NumberInput(props: NumberProps) {
 	return (
 		<Form.Group className={props.className}>
 			<Form.Label>{props.label}</Form.Label>

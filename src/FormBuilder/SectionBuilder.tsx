@@ -7,8 +7,8 @@ import { createComponent, options, sectionsPropsAreEqual } from './helpers';
 import { SectionBuilderProps } from './types';
 import RowBuilder from './RowBuilder';
 import GroupBuilder from './GroupBuilder';
-import TextChange from './TextChange';
-import SelectChange from './SelectChange';
+import TextInput from './inputs/Text';
+import Select from './inputs/Select';
 
 function SectionBuilder(props: SectionBuilderProps) {
 	const [section, setSection] = useState(props.section);
@@ -42,7 +42,7 @@ function SectionBuilder(props: SectionBuilderProps) {
 
 	return (
 		<div className={props.className}>
-			<TextChange
+			<TextInput
 				className="mb-2"
 				text={section.header}
 				label="Section Header"
@@ -70,7 +70,7 @@ function SectionBuilder(props: SectionBuilderProps) {
 			>
 				Add Row
 			</Button>
-			<SelectChange className='mb-2'
+			<Select className='mb-2'
 				options={options.map((option) => {
 					return { value: option, selected: false };
 				})}

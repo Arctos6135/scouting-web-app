@@ -24,33 +24,37 @@ export type RowBuilderProps = {
 	row: Row;
 } & BuilderProps;
 
-export type ChangeProps = {
+export type InputProps = {
 	label: string;
 	onChange: (value: string) => void;
 	className?: string;
 };
 
-export type TextChangeProps = {
+export type TextProps = {
 	text: string;
-} & ChangeProps;
+} & InputProps;
 
-export type NumberChangeProps = {
+export type NumberProps = {
 	number: number;
-} & ChangeProps;
+} & InputProps;
 
-export type TextWithButtonChangeProps = {
+export type TextWithConfirmProps = {
 	buttonText: string;
-} & ChangeProps;
+} & InputProps;
 
-export type SelectChangeProps = {
+export type SelectProps = {
 	options: { value: string; selected: boolean }[];
 	buttonText: string;
-} & ChangeProps;
+} & InputProps;
 
-export type ToggleChangeProps = {
+export type EditSelectionProps = {
+	onChange: (value: string, edit: string) => void;
+} & Omit<SelectProps, 'onChange'>;
+
+export type ToggleProps = {
 	checked: boolean;
 	onChange: () => void;
-} & ChangeProps;
+} & Omit<InputProps, 'onChange'>;
 
 export type SectionParams = {
 	indices: { index: number; };

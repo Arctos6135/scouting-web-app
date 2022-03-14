@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { TextChangeProps } from './types';
+import { TextProps } from '../types';
 
-export default function TextChange(props: TextChangeProps) {
+export default function TextInput(props: TextProps) {
 	return (
 		<Form.Group className={props.className}>
 			<Form.Label>{props.label}</Form.Label>

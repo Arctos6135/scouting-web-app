@@ -3,11 +3,12 @@ import { Group } from '../../shared/dataClasses/FormClass';
 import { useState, useEffect } from 'react';
 import { createComponent, groupsPropsAreEqual, options } from './helpers';
 import { GroupBuilderProps } from './types';
-import TextChange from './TextChange';
-import SelectChange from './SelectChange';
-import NumberChange from './NumberChange';
-import ToggleChange from './ToggleChange';
-import TextWithButtonChange from './TextWithButtonChange';
+import TextInput from './inputs/Text';
+import Select from './inputs/Select';
+import NumberInput from './inputs/Number';
+import Toggle from './inputs/Toggle';
+import TextWithConfirm from './inputs/TextWithConfirm';
+import EditSelection from './inputs/EditSelection';
 
 function GroupBuilder(props: GroupBuilderProps) {
 	const [group, setGroup] = useState(props.group);
@@ -20,7 +21,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 	console.log('rerender group');
 	return (
 		<div className={props.className}>
-			<TextChange
+			<TextInput
 				text={group.label}
 				label='Group Label'
 				onChange={(value) => {
@@ -28,7 +29,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 					onChange(group);
 				}}
 			/>
-			<TextChange
+			<TextInput
 				text={group.description}
 				label='Group Description'
 				onChange={(value) => {
@@ -36,7 +37,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 					onChange(group);
 				}}
 			/>
-			<TextChange
+			<TextInput
 				text={group.component.valueID}
 				label='Value ID'
 				onChange={(value) => {
@@ -47,19 +48,19 @@ function GroupBuilder(props: GroupBuilderProps) {
 				}}
 			/>
 			{group.component.type === 'num' ? (
-				<NumberChange
-					label='Min'
+				<NumberInput
+					label='Min'									
 					number={group.component.min}
 					onChange={(value) => {
 						if (group.component.type === 'num') {
-							group.component.max = Number.parseInt(value);
+							group.component.min = Number.parseInt(value);
 							onChange(group);
 						}
 					}}
 				/>
 			) : undefined}
 			{group.component.type === 'num' ? (
-				<NumberChange
+				<NumberInput
 					label='Max'
 					number={group.component.max}
 					onChange={(value) => {
@@ -71,7 +72,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 				/>
 			) : undefined}
 			{group.component.type === 'text' ? (
-				<TextChange
+				<TextInput
 					label='Allowed Characters'
 					text={group.component.charset}
 					onChange={(value) => {
@@ -83,7 +84,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 				/>
 			) : undefined}
 			{group.component.type === 'text' ? (
-				<NumberChange
+				<NumberInput
 					label='Minimum Length'
 					number={group.component.minlength}
 					onChange={(value) => {
@@ -95,7 +96,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 				/>
 			) : undefined}
 			{group.component.type === 'text' ? (
-				<NumberChange
+				<NumberInput
 					label='Maximum Length'
 					number={group.component.maxlength}
 					onChange={(value) => {
@@ -107,7 +108,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 				/>
 			) : undefined}
 			{group.component.type === 'text' ? (
-				<ToggleChange className='mt-1'
+				<Toggle className='mt-1'
 					label='Password'
 					checked={group.component.password}
 					onChange={() => {
@@ -119,7 +120,34 @@ function GroupBuilder(props: GroupBuilderProps) {
 				/>
 			) : undefined}
 			{group.component.type === 'picker' ? (
-				<TextWithButtonChange
+				<EditSelection
+					label='Edit Option'
+					buttonText='Edit'
+					options={group.component.options.map(option => ({ value: option, selected: false }))}
+					onChange={(value, edit) => {
+						if (group.component.type === 'picker') {
+							group.component.options.splice(group.component.options.indexOf(value), 1);
+							group.component.options.push(edit);
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+			{group.component.type === 'picker' ? (
+				<Select
+					label='Delete Option'
+					buttonText='Delete'
+					options={group.component.options.map(option => ({ value: option, selected: false }))}
+					onChange={(value) => {
+						if (group.component.type === 'picker') {
+							group.component.options.splice(group.component.options.indexOf(value), 1);
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+			{group.component.type === 'picker' ? (
+				<TextWithConfirm
 					label='New Option'
 					buttonText='Add Option'
 					onChange={(value) => {
@@ -130,15 +158,20 @@ function GroupBuilder(props: GroupBuilderProps) {
 					}}
 				/>
 			) : undefined}
-			{/* currently wont't update default
-			{group.component.type === 'num' ? <TextChange text={group.component.default} label='Default Value' onChange={(value) => {
-				if (group.component.type === 'num') {
-					group.component.default = value;
-					onChange(group);
-				}
-			}} /> : undefined}
-			*/}
-			<SelectChange
+			{group.component.type === 'num' ? (
+				<TextInput
+					text={group.component.default}
+					label='Default Value'
+					onChange={(value) => {
+						if (group.component.type === 'num') {
+							group.component.default = value;
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+
+			<Select
 				options={options.map((option) => {
 					return { value: option, selected: option === group.component.type };
 				})}

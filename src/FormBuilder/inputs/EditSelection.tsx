@@ -1,32 +1,36 @@
 import * as React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
-import { SelectChangeProps } from './types';
+import { EditSelectionProps } from '../types';
 
-export default function SelectChange(props: SelectChangeProps) {
+export default function EditSelection(props: EditSelectionProps) {
 	const [selection, setSelection] = useState(
-		props.options.find((value) => value.selected)?.value ||
-		props.options[0].value
+		props.options.length !== 0 ? props.options.find((value) => value.selected)?.value ||
+			props.options[0].value : undefined
 	);
+	const [edit, setEdit] = useState('');
 
 	return (
 		<Form.Group className={props.className}>
 			<Form.Label>{props.label}</Form.Label>
 			<InputGroup>
-				<Form.Select onChange={(e) => setSelection(e.target.value)}>
+				<Form.Select defaultValue={selection} onChange={(e) => setSelection(e.target.value)}>
 					{props.options.map((option) => (
 						<option
 							key={option.value}
 							value={option.value}
-							selected={option.selected}
 						>
 							{option.value}
 						</option>
 					))}
 				</Form.Select>
+				<Form.Control
+					value={edit}
+					onChange={(e) => setEdit(e.target.value)}
+					className="form-control-sm" />
 				<Button
 					variant="outline-secondary"
-					onClick={() => props.onChange(selection)}
+					onClick={() => props.onChange(selection, edit)}
 				>
 					{props.buttonText}
 				</Button>

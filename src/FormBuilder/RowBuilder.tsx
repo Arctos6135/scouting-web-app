@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { createComponent, options, rowsPropsAreEqual } from './helpers';
 import { RowBuilderProps } from './types';
 import GroupBuilder from './GroupBuilder';
-import SelectChange from './SelectChange';
+import Select from './inputs/Select';
 
 function RowBuilder(props: RowBuilderProps) {
 	const [row, setRow] = useState(props.row);
@@ -35,7 +35,7 @@ function RowBuilder(props: RowBuilderProps) {
 					</Col>
 				))}
 			</Row>
-			<SelectChange
+			<Select
 				options={options.map((option) => {
 					return { value: option, selected: false };
 				})}

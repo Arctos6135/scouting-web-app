@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Form } from 'react-bootstrap';
-import { ToggleChangeProps } from './types';
+import { ToggleProps } from '../types';
 
-export default function ToggleChange(props: ToggleChangeProps) {
+export default function Toggle(props: ToggleProps) {
 	return (
 		<Form.Group className={props.className}>
 			<Form.Check
