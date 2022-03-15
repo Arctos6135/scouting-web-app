@@ -43,19 +43,26 @@ function AssignmentRow({form, assignment, scouts}: {
 	assignment: AssignmentClass;
 	scouts: ScoutClass[];
 }) {
-	const [removing, setRemoving] = useState<string[]>(null);
+	const [removingScout, setRemovingScout] = useState<string[]>(null);
+	const [removingAssignment, setRemovingAssignment] = useState<string>(null);
 
 	// TODO: Stop typeahead from focusing after closing the delete modal
 	return <>
-		<DeleteModal show={!!removing} onClose={(result) => {
+		<DeleteModal show={!!removingScout} onClose={(result) => {
 			if (result) {
 				conn.socket.emit('organization:assign', {
 					...assignment,
-					scouts: removing
+					scouts: removingScout
 				});
 			}
-			setRemoving(null);
+			setRemovingScout(null);
 		}} titleText='Are you sure you want to remove a scout from an assignment?' bodyText='This will delete any data entered/submitted by that scout'/>
+		<DeleteModal show={!!removingAssignment} onClose={(result) => {
+			if (result) {
+				conn.socket.emit('organization:delete assignment', removingAssignment);
+			}
+			setRemovingAssignment(null);
+		}} titleText='Are you sure you want to delete an assignment' bodyText='This will delete any data entered/submitted scouts for this assignment'/>
 		<tr>
 			<td>{assignment.name}</td>
 			<td>
@@ -70,7 +77,7 @@ function AssignmentRow({form, assignment, scouts}: {
 				onChange={(newVal: string[]) => {
 					const removed = removedScout(assignment.scouts, newVal);
 					console.log(removed, assignment.scouts, newVal);
-					if (removed) setRemoving(newVal);
+					if (removed) setRemovingScout(newVal);
 					else {
 						conn.socket.emit('organization:assign', {
 							...assignment,
@@ -79,7 +86,7 @@ function AssignmentRow({form, assignment, scouts}: {
 					}
 				} } options={scouts.map(s => s.login)} multiple id={`user-selector-${assignment.id}`}></Typeahead>
 			</td>
-			<td><CloseButton onClick={() => conn.socket.emit('organization:delete assignment', assignment.id)} /></td>
+			<td><CloseButton onClick={() => setRemovingAssignment(assignment.id)} /></td>
 		</tr>
 	</>;
 }
