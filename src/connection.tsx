@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import * as React from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
+import AssignmentResponseClass from '../shared/dataClasses/AssignmentResponseClass';
 import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import FormClass from '../shared/dataClasses/FormClass';
 
@@ -51,6 +52,18 @@ export const forms = atom<FormClass[]>({
 	key: 'forms',
 	default: [], 
 	effects: [localStorageEffect('forms')]
+});
+
+export const submitQueue = atom<AssignmentClass[]>({
+	key: 'submitQueue',
+	default: [],
+	effects: [localStorageEffect('submitQueue')]
+});
+
+export const responses = atom<AssignmentResponseClass[]>({
+	key: 'assignmentResponses',
+	default: [],
+	effects: [localStorageEffect('assignmentResponses')]
 });
 
 export const useSocketEffect = (event: keyof ServerToClientEvents, listener: ServerToClientEvents[typeof event], ...args: any[]) => {
