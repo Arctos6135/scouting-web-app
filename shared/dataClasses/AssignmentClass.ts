@@ -1,12 +1,17 @@
 import { prop } from '@typegoose/typegoose';
 
 export default class AssignmentClass {
-	@prop() name: string;
+	@prop({ required: true }) 
+	public name: string;
 	@prop({
 		// Ensure each scout is only assigned once
-		validate: ((scouts: string[]) => (new Set(scouts)).size == scouts.length)
+		validate: ((scouts: string[]) => (new Set(scouts)).size == scouts.length),
+		required: true
 	}) scouts: string[];
-    @prop() due?: string;
-    @prop() id: string;
-	@prop() form: string;
+    @prop() 
+	public due?: string;
+    @prop({ required: true }) 
+	public id: string;
+	@prop({ required: true }) 
+	public form: string;
 }
