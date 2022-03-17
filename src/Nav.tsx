@@ -68,7 +68,7 @@ function XLSXDownloadButton() {
 
 export default function TopNav() {
 	const signedIn: boolean = useRecoilValue(conn.signedIn);
-	return (<Navbar bg="light" expand="lg">
+	return (<Navbar bg="light" expand="lg" style={{zIndex: 100}}>
 		<Container>
 			<Navbar.Brand>Scouting app</Navbar.Brand>
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
