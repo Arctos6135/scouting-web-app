@@ -8,6 +8,7 @@ import * as XLSX from 'xlsx';
 import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import { saveAs } from 'file-saver';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
+import {Link} from 'react-router-dom';
 
 function downloadXLSX(responses: AssignmentResponseClass[], assignments: AssignmentClass[]) {
 	const wb = XLSX.utils.book_new();
@@ -67,20 +68,18 @@ function XLSXDownloadButton() {
 
 export default function TopNav() {
 	const signedIn: boolean = useRecoilValue(conn.signedIn);
-	const scout = useRecoilValue(conn.scout);
 	return (<Navbar bg="light" expand="lg">
 		<Container>
-			<Navbar.Brand href="#home">Scouting app</Navbar.Brand>
+			<Navbar.Brand>Scouting app</Navbar.Brand>
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse>
-				<Nav className="container">
-					<Nav.Link href="/">Home</Nav.Link>
+				<Nav className="me-auto">
+					<Nav.Link as={Link} to="/">Home</Nav.Link>
 					{signedIn ? <>
-						<Nav.Link href="/admin">Admin</Nav.Link>
-						<Nav.Link href="/forms">Forms</Nav.Link>
+						<Nav.Link as={Link} to="/admin">Admin</Nav.Link>
+						<Nav.Link as={Link} to="/forms">Forms</Nav.Link>
 						<Nav.Link onClick={() => conn.socket.emit('logout')}>Log out</Nav.Link>
-					</> : <><Nav.Link href="/login">Log In</Nav.Link><Nav.Link href="/register">Register</Nav.Link></>}
-					{ scout?.admin ? <XLSXDownloadButton/> : <></> }
+					</> : <><Nav.Link as={Link} to="/login">Log In</Nav.Link><Nav.Link as={Link} to="/register">Register</Nav.Link></>}
 				</Nav>
 			</Navbar.Collapse>
 		</Container>
