@@ -67,19 +67,21 @@ function XLSXDownloadButton() {
 }
 
 export default function TopNav() {
-	const signedIn: boolean = useRecoilValue(conn.signedIn);
+	const signedIn = useRecoilValue(conn.signedIn);
+	const scout = useRecoilValue(conn.scout);
 	return (<Navbar bg="light" expand="lg" style={{zIndex: 100}}>
 		<Container>
 			<Navbar.Brand>Scouting app</Navbar.Brand>
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse>
-				<Nav className="me-auto">
+				<Nav className="container-fluid">
 					<Nav.Link as={Link} to="/">Home</Nav.Link>
 					{signedIn ? <>
 						<Nav.Link as={Link} to="/admin">Admin</Nav.Link>
 						<Nav.Link as={Link} to="/forms">Forms</Nav.Link>
 						<Nav.Link onClick={() => conn.socket.emit('logout')}>Log out</Nav.Link>
 					</> : <><Nav.Link as={Link} to="/login">Log In</Nav.Link><Nav.Link as={Link} to="/register">Register</Nav.Link></>}
+					{ scout?.admin ? <XLSXDownloadButton/> : <></> }
 				</Nav>
 			</Navbar.Collapse>
 		</Container>
