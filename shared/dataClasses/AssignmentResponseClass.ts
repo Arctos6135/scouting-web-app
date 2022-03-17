@@ -1,8 +1,12 @@
 import { prop } from '@typegoose/typegoose';
 
 export default class AssignmentResponseClass {
-	@prop() name: string;
-	@prop() scout: string;
-	@prop() assignment: string;
-	@prop() data: {[key: string]: number | string};
+	@prop({ required: true }) 
+	public org!: string;
+	@prop({ required: true }) 
+	public scout!: string;
+	@prop({ required: true }) 
+	public assignment!: string;
+	@prop({ required: true }) 
+	public data!: {[key: string]: number | string};
 }

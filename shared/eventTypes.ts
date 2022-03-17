@@ -1,4 +1,5 @@
 import AssignmentClass from './dataClasses/AssignmentClass';
+import AssignmentResponseClass from './dataClasses/AssignmentResponseClass';
 import FormClass, { Section } from './dataClasses/FormClass';
 import ScoutClass from './dataClasses/ScoutClass';
 
@@ -20,6 +21,8 @@ export interface ServerToClientEvents {
     'organization:delete form': () => void;
     'organization:get url': (url: string) => void;
 	'organization:assign': (status: boolean) => void;
+
+	'assignment:get responses': (responses: AssignmentResponseClass[]) => void;
 
     'status': (data: { scout: ScoutClass }) => void;
 }
@@ -48,7 +51,8 @@ export interface ClientToServerEvents {
     'organization:assign': (data: AssignmentClass) => void;
     'organization:delete assignment': (id: string) => void;
 
-	'assignment:respond': (response: { assignment: string; data: {[key: string]: number|string} }) => void;
+	'assignment:respond': (response: AssignmentResponseClass) => void;
+	'assignment:get responses': () => void;
 
     'login': (data: {
         login: string;
