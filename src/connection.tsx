@@ -53,11 +53,16 @@ export const forms = atom<FormClass[]>({
 	effects: [localStorageEffect('forms')]
 });
 
-export const useSocketEffect = (event: keyof ServerToClientEvents, listener: ServerToClientEvents[typeof event], ...args: any[]) => {
+export const online = atom<boolean>({
+	key: 'online',
+	default: false
+});
+
+export const useSocketEffect = (event: string, listener: any, ...args: any[]) => {
 	return useEffect(() => {
-		socket.on(event, listener);
+		socket.on(event as any, listener);
 		return () => {
-			socket.off(event, listener);
+			socket.off(event as any, listener);
 		};
 	}, ...args);
 };
@@ -75,6 +80,7 @@ export default function LoginSitter() {
 	const setAssignments = useSetRecoilState(assignments);
 	const setScouts = useSetRecoilState(scouts);
 	const setForms = useSetRecoilState(forms);
+	const setOnline = useSetRecoilState(online);
 	useEffect(() => {
 		const lis = (val: any) => {
 			setSignedIn(!!val.scout);
@@ -84,6 +90,15 @@ export default function LoginSitter() {
 		return () => {
 			socket.off('status', lis);
 		};
+	});
+
+
+	useSocketEffect('connect', () => {
+		setOnline(true);
+	});
+
+	useSocketEffect('disconnect', () => {
+		setOnline(false);
 	});
 
 	useSocketEffect('organization:get assignments', (assignments) => {
