@@ -13,19 +13,21 @@ function Assignment(props: {
 	assignment: AssignmentClass;
 }) {
 	const [submitQueue, setSubmitQueue] = useRecoilState(conn.submitQueue);
+	const scout = useRecoilValue(conn.scout);
 	return <>
 		{props.form && <DataEntry form={props.form} formID={props.assignment.id} />}
-		<Button onClick={() => setSubmitQueue([...submitQueue, props.assignment])}>Submit</Button>
+		<Button onClick={() => setSubmitQueue([...submitQueue, {
+			assignment: props.assignment.id,
+			data: forms[props.assignment.id] ?? {},
+			org: scout.org,
+			scout: scout.login
+		}])}>Submit</Button>
 	</>
 }
 
-function submitResponses(queue: AssignmentClass[]) {
+function submitResponses(queue: AssignmentResponseClass[], responses: AssignmentResponseClass[]) {
 	for (let resp of queue) {
-		console.log(resp);
-		conn.socket.emit('assignment:respond', {
-			assignment: resp.id,
-			data: forms[resp.id]
-		});
+		conn.socket.emit('assignment:respond', resp);
 	}
 }
 
@@ -35,11 +37,13 @@ export default function AssignmentsList() {
 	const submitQueue = useRecoilValue(conn.submitQueue);
 	const responses = useRecoilValue(conn.responses);
 
+	console.log('res', responses, 'sub', submitQueue);
+
 	return <>
 		<Accordion>
 			{assignments
 				// Don't display assignments queued for submission
-				.filter((assignment) => !submitQueue.find((a) => a.id == assignment.id))
+				.filter((assignment) => !submitQueue.find((a) => a.assignment == assignment.id))
 				// Don't display assignments that have already been submitted
 				.filter((assignment) => !responses.find((r) => r.assignment == assignment.id))
 				.map((assignment, idx) => 
@@ -53,10 +57,11 @@ export default function AssignmentsList() {
 					</Accordion.Item>
 			)}
 		</Accordion>
+		<br/>
 		<Stack direction='horizontal' gap={3}>
-			<Button onClick={() => submitResponses(submitQueue)}>
-				Sync ({submitQueue.filter(assignment => responses.find(res => res.assignment == assignment.id)).length} forms)
-		  </Button> 
+			<Button onClick={() => submitResponses(submitQueue, responses)}>
+				Sync ({submitQueue.filter(resp => !responses.find(res => res.assignment == resp.assignment)).length} forms)
+			</Button> 
 			<Button variant='secondary'>Sync by QR Code</Button>
 		</Stack>
 	</>;

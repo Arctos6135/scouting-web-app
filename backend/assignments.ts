@@ -17,9 +17,15 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		if (!req.session.scout) return;
 		console.log(response);
 		try {
+			if (response.scout != req.session.scout.login && !req.session.scout.admin) return;
+			await models.AssignmentResponse.deleteOne({
+				org: req.session.scout.org,
+				scout: response.scout,
+				assignment: response.assignment
+			}).exec();
 			const res = new models.AssignmentResponse({
 				org: req.session.scout.org,
-				scout: req.session.scout.login,
+				scout: response.scout,
 				assignment: response.assignment,
 				data: response.data
 			});
@@ -29,6 +35,9 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			// do nothing
 			console.log(e);
 		}
+	});
+	socket.on('assignment:get responses', async () => {
+		await sendResponses();
 	});
 	assignmentResponseEvents.on('change', (change) => {
 		sendResponses();

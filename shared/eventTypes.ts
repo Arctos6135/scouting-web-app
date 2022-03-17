@@ -51,8 +51,8 @@ export interface ClientToServerEvents {
     'organization:assign': (data: AssignmentClass) => void;
     'organization:delete assignment': (id: string) => void;
 
-	'assignment:respond': (response: { assignment: string; data: {[key: string]: number|string} }) => void;
-	'assignment:get responses': (responses: AssignmentResponseClass[]) => void;
+	'assignment:respond': (response: AssignmentResponseClass) => void;
+	'assignment:get responses': () => void;
 
     'login': (data: {
         login: string;
