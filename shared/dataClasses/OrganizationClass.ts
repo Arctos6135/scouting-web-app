@@ -8,7 +8,10 @@ export enum RegisterResult {
 	LoginTaken
 }
 export default class OrganizationClass {
-	@prop(email)
+	@prop({
+		...email,
+		required: true
+	})
 	public email: string;
 
 	@prop()
@@ -19,6 +22,6 @@ export default class OrganizationClass {
 	})
 	public verified: boolean;
 
-	@prop()
-		orgID: string;
+	@prop({ required: true })
+	public orgID: string;
 }

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import * as React from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
+import AssignmentResponseClass from '../shared/dataClasses/AssignmentResponseClass';
 import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import FormClass from '../shared/dataClasses/FormClass';
 
@@ -53,6 +54,18 @@ export const forms = atom<FormClass[]>({
 	effects: [localStorageEffect('forms')]
 });
 
+export const submitQueue = atom<AssignmentResponseClass[]>({
+	key: 'submitQueue',
+	default: [],
+	effects: [localStorageEffect('submitQueue')]
+});
+
+export const responses = atom<AssignmentResponseClass[]>({
+	key: 'assignmentResponses',
+	default: [],
+	effects: [localStorageEffect('assignmentResponses')]
+});
+
 export const useSocketEffect = (event: keyof ServerToClientEvents, listener: ServerToClientEvents[typeof event], ...args: any[]) => {
 	return useEffect(() => {
 		socket.on(event, listener);
@@ -67,6 +80,7 @@ export const useSocketEffect = (event: keyof ServerToClientEvents, listener: Ser
 setInterval((() => socket.emit('status')), 10000);
 socket.emit('organization:get assignments');
 socket.emit('organization:get forms');
+socket.emit('assignment:get responses');
 
 // Invisible component that listens for changes
 export default function LoginSitter() {
@@ -75,10 +89,15 @@ export default function LoginSitter() {
 	const setAssignments = useSetRecoilState(assignments);
 	const setScouts = useSetRecoilState(scouts);
 	const setForms = useSetRecoilState(forms);
+	const setResponses = useSetRecoilState(responses);
+
 	useEffect(() => {
 		const lis = (val: any) => {
 			setSignedIn(!!val.scout);
 			setScout(val.scout);
+			socket.emit('organization:get assignments');
+			socket.emit('organization:get forms');
+			socket.emit('assignment:get responses');
 		};
 		socket.on('status', lis);
 		return () => {
@@ -88,6 +107,9 @@ export default function LoginSitter() {
 
 	useSocketEffect('organization:get assignments', (assignments) => {
 		setAssignments(assignments);
+	});
+	useSocketEffect('assignment:get responses', (responses) => {
+		setResponses(responses);
 	});
 	useSocketEffect('organization:get scouts', (scouts: ScoutClass[]) => {
 		setScouts(scouts);

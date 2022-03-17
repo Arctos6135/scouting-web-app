@@ -1,9 +1,9 @@
-import FormSchema, {Section, Group, Row as FormRow} from '../shared/dataClasses/FormClass';
+import FormSchema, {Section, Group, Row as FormRow} from '../../shared/dataClasses/FormClass';
 import * as React from 'react';
 import {useEffect} from 'react';
 import {Form,  Row, ListGroup, Col} from 'react-bootstrap';
 import { useRecoilState, atomFamily, selectorFamily} from 'recoil';
-import FormComponent from '../shared/dataClasses/FormClass/FormComponent';
+import FormComponent from '../../shared/dataClasses/FormClass/FormComponent';
 
 // Context that stores the id of a form
 // Inputs for that form use this to know where to store their values
@@ -109,6 +109,7 @@ export default function DataEntry(props: {
 	formID?: string;
 	inputComponent?: any;
 }) {
+
 	return <Form>
 		<FormIDContext.Provider value={props.formID ?? ''}>
 			<ListGroup variant="flush">

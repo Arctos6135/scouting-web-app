@@ -9,9 +9,14 @@ export enum LoginResult {
 }
 
 export default class ScoutClass {
-    @prop() name: string;
-    @prop() login: string;
-    @prop() passwordHash: string;
-    @prop() org: string;
-    @prop() admin: boolean;
+    @prop({ required: true }) 
+	public name: string;
+    @prop({ required: true }) 
+	public login: string;
+    @prop({ required: true }) 
+	public passwordHash: string;
+    @prop({ required: true }) 
+	public org: string;
+    @prop({ required: true }) 
+	public admin: boolean;
 }
