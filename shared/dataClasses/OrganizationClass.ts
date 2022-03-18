@@ -1,6 +1,8 @@
 import { prop} from '@typegoose/typegoose';
 import { email } from './util';
 
+import * as crypto from 'crypto';
+
 export enum RegisterResult {
 	Successful,
 	EmailTaken,
@@ -22,6 +24,6 @@ export default class OrganizationClass {
 	})
 	public verified: boolean;
 
-	@prop({ required: true })
+	@prop({ required: true, default: () => crypto.randomBytes(16).toString('hex') })
 	public orgID: string;
 }
