@@ -6,6 +6,7 @@ services:
     image: docker-registry.i.mm12.xyz/scouting-app:0.0.0
     ports:
       - 8085:8085
+    platform: linux/x86-64
   db:
     image: mongo:4.4
     volumes:
