@@ -197,7 +197,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 					onChange(group);
 				}}
 				label='Group Type'
-				buttonText='Change Type'
+				buttonText='Change'
 			/>
 		</div>
 	);
