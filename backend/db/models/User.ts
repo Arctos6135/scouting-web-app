@@ -7,11 +7,6 @@ import {ScoutModel} from './Scouting';
 import OrganizationClass, { RegisterResult } from '../../../shared/dataClasses/OrganizationClass';
 import VerificationCodeClass from '../../../shared/dataClasses/VerificationCodeClass';
 
-@pre<Organization>('save', async function() {
-	// Default initialize orgID to 24 random bytes
-	// This should be more than enough to prevent collisions
-	if (this.orgID == null) this.orgID = (await promisify(crypto.randomBytes)(24)).toString('base64').replace(/[/]/g, '-');
-})
 export class Organization extends OrganizationClass {
 	public async verify(this: DocumentType<Organization>, password: string): Promise<boolean> {
 		if (this.verified) return true;

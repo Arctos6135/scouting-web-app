@@ -16,6 +16,7 @@ import ScoutClass from '../shared/dataClasses/ScoutClass';
 import {IncomingMessage} from 'http';
 
 const mongoUrl = process.env.MONGO_URL + '/' + process.env.DB_NAME;
+console.log(mongoUrl);
 mongoose.connect(mongoUrl);
 
 const sess = session({

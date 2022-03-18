@@ -104,6 +104,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 				await prev.save();
 			}
 			catch (e) {
+				console.log(e);
 				socket.emit('organization:assign', false);
 			}
 		}
@@ -113,6 +114,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 				await obj.save();
 			}
 			catch (e) {
+				console.log(e);
 				socket.emit('organization:assign', false);
 			}
 		}
