@@ -17,6 +17,6 @@ export default class ScoutClass {
 	public passwordHash: string;
     @prop({ required: true }) 
 	public org: string;
-    @prop({ required: true }) 
+    @prop({ required: true, default: false }) 
 	public admin: boolean;
 }
