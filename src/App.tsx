@@ -15,6 +15,7 @@ import DataEntry from './DataEntry';
 import Text from '../shared/dataClasses/FormClass/Text';
 import './styles.css';
 import AssignmentsList from './AssignmentsList';
+import { Workbox } from 'workbox-window';
 
 function App() {
 	return (<div>
@@ -42,3 +43,8 @@ ReactDOM.render((<React.StrictMode><RecoilRoot>
 	</BrowserRouter>
 	<SocketConnection />
 </RecoilRoot></React.StrictMode>), document.getElementById('root'));
+
+if ('serviceWorker' in navigator) {
+	const wb = new Workbox('/sw.js');
+	wb.register();
+}

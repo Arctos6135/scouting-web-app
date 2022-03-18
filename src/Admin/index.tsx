@@ -27,6 +27,7 @@ export default function AdminPage() {
 	const [loginLink, setLoginLink] = useState<string>('Loading...');
 	const signedIn = useRecoilValue(conn.signedIn);
 
+	const online = useRecoilValue(conn.online);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -71,7 +72,9 @@ export default function AdminPage() {
 	
 	const AssignmentTable = AssignmentsTable();
 
+
 	return <>
+		{ online ? <></> : <div id="screen-cover">You are not connected to the internet.</div> }
 		<ErrorModal show={errorPopup != null} content={errorPopup} onClose={
 			() => setErrorPopup(null)
 		}/>
@@ -92,7 +95,7 @@ export default function AdminPage() {
 			});
 		}}></AssignmentModal>
 
-		<Container>
+		<Container style={{overflow: online ? 'visible' : 'hidden', maxHeight: online ? undefined : '80vh'}}>
 			<InputGroup>
 				<InputGroup.Text>Organization login link</InputGroup.Text>
 				<Form.Control id="login-link" readOnly={true} value={loginLink}></Form.Control>
