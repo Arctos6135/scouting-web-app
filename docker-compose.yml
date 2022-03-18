@@ -3,7 +3,8 @@ version: "3.7"
 services:
   app:
     build: .
-    image: docker-registry.i.mm12.xyz/scouting-app:0.0.0
+    image: docker-registry.i.mm12.xyz/scouting-app:latest
+    env_file: .env
     ports:
       - 8085:8085
     platform: linux/x86-64
