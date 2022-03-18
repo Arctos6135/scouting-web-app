@@ -21,7 +21,7 @@ function RowBuilder(props: RowBuilderProps) {
 		<div className={props.className}>
 			<Row xs={1} lg={2} xl={3}>
 				{row.components.map((component, index) => (
-					<Col key={index}>
+					<Col key={index} className='py-2 border'>
 						<Button onClick={() => {
 							row.components.splice(index, 1);
 							onChange(row);
