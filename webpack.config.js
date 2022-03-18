@@ -36,6 +36,6 @@ module.exports = (env) => ({
 	resolve: {
 		extensions: ['.js', '.json', '.jsx', '.ts', '.tsx']
 	},
-	devtool: env.production ? 'source-map' : undefined,
+	devtool: env.production ? undefined : 'source-map',
 	mode: env.production ? 'production' : 'development'
 });
