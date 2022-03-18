@@ -10,6 +10,7 @@ services:
     ports:
       - 8080:8080
     platform: linux/x86-64
+    restart: always
   db:
     image: mongo:4.4
     volumes:
