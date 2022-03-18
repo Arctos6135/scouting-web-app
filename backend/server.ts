@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
 	assignments(socket, io);
 });
 
-server.listen(8080, '0.0.0.0');
+server.listen(parseInt(process.env.PORT ?? '8080'), '0.0.0.0');
 
 export default app;
 export type Socket = socketio.Socket<ClientToServerEvents, ServerToClientEvents> & {
