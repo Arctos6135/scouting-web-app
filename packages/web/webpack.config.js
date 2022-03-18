@@ -1,0 +1,45 @@
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+module.exports = {
+	entry: path.resolve(__dirname, './src/App.tsx'),
+	output: {
+		path: path.resolve('dist')
+	},
+	module: {
+		rules: [
+			{ test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
+			{ test: /\.tsx?$/, exclude: /node_modules/, use: 'ts-loader' }
+		]
+	},
+	plugins: [
+		new HTMLWebpackPlugin({
+			template: path.join(__dirname, 'src', 'index.html'),
+		}),
+		new MiniCssExtractPlugin(),
+		new WorkboxWebpackPlugin.InjectManifest({
+			swSrc: path.join(__dirname, 'src', 'sw.ts'),
+			swDest: 'sw.js',
+			maximumFileSizeToCacheInBytes: 6 * 1024 * 1024
+		}),
+		new CopyWebpackPlugin({
+			patterns: [
+				{from: path.resolve(__dirname, './static')}
+			]
+		})
+	],
+	resolve: {
+		extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
+		symlinks: true
+	},
+	devtool: 'source-map',
+	mode: 'development',
+	optimization: {
+		splitChunks: {
+			chunks: 'all'
+		}
+	}
+};

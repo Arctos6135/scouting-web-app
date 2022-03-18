@@ -1,0 +1,24 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"jsx": "react",
+		"target": "ES2015",
+		"moduleResolution": "node",
+		"module": "CommonJS",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"declaration": true,
+		"outDir": "./build/",
+		"composite": true,
+		"allowJs": true,
+		"skipLibCheck": true
+	},
+	"references": [
+		{ "path": "packages/shared" },
+		{ "path": "packages/backend" },
+		{ "path": "packages/web" }
+	],
+	"exclude": [
+		"./build/**"
+	]
+}

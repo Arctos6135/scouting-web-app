@@ -1,0 +1,51 @@
+{
+  "name": "@scouting-app/web",
+  "version": "1.0.0",
+  "description": "Frontend",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack build --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arctos6135/scouting-web-app.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Arctos6135/scouting-web-app/issues"
+  },
+  "homepage": "https://github.com/Arctos6135/scouting-web-app#readme",
+  "dependencies": {
+    "@scouting-app/shared": "file:packages/shared",
+    "cross-env": "^7.0.3",
+    "file-saver": "^2.0.5",
+    "react": "^17.0.2",
+    "react-bootstrap": "^2.2.1",
+    "react-bootstrap-typeahead": "^6.0.0-alpha.9",
+    "react-icons": "^4.3.1",
+    "react-router": "^6.2.2",
+    "react-router-dom": "^6.2.2",
+    "recoil": "^0.6.1",
+    "socket.io-client": "^4.4.1",
+    "workbox-core": "^6.5.1",
+    "workbox-precaching": "^6.5.1",
+    "workbox-routing": "^6.5.1",
+    "workbox-strategies": "^6.5.1",
+    "workbox-window": "^6.5.1",
+    "typescript": "^4.6.2",
+    "xlsx": "^0.18.4"
+  },
+  "devDependencies": {
+    "@types/webpack": "^5.28.0",
+    "copy-webpack-plugin": "^10.2.4",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.0",
+    "ts-loader": "^9.2.8",
+    "ts-node": "^10.7.0",
+    "webpack-cli": "^4.9.2",
+    "workbox-webpack-plugin": "^6.5.1"
+  }
+}

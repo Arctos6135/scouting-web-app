@@ -2,3 +2,7 @@ data/*
 node_modules
 .DS_Store
 dist/*
+build/*
+./packages/*/build
+./**/node_modules
+./**/build

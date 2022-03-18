@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"composite": true,
+		"outDir": "./build",
+		"baseUrl": "./src"
+	},
+	"files": ["src/server.ts"],
+	"include": ["./src/**/*.ts"],
+	"references": [
+		{"path": "../shared"}
+	]
+}
