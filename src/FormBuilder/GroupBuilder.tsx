@@ -19,7 +19,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 		setGroup(groupUpdate);
 		props.onChange({ indices: { index: props.index, sectionIndex: props.sectionIndex, rowIndex: props.rowIndex }, update: groupUpdate, type: 'group' });
 	};
-	console.log('rerender group');
+
 	return (
 		<div className={props.className}>
 			<TextInput

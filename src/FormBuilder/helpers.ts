@@ -2,15 +2,8 @@ import Num from '../../shared/dataClasses/FormClass/Number';
 import Picker from '../../shared/dataClasses/FormClass/Picker';
 import Text from '../../shared/dataClasses/FormClass/Text';
 import FormComponent from '../../shared/dataClasses/FormClass/FormComponent';
-import { atom } from 'recoil';
-import FormClass, { Group, Row, Section } from '../../shared/dataClasses/FormClass';
+import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 import { SectionBuilderProps, RowBuilderProps, GroupBuilderProps } from './types';
-
-export const editingForm = atom<FormClass>({
-	key: 'editingForm',
-	default: {} as FormClass,
-	dangerouslyAllowMutability: true,
-});
 
 export type Component = Num | Picker | Text;
 

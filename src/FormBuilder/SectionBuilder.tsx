@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
-import { Button, ListGroup } from 'react-bootstrap';
+import { Button, Accordion } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { createComponent, options, sectionsPropsAreEqual } from './helpers';
 import { SectionBuilderProps } from './types';
@@ -38,7 +38,6 @@ function SectionBuilder(props: SectionBuilderProps) {
 		setSection(sectionUpdate);
 		props.onChange({ indices: { index: props.index }, update: sectionUpdate, type: 'section' });
 	}
-	console.log('rerender section');
 
 	return (
 		<div className={props.className}>
@@ -51,17 +50,22 @@ function SectionBuilder(props: SectionBuilderProps) {
 					onChange(section);
 				}}
 			/>
-			<ListGroup>
+			<Accordion>
 				{section.groups.map((group, index) => (
-					<ListGroup.Item key={index}>
-						<Button className='mb-2' onClick={() => {
-							section.groups.splice(index, 1);
-							onChange(section);
-						}}>Delete {group.type}</Button>
-						{builders[group.type](group, index)}
-					</ListGroup.Item>
+					<Accordion.Item key={index} eventKey={`${index}`} >
+						<Accordion.Header>
+							{group.type === 'group' ? `Group ${index + 1}` : `Row ${index + 1}`}
+						</Accordion.Header>
+						<Accordion.Body>
+							<Button className='mb-2' onClick={() => {
+								section.groups.splice(index, 1);
+								onChange(section);
+							}}>Delete {group.type}</Button>
+							{builders[group.type](group, index)}
+						</Accordion.Body>
+					</Accordion.Item>
 				))}
-			</ListGroup>
+			</Accordion>
 			<Button className='mb-1 mt-2'
 				onClick={() => {
 					section.groups.push({ type: 'row', components: [] });

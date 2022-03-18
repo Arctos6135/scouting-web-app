@@ -11,12 +11,10 @@ import {
 	Tab,
 	Tabs,
 } from 'react-bootstrap';
-import { useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { editingForm } from './helpers';
+import { useEffect, useState } from 'react';
 import { FormBuilderProps, OnChangeParams } from './types';
 import SectionBuilder from './SectionBuilder';
-import { Row as RowType } from '../../shared/dataClasses/FormClass';
+import FormClass, { Row as RowType } from '../../shared/dataClasses/FormClass';
 
 class ErrorBoundary extends React.Component {
 	constructor(props) {
@@ -31,7 +29,7 @@ class ErrorBoundary extends React.Component {
 	}
 }
 export default function FormBuilder(props: FormBuilderProps) {
-	const [form, setForm] = useRecoilState(editingForm);
+	const [form, setForm] = useState<FormClass>(undefined);
 	useEffect(() => setForm(JSON.parse(JSON.stringify(props.form))), [props.form]);
 	const onChange = React.useCallback((params: OnChangeParams) => {
 		setForm((form) => {
@@ -39,7 +37,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 			case ('group'): {
 				if (typeof params.indices.rowIndex === 'number') {
 					(
-                            form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
+							form.sections[params.indices.sectionIndex].groups[params.indices.rowIndex] as RowType
 					).components[params.indices.index] = params.update;
 				} else {
 					form.sections[params.indices.sectionIndex].groups[params.indices.index] = params.update;
@@ -61,7 +59,7 @@ export default function FormBuilder(props: FormBuilderProps) {
 			return updateForm;
 		});
 	}, []);
-	console.log('re-render builder');
+	
 	if (!form || Object.keys(form).length === 0) {
 		return <Spinner animation="grow" />;
 	}
@@ -114,10 +112,10 @@ export default function FormBuilder(props: FormBuilderProps) {
 							props.onChange(form);
 						}}
 					>
-                        Add Section
+						Add Section
 					</Button>
 				</Col>
 			</Row>
-		</Container>
+		</Container >
 	);
 }

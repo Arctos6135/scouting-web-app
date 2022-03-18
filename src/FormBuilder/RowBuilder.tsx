@@ -16,10 +16,10 @@ function RowBuilder(props: RowBuilderProps) {
 		setRow(rowUpdate);
 		props.onChange({ indices: { index: props.index, sectionIndex: props.sectionIndex }, update: rowUpdate, type: 'row' });
 	}
-	console.log('rerender row');
+
 	return (
 		<div className={props.className}>
-			<Row>
+			<Row xs={1} lg={2} xl={3}>
 				{row.components.map((component, index) => (
 					<Col key={index}>
 						<Button onClick={() => {
