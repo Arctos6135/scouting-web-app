@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  app:
+    build: .
+    image: docker-registry.i.mm12.xyz/scouting-app:0.0.0
+    ports:
+      - 8085:8085
+  db:
+    image: mongo:4.4
+    volumes:
+      - db-data:/data/db
+    command: "mongod --replSet rs0"
+    ports:
+      - 27017:27017
+
+volumes:
+  db-data:
