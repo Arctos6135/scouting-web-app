@@ -25,7 +25,7 @@ module.exports = {
 		new WorkboxWebpackPlugin.InjectManifest({
 			swSrc: path.join(__dirname, 'src', 'sw.ts'),
 			swDest: 'sw.js',
-			maximumFileSizeToCacheInBytes: 6 * 1024 * 1024
+			maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
 		}),
 		new CopyWebpackPlugin({
 			patterns: [
