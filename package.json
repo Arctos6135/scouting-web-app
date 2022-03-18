@@ -7,9 +7,8 @@
     "predev": "mongod --replSet rs0 --dbpath ./data > data/logfile &",
     "dev": "trap 'exit 0' SIGINT; ts-node-dev backend/dev-server.ts",
     "postdev": "mongo admin --eval 'db.shutdownServer()' > /dev/null",
-    "prestart": "mongod --replSet rs0 --dbpath ./data > /dev/null &",
-    "start": "trap 'exit 0' SIGINT; nodemon backend/server.ts",
-    "poststart": "mongo admin --eval 'db.shutdownServer()' > /dev/null"
+    "build": "tsc -b && webpack build",
+    "start": "nodemon build/backend/server.js"
   },
   "author": "Alex Waese-Perlman",
   "license": "MIT",
@@ -64,6 +63,7 @@
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
     "ts-node-dev": "^1.1.8",
+    "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
   }
 }

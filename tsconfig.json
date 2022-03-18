@@ -3,8 +3,13 @@
 		"esModuleInterop": true,
 		"jsx": "react",
 		"target": "ES6",
-		"moduleResolution": "node",
+		"moduleResolution": "Node",
+		"module": "CommonJS",
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-	}
+		"emitDecoratorMetadata": true,
+		"outDir": "./build",
+		"baseUrl": "./backend/",
+		"skipLibCheck": true
+	},
+	"exclude": ["src"]
 }
