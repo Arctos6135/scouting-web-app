@@ -6,7 +6,7 @@ const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
-module.exports = {
+module.exports = (env) => ({
 	entry: path.resolve(__dirname, './src/App.tsx'),
 	output: {
 		path: path.join(__dirname, 'dist')
@@ -36,6 +36,6 @@ module.exports = {
 	resolve: {
 		extensions: ['.js', '.json', '.jsx', '.ts', '.tsx']
 	},
-	devtool: 'source-map',
-	mode: 'development'
-};
+	devtool: env.production ? 'source-map' : undefined,
+	mode: env.production ? 'production' : 'development'
+});

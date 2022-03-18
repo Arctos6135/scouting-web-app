@@ -7,7 +7,7 @@
     "predev": "mongod --replSet rs0 --dbpath ./data > data/logfile &",
     "dev": "trap 'exit 0' SIGINT; ts-node-dev backend/dev-server.ts",
     "postdev": "mongo admin --eval 'db.shutdownServer()' > /dev/null",
-    "build": "tsc -b && webpack build",
+    "build": "tsc -b && webpack build -env production",
     "start": "nodemon build/backend/server.js"
   },
   "author": "Alex Waese-Perlman",
