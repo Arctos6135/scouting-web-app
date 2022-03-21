@@ -33,7 +33,7 @@ function Response(props: {
 
 function submitResponses(queue: ResponseClass[]) {
 	for (const resp of queue) {
-		conn.socket.emit('assignment:respond', resp);
+		conn.socket.emit('data:respond', resp);
 	}
 }
 

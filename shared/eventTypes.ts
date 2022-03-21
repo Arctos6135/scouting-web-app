@@ -20,7 +20,7 @@ export interface ServerToClientEvents {
     'organization:get url': (url: string) => void;
 	'organization:assign': (status: boolean) => void;
 
-	'assignment:get responses': (responses: ResponseClass[]) => void;
+	'data:get responses': (responses: ResponseClass[]) => void;
 
     'status': (data: { scout: ScoutClass }) => void;
 }
@@ -45,10 +45,9 @@ export interface ClientToServerEvents {
     }) => void;
     'organization:delete form': (data: {id: string}) => void;
     'organization:get url': () => void;
-    'organization:delete assignment': (id: string) => void;
 
-	'assignment:respond': (response: ResponseClass) => void;
-	'assignment:get responses': () => void;
+	'data:respond': (response: ResponseClass) => void;
+	'data:get responses': () => void;
 
     'login': (data: {
         login: string;

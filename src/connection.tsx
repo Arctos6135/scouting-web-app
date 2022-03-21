@@ -84,7 +84,7 @@ export const useSocketEffect = (event: string, listener: any, ...args: any[]) =>
 // This is useful in case the session expires or something
 setInterval((() => socket.emit('status')), 10000);
 socket.emit('organization:get forms');
-socket.emit('assignment:get responses');
+socket.emit('data:get responses');
 
 // Invisible component that listens for changes
 export default function LoginSitter() {
@@ -100,7 +100,7 @@ export default function LoginSitter() {
 			setSignedIn(!!val.scout);
 			setScout(val.scout);
 			socket.emit('organization:get forms');
-			socket.emit('assignment:get responses');
+			socket.emit('data:get responses');
 		};
 		socket.on('status', lis);
 		return () => {
@@ -117,7 +117,7 @@ export default function LoginSitter() {
 		setOnline(false);
 	});
 
-	useSocketEffect('assignment:get responses', (responses) => {
+	useSocketEffect('data:get responses', (responses) => {
 		setResponses(responses);
 	});
 	useSocketEffect('organization:get scouts', (scouts: ScoutClass[]) => {
