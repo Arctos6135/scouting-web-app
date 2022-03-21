@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import * as React from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
-import AssignmentResponseClass from '../shared/dataClasses/AssignmentResponseClass';
-import AssignmentClass from '../shared/dataClasses/AssignmentClass';
+import ResponseClass from '../shared/dataClasses/ResponseClass';
 import FormClass from '../shared/dataClasses/FormClass';
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
@@ -36,12 +35,6 @@ export const scout = atom<ScoutClass>({
 	effects: [localStorageEffect('scout')]
 });
 
-export const assignments = atom<AssignmentClass[]>({
-	key: 'assignments',
-	default: [],
-	effects: [localStorageEffect('assignments')]
-});
-
 export const scouts = atom<ScoutClass[]>({
 	key: 'scouts',
 	default: [], 
@@ -59,16 +52,23 @@ export const online = atom<boolean>({
 	default: false
 });
 
-export const submitQueue = atom<AssignmentResponseClass[]>({
+// Forms that are being worked on
+export const activeForms = atom<ResponseClass[]>({
+	key: 'activeReponses',
+	default: [],
+	effects: [localStorageEffect('activeResponses')]
+});
+
+export const submitQueue = atom<ResponseClass[]>({
 	key: 'submitQueue',
 	default: [],
 	effects: [localStorageEffect('submitQueue')]
 });
 
-export const responses = atom<AssignmentResponseClass[]>({
-	key: 'assignmentResponses',
+export const responses = atom<ResponseClass[]>({
+	key: 'responses',
 	default: [],
-	effects: [localStorageEffect('assignmentResponses')]
+	effects: [localStorageEffect('responses')]
 });
 
 export const useSocketEffect = (event: string, listener: any, ...args: any[]) => {
@@ -83,7 +83,6 @@ export const useSocketEffect = (event: string, listener: any, ...args: any[]) =>
 // Get status from server every ten seconds
 // This is useful in case the session expires or something
 setInterval((() => socket.emit('status')), 10000);
-socket.emit('organization:get assignments');
 socket.emit('organization:get forms');
 socket.emit('assignment:get responses');
 
@@ -91,7 +90,6 @@ socket.emit('assignment:get responses');
 export default function LoginSitter() {
 	const setSignedIn = useSetRecoilState(signedIn);
 	const setScout = useSetRecoilState(scout);
-	const setAssignments = useSetRecoilState(assignments);
 	const setScouts = useSetRecoilState(scouts);
 	const setForms = useSetRecoilState(forms);
 	const setOnline = useSetRecoilState(online);
@@ -101,7 +99,6 @@ export default function LoginSitter() {
 		const lis = (val: any) => {
 			setSignedIn(!!val.scout);
 			setScout(val.scout);
-			socket.emit('organization:get assignments');
 			socket.emit('organization:get forms');
 			socket.emit('assignment:get responses');
 		};
@@ -120,9 +117,6 @@ export default function LoginSitter() {
 		setOnline(false);
 	});
 
-	useSocketEffect('organization:get assignments', (assignments) => {
-		setAssignments(assignments);
-	});
 	useSocketEffect('assignment:get responses', (responses) => {
 		setResponses(responses);
 	});

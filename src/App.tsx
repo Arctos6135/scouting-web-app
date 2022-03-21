@@ -1,25 +1,23 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { BrowserRouter, Link } from 'react-router-dom';
-import { Route, Router, Navigate, Routes } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import LoginPage from './Login';
 import Nav from './Nav';
-import { atom, RecoilRoot, useRecoilValue } from 'recoil';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import SocketConnection from './connection';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import RegisterPage from './Register';
 import AdminPage from './Admin';
 import * as conn from './connection';
-import DataEntry from './DataEntry';
-import Text from '../shared/dataClasses/FormClass/Text';
 import './styles.css';
-import AssignmentsList from './AssignmentsList';
+import FormsList from './FormsList';
 import { Workbox } from 'workbox-window';
 
 function App() {
 	return (<div>
-		<Container><AssignmentsList /></Container>
+		<Container><FormsList /></Container>
 	</div>
 	);
 }

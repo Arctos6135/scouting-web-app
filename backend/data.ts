@@ -1,7 +1,7 @@
 import models from './db';
 import { IOServer, Socket } from './server';
 
-const assignmentResponseEvents = models.AssignmentResponse.watch();
+const assignmentResponseEvents = models.Response.watch();
 assignmentResponseEvents.setMaxListeners(Infinity);
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const req = socket.request;
@@ -10,30 +10,32 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			socket.emit('assignment:get responses', []);
 			return;
 		}
-		const scouts = await models.AssignmentResponse.find({ org: req.session.scout.org, scout: req.session.scout.login }).lean().exec();
+		const scouts = await models.Response.find({ org: req.session.scout.org, scout: req.session.scout.login }).lean().exec();
 		socket.emit('assignment:get responses', scouts);
 	};
 	socket.on('assignment:respond', async (response) => {
 		if (!req.session.scout) return;
-		console.log(response);
 		try {
 			if (response.scout != req.session.scout.login && !req.session.scout.admin) return;
-			await models.AssignmentResponse.deleteOne({
+			await models.Response.deleteOne({
 				org: req.session.scout.org,
 				scout: response.scout,
-				assignment: response.assignment
+				form: response.form,
+				id: response.id
 			}).exec();
-			const res = new models.AssignmentResponse({
+			const res = new models.Response({
 				org: req.session.scout.org,
 				scout: response.scout,
-				assignment: response.assignment,
-				data: response.data
+				form: response.form,
+				data: response.data,
+				id: response.id,
+				name: response.name
 			});
 			await res.save();
 		}
 		catch (e) {
 			// do nothing
-			console.log(e);
+			console.log(e, response);
 		}
 	});
 	socket.on('assignment:get responses', async () => {

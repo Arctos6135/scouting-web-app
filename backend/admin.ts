@@ -1,15 +1,12 @@
-import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 import models from './db';
 import { IOServer, Socket } from './server';
 
 const scoutEvents = models.Scout.watch();
 const formEvents = models.Form.watch();
-const assignmentEvents = models.Assignment.watch();
 
 scoutEvents.setMaxListeners(Infinity);
 formEvents.setMaxListeners(Infinity);
-assignmentEvents.setMaxListeners(Infinity);
 
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const session = socket.request.session;
@@ -36,14 +33,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		if (!session.scout) return;
 		const forms = await models.Form.find({ ownerOrg: session.scout.org }).lean().exec();
 		socket.emit('organization:get forms', forms);
-	};
-
-	const sendAssignments = async () => {
-		if (!session.scout) return;
-		const query: Record<string, any> = { org: session.scout.org };
-		if (!session.scout.admin) query.scouts = session.scout.login;
-		const assignments = await models.Assignment.find(query).lean().exec();
-		socket.emit('organization:get assignments', assignments);
 	};
 
 	socket.on('organization:get scouts', sendScouts);
@@ -95,40 +84,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		if (current) await current.delete();
 	});
 
-	socket.on('organization:assign', async (assignment: AssignmentClass) => {
-		if (!admin()) return socket.emit('organization:update form', false);
-		const prev = await models.Assignment.findOne({id: assignment.id}).exec();
-		if (prev && assignment.id) {
-			for (const k in assignment) prev[k] = assignment[k];
-			try {
-				await prev.save();
-			}
-			catch (e) {
-				console.log(e);
-				socket.emit('organization:assign', false);
-			}
-		}
-		else {
-			const obj = new models.Assignment(assignment);
-			try {
-				await obj.save();
-			}
-			catch (e) {
-				console.log(e);
-				socket.emit('organization:assign', false);
-			}
-		}
-	});
-
-	socket.on('organization:get assignments', async () => {
-		await sendAssignments();
-	});
-
-	socket.on('organization:delete assignment', async (id) => {
-		if (!admin()) return;
-		await models.Assignment.findOneAndDelete({ id }).exec();
-	});
-
 	// TODO: There should only be one set of these listeners in the server
 	// New connections can subscribe to relevant listeners
 	const scoutListener = async (change: any) => {
@@ -142,11 +97,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		sendForms();
 	};
 	formEvents.on('change', formListener);
-
-	const assignmentListener = async () => {
-		sendAssignments();
-	};
-	assignmentEvents.on('change', assignmentListener);
 
 	socket.on('disconnect', () => {
 		console.log('disconnect');
