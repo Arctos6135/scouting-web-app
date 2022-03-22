@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup, FormControl } from 'react-bootstrap';
 import { useRecoilState } from 'recoil';
 import { FormIDContext, formData } from './formState';
 import Timer from '../../shared/dataClasses/FormClass/Timer';
@@ -19,6 +19,7 @@ export function TimerInput(props: {
 	const [startTime, setStartTime] = useState(Date.now());
 	const [endTime, setEndTime] = useState(Date.now());
 	const [intervalRef, setIntervalRef] = useState<undefined | NodeJS.Timer>(undefined);
+	const [editableTime, setEditableTime] = useState((millis/1000).toFixed(2));
 	const startTimer = () => {
 		setStartTime(Date.now());
 		setEndTime(Date.now());
@@ -36,25 +37,35 @@ export function TimerInput(props: {
 			setValue(millis + endTime - startTime);
 			setStartTime(Date.now());
 			setEndTime(Date.now());
+			setEditableTime(((millis + endTime - startTime)/1000).toFixed(2));
 		}
 	};
 	const restartTimer = () => {
 		setMillis(0);
 		setValue(0);
+		setEditableTime('0');
 		setStartTime(Date.now());
 		setEndTime(Date.now());
 	};
+
+	const onChange = (value: string) => {
+		const newTime = Math.floor(Number.parseFloat(value) * 1000);
+		setMillis(newTime);
+		setValue(newTime);
+		setEditableTime(value);
+	};
+
 	return (
 		<div className="d-flex flex-column">
-			<div className='text-center fs-5 fw-bold'>{((millis + endTime - startTime) / 1000).toFixed(2)} seconds</div>
+			{intervalRef === undefined ? <FormControl value={editableTime} onChange={(e) => onChange(e.target.value)} /> : <div className='text-center fs-5 fw-bold'>{((millis + endTime - startTime) / 1000).toFixed(2)} seconds</div>}
 			<ButtonGroup>
-				<Button onClick={startTimer}>
+				<Button variant='outline-secondary' onClick={startTimer}>
 					Start
 				</Button>
-				<Button onClick={stopTimer}>
+				<Button variant='outline-secondary' onClick={stopTimer}>
 					Stop
 				</Button>
-				<Button onClick={restartTimer}>
+				<Button variant='outline-secondary' onClick={restartTimer}>
 					Restart
 				</Button>
 			</ButtonGroup>
