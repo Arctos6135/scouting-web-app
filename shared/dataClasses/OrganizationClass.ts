@@ -24,6 +24,6 @@ export default class OrganizationClass {
 	})
 	public verified: boolean;
 
-	@prop({ required: true, default: () => crypto.randomBytes(24).toString('hex') })
+	@prop({ required: true, default: () => crypto.randomUUID() })
 	public orgID: string;
 }

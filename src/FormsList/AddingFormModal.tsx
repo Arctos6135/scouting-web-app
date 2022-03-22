@@ -1,33 +1,32 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { Button, Form, Modal, InputGroup } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { Button, DropdownButton, Form, InputGroup, Modal } from 'react-bootstrap';
 import { useRecoilValue } from 'recoil';
-
 import * as conn from '../connection';
 
-export function AssignmentModal(props: {
+export function AddingFormModal(props: {
 	show: boolean;
-	onClose: (user?: { form: string; name: string; due: string; }) => void;
+	onClose: (res?: { name: string; form: string; }) => void;
 }) {
-
 	const forms = useRecoilValue(conn.forms);
-	const [form, setForm] = useState<string>(forms[0]?.id ??'');
+
 	const [name, setName] = useState<string>('');
-	//const [due, setDue] = useState<string>('');
+	const [form, setForm] = useState<string>();
+	useEffect(() => {
+		setForm(forms[0]?.id ?? '');
+	}, [forms]);
 
 	const handleClose = (res?) => {
 		props.onClose(res);
 		setTimeout(() => {
-			setForm('');
 			setName('');
-			//setDue('');
+			setForm(forms[0].id);
 		}, 500);
 	};
-
 	return <Modal centered show={props.show} onHide={() => handleClose()}>
 		<Modal.Header closeButton>
 			<Modal.Title>
-				Create assignment
+				Add form
 			</Modal.Title>
 		</Modal.Header>
 		<Modal.Body>
@@ -40,16 +39,11 @@ export function AssignmentModal(props: {
 				<InputGroup.Text>Form</InputGroup.Text>
 				<Form.Select value={form} onChange={ e => setForm(e.target?.value) }>
 					{forms.map((form, idx) => <option key={idx} value={form.id}>{form.name}</option>)}
-				</Form.Select>
+				</Form.Select>	
 			</InputGroup>
-
-			{/*<InputGroup className='mb-3'>
-				<InputGroup.Text>Due date</InputGroup.Text>
-				<Form.Control type='datetime-local' value={due} onChange={e => setDue(e.target.value)} />
-			</InputGroup>*/}
 		</Modal.Body>
 		<Modal.Footer>
-			<Button onClick={() => handleClose({ form, name})} variant="primary">Create</Button>
+			<Button onClick={() => handleClose({ name, form })} variant="primary">Create</Button>
 		</Modal.Footer>
 	</Modal>;
 }

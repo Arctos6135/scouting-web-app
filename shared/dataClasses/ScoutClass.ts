@@ -12,11 +12,11 @@ export default class ScoutClass {
     @prop({ required: true }) 
 	public name: string;
     @prop({ required: true }) 
-	public login: string;
+    public login: string;
     @prop({ required: true }) 
-	public passwordHash: string;
+    public passwordHash: string;
     @prop({ required: true }) 
-	public org: string;
+    public org: string;
     @prop({ required: true, default: false }) 
-	public admin: boolean;
+    public admin: boolean;
 }
