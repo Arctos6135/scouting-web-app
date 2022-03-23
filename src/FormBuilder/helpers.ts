@@ -1,17 +1,18 @@
 import Num from '../../shared/dataClasses/FormClass/Number';
 import Picker from '../../shared/dataClasses/FormClass/Picker';
 import Text from '../../shared/dataClasses/FormClass/Text';
+import Timer from '../../shared/dataClasses/FormClass/Timer';
 import FormComponent from '../../shared/dataClasses/FormClass/FormComponent';
 import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 import { SectionBuilderProps, RowBuilderProps, GroupBuilderProps } from './types';
 
-export type Component = Num | Picker | Text;
+export type Component = Num | Picker | Text | Timer;
 
-export const options = ['num', 'text', 'picker'];
+export const options = ['num', 'text', 'picker', 'timer'];
 
 export const createComponent = (
 	component: FormComponent,
-	newType: 'num' | 'text' | 'picker'
+	newType: 'num' | 'text' | 'picker' | 'timer'
 ): Component => {
 	const newComponent = { type: newType, valueID: component.valueID };
 	switch (newComponent.type) {
@@ -21,6 +22,8 @@ export const createComponent = (
 		return { ...newComponent } as Component;
 	case 'picker':
 		return { options: [], ...newComponent } as Component;
+	case 'timer':
+		return {...newComponent} as Component;
 	default:
 		break;
 	}
