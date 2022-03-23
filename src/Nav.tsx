@@ -3,56 +3,59 @@ import './nav.css';
 import { atom, RecoilRoot, useRecoilValue } from 'recoil';
 import * as conn from './connection';
 import {Navbar, Nav, Container, Button} from 'react-bootstrap';
-import AssignmentResponseClass from '../shared/dataClasses/AssignmentResponseClass';
+import ResponseClass from '../shared/dataClasses/ResponseClass';
 import * as XLSX from 'xlsx';
-import AssignmentClass from '../shared/dataClasses/AssignmentClass';
 import { saveAs } from 'file-saver';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
 import {Link} from 'react-router-dom';
+import FormClass from '../shared/dataClasses/FormClass';
 
-function downloadXLSX(responses: AssignmentResponseClass[], assignments: AssignmentClass[]) {
+function downloadXLSX(responses: ResponseClass[], forms: FormClass[]) {
 	const wb = XLSX.utils.book_new();
 	const cols = {};
-	for (const assign of assignments) {
-		wb.SheetNames.push(assign.name);
+	for (const form of forms) {
+		wb.SheetNames.push(form.name);
 	}
 
-	const data = {} 
+	const data = {};
 	for (const resp of responses) {
-		if (!cols[resp.assignment]) {
-			cols[resp.assignment] = [];
-			data[resp.assignment] = {'scout': []};
+		if (!cols[resp.form]) {
+			cols[resp.form] = [];
+			data[resp.form] = {'scout': []};
 		}
-		for (const col in resp.data) if (!cols[resp.assignment].includes(col)) {
-			cols[resp.assignment].push(col);
-			data[resp.assignment][col] = [];
+		for (const col in resp.data) if (!cols[resp.form].includes(col)) {
+			cols[resp.form].push(col);
+			data[resp.form][col] = [];
 		}
 	}
 
 	for (const resp of responses) {
-		data[resp.assignment]['scout'].push(resp.scout);
-		for (let i of cols[resp.assignment]) {
-			data[resp.assignment][i].push(resp.data[i]);
+		data[resp.form]['scout'].push(resp.scout);
+		for (const i of cols[resp.form]) {
+			data[resp.form][i].push(resp.data[i]);
 		}
 	}
+	console.log(data);
 
-	for (const assign of assignments) {
-		const rows = [ [ 'scout', ...cols[assign.id]] ];
-		for (let i = 0; i < data[assign.id]['scout'].length; i++) {
+	for (const form of forms) {
+		console.log(form);
+		if (!data[form.id]) continue;
+		const rows = [ [ 'scout', ...cols[form.id]] ];
+		for (let i = 0; i < data[form.id]['scout'].length; i++) {
 			const row = [];
-			row.push(data[assign.id]['scout'][i]);
-			for (let col of cols[assign.id]) row.push(data[assign.id][col][i]);
+			row.push(data[form.id]['scout'][i]);
+			for (const col of cols[form.id]) row.push(data[form.id][col][i]);
 			rows.push(row);
 		}
 		console.log(rows);
-		wb.Sheets[assign.name] = XLSX.utils.aoa_to_sheet(rows);
+		wb.Sheets[form.name] = XLSX.utils.aoa_to_sheet(rows);
 	}
 
 	const out = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 	console.log(out.constructor, typeof out);
 
-	let buf = new ArrayBuffer(out.length);
-	let view = new Uint8Array(buf); 
+	const buf = new ArrayBuffer(out.length);
+	const view = new Uint8Array(buf); 
 	for (let i=0; i < out.length; i++) view[i] = out.charCodeAt(i) & 0xFF; //convert to octet
 
 	saveAs(new Blob([buf], {type: 'application/octet-stream'}), 'scouting-data.xlsx');
@@ -61,9 +64,9 @@ function downloadXLSX(responses: AssignmentResponseClass[], assignments: Assignm
 function XLSXDownloadButton() {
 	const responses = useRecoilValue(conn.responses);
 	const queued = useRecoilValue(conn.submitQueue);
-	const assignments = useRecoilValue(conn.assignments);
+	const forms = useRecoilValue(conn.forms);
 
-	return <Button onClick={() => downloadXLSX(responses.concat(queued), assignments)} className='ms-auto'>Download XLSX</Button>
+	return <Button onClick={() => downloadXLSX(responses.concat(queued), forms)} className='ms-auto'>Download XLSX</Button>;
 }
 
 export default function TopNav() {

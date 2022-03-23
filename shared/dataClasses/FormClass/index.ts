@@ -3,8 +3,9 @@ import assert from 'assert';
 import Num from './Number';
 import Picker from './Picker';
 import Text from './Text';
+import Timer from './Timer';
 
-type Component = Num | Picker | Text;
+type Component = Num | Picker | Text | Timer;
 export class Row {
 	@prop()
 	readonly type: string = 'row';
