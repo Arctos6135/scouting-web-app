@@ -60,13 +60,25 @@ function GroupBuilder(props: GroupBuilderProps) {
 					}}
 				/>
 			) : undefined}
-			{group.component.type === 'num' ? (
+			{group.component.type === 'num' || group.component.type === 'timer' ? (
 				<NumberInput
 					label='Max'
 					number={group.component.max}
 					onChange={(value) => {
-						if (group.component.type === 'num') {
+						if (group.component.type === 'num' || group.component.type === 'timer') {
 							group.component.max = Number.parseInt(value);
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+			{group.component.type === 'num' ? (
+				<NumberInput
+					label='Increment'
+					number={group.component.increment}
+					onChange={(value) => {
+						if (group.component.type === 'num') {
+							group.component.increment = Number.parseInt(value);
 							onChange(group);
 						}
 					}}

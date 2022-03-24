@@ -1,5 +1,4 @@
 import {prop} from '@typegoose/typegoose';
-import assert from 'assert';
 import FormComponent from './FormComponent';
 
 class Text extends FormComponent {
@@ -17,7 +16,6 @@ class Text extends FormComponent {
 	}) charset?: string;
 
 	static serialize(data: string, previous: bigint, text: Text): bigint {
-		assert(data.length <= text.maxlength);
 		let charmap = {};
 		for (let i = 0; i < text.charset.length; i++) {
 			charmap[text.charset[i]] = BigInt(i);

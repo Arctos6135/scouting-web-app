@@ -7,9 +7,9 @@
     "predev": "mongod --replSet rs0 --dbpath ./data > data/logfile &",
     "dev": "trap 'exit 0' SIGINT; ts-node-dev backend/dev-server.ts",
     "postdev": "mongo admin --eval 'db.shutdownServer()' > /dev/null",
-	"build": "tsc -b && webpack build --env production",
-	"test": "jest",
-	"start": "node build/backend/server.js"
+    "build": "tsc -b && webpack build --env production",
+    "test": "jest",
+    "start": "node build/backend/server.js"
   },
   "author": "Alex Waese-Perlman",
   "license": "MIT",
@@ -26,6 +26,7 @@
     "mongodb": "^4.4.0",
     "mongoose": "^6.2.3",
     "nodemailer": "^6.7.2",
+    "qrcode.react": "^2.0.0",
     "react": "^17.0.2",
     "react-bootstrap": "^2.1.2",
     "react-bootstrap-typeahead": "^6.0.0-alpha.9",

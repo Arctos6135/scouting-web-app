@@ -1,5 +1,4 @@
 import {prop} from '@typegoose/typegoose';
-import assert from 'assert';
 import Num from './Number';
 import Picker from './Picker';
 import Text from './Text';
@@ -64,7 +63,6 @@ function extractGroups(schema: Section[]): Group[] {
 export function serialize(data: { [key: string]: number | string }, schema: Section[]) {
 	let out = 0n;
 	const processGroup = (group: Group) => {
-		assert(group.component.type in constructorMap);
 		const constructor = constructorMap[group.component.type];
 		out = constructor.serialize(data[group.component.valueID] as never, out, group.component as never);
 	};
@@ -79,7 +77,6 @@ export function deserialize(data: bigint, schema: Section[]) {
 	const out: { [key: string]: number | string } = {};
 	
 	const processGroup = (group: Group) => {
-		assert(group.component.type in constructorMap);
 		const constructor = constructorMap[group.component.type];
 		const res = constructor.deserialize(data, group.component as never);
 		out[group.component.valueID] = res.data;

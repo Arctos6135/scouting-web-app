@@ -1,5 +1,4 @@
 import {prop} from '@typegoose/typegoose';
-import assert from 'assert';
 import FormComponent from './FormComponent';
 
 class Num extends FormComponent {
@@ -16,8 +15,6 @@ class Num extends FormComponent {
 		const min = num.min/num.increment;
 		const max = num.max/num.increment;
 		const intVal = Math.round((data-min)/num.increment);
-		assert(0 <= data);
-		assert(data <= max-min);
 		console.log(intVal, max, min);
 		return previous * BigInt(max-min) + BigInt(intVal)
 	}
