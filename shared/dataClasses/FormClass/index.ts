@@ -31,28 +31,30 @@ const constructorMap: {
 	'num': typeof Num;
 	'picker': typeof Picker;
 	'text': typeof Text;
+	'timer': typeof Timer;
 } = {
 	'num': Num,
 	'picker': Picker,
-	'text': Text
-}
+	'text': Text,
+	'timer': Timer
+};
 
 function extractGroups(schema: Section[]): Group[] {
 	const groups = [];
 	const processGroup = (group: Group) => {
 		groups.push(group);
-	}
+	};
 
 	const processRow = (row: Row) => {
 		for (const g of row.components) processGroup(g);
-	}
+	};
 
 	const processSection = (section: Section) => {
 		for (const g of section.groups) {
 			if (g.type == 'group') processGroup(g as Group);
 			else if (g.type == 'row') processRow(g as Row);
 		}
-	}
+	};
 
 	for (const section of schema) processSection(section);
 
@@ -65,7 +67,7 @@ export function serialize(data: { [key: string]: number | string }, schema: Sect
 		assert(group.component.type in constructorMap);
 		const constructor = constructorMap[group.component.type];
 		out = constructor.serialize(data[group.component.valueID] as never, out, group.component as never);
-	}
+	};
 
 	extractGroups(schema).forEach(processGroup);
 	return out;
@@ -82,7 +84,7 @@ export function deserialize(data: bigint, schema: Section[]) {
 		const res = constructor.deserialize(data, group.component as never);
 		out[group.component.valueID] = res.data;
 		data = res.remaining;
-	}
+	};
 
 	groups.forEach(processGroup);
 
