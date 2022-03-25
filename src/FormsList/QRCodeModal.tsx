@@ -2,21 +2,22 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Carousel, Modal } from 'react-bootstrap';
 import QRCode from 'qrcode.react';
-import { serialize } from '../../shared/dataClasses/FormClass';
+import { deserialize, serialize } from '../../shared/dataClasses/FormClass';
 import { useRecoilValue } from 'recoil';
 import * as conn from '../connection';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
+import Text from '../../shared/dataClasses/FormClass/Text';
 
-const useWindowWidth = () => {
-	const [width, setWidth] = useState(window.innerWidth);
+const useWindowSize = () => {
+	const [size, setSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 	React.useEffect(() => {
 		function onResize() {
-			setWidth(window.innerWidth);
+			setSize(Math.min(window.innerWidth, window.innerHeight));
 		}
 		window.addEventListener('resize', onResize);
 		return () => window.removeEventListener('resize', onResize);
 	}, []);
-	return width;
+	return size;
 };
 
 export function QRCodeModal(props: {
@@ -25,12 +26,13 @@ export function QRCodeModal(props: {
 }) {
 	const submitQueue = useRecoilValue(conn.submitQueue);
 	const forms = useRecoilValue(conn.forms);
-	const divRef = React.useRef<HTMLDivElement>(null);
-	const width = useWindowWidth();
+	const size = useWindowSize();
+	const scout = useRecoilValue(conn.scout);
 
 	const createQRData = (submission: ResponseClass) => {
-		const response = serialize(submission.data, forms.find(form => form.id === submission.form).sections).toString();
-		return submission.form + ';' + submission.scout + ';' + response;
+		const serializedData = serialize(submission.data, forms.find(form => form.id === submission.form).sections);
+		const data = Text.serialize(submission.form, serializedData, {type:'text', valueID: 'form', charset: '0123456789abcdef-', maxlength: 32});
+		return submission.form + ';' + submission.scout + ';' + data.toString();
 	};
 
 	return <Modal show={props.show} onHide={props.onClose}>
@@ -42,8 +44,8 @@ export function QRCodeModal(props: {
 		<Modal.Body>
 			<Carousel controls={false} interval={null} variant='dark'>{submitQueue.map((submission, i) => (
 				<Carousel.Item key={submission.id}>
-					<div style={{ marginBottom: Math.floor((width * 0.9) / 2) }} className='d-flex justify-content-center'>
-						<QRCode size={Math.ceil(width * 0.9)} renderAs='svg' value={createQRData(submission)} />
+					<div style={{ marginBottom: Math.floor((size * 0.9) / 2) }} className='d-flex justify-content-center'>
+						<QRCode size={Math.ceil(size * 0.9)} renderAs='svg' value={createQRData(submission)} />
 					</div>
 					<Carousel.Caption>
 						{submission.name}

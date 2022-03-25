@@ -7,6 +7,7 @@ import DataEntry, { forms } from '../DataEntry';
 import FormClass from '../../shared/dataClasses/FormClass';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
 import { AddingFormModal } from './AddingFormModal';
+import {QRCodeModal} from './QRCodeModal';
 
 function Response(props: {
 	form?: FormClass;
@@ -45,6 +46,7 @@ export default function FormsList() {
 	const scout = useRecoilValue(conn.scout);
 
 	const [addingForm, setAddingForm] = React.useState<boolean>(false);
+	const [showingQR, setShowingQR] = React.useState(false);
 
 	return <>
 		<AddingFormModal show={addingForm} onClose={response => {
@@ -63,6 +65,7 @@ export default function FormsList() {
 			}
 			setAddingForm(false);
 		}}></AddingFormModal>
+		<QRCodeModal show={showingQR} onClose={() => setShowingQR(false)}/>
 		<Card>
 			<Card.Body>
 				{activeForms.length ? <Accordion>
@@ -96,7 +99,7 @@ export default function FormsList() {
 					<Button variant='outline-primary' onClick={() => submitResponses(submitQueue)} disabled={!scout}>
 						Sync ({submitQueue.filter(resp => !responses.find(res => res.id == resp.id)).length} forms)
 					</Button>
-					<Button variant='outline-secondary' disabled={!scout}>Sync by QR Code</Button>
+					<Button variant='outline-secondary' disabled={!scout} onClick={() => setShowingQR(true)}>Sync by QR Code</Button>
 				</Stack>
 			</Card.Body>
 		</Card>
