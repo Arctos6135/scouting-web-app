@@ -22,8 +22,9 @@ export function ToggleInput(props: {
 				onChange={(e) => setValue(e.currentTarget.value)}
 				type='radio'
 				name="radio"
-				variant='outline-danger'
-				checked={value == 0} value={0}>
+				variant={value == 0 ? 'danger' : 'outline-danger'}
+				checked={value == 0}
+				value={0}>
 				{props.component.falseLabel}
 			</ToggleButton>
 			<ToggleButton
@@ -31,8 +32,9 @@ export function ToggleInput(props: {
 				onChange={(e) => setValue(e.currentTarget.value)}
 				type='radio'
 				name="radio"
-				variant='outline-success'
-				checked={value == 1} value={1}>
+				variant={value == 1 ? 'success' : 'outline-success'}
+				checked={value == 1}
+				value={1}>
 				{props.component.trueLabel}
 			</ToggleButton>
 		</ButtonGroup>
