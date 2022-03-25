@@ -16,7 +16,7 @@ export function NumInput(props: {
 		}
 	});
 	const setNum = (num: number) => {
-		if (props.component.min <= num && num >= props.component.max) {
+		if (props.component.min <= num && num <= props.component.max) {
 			setValue(num);
 		}
 	};
