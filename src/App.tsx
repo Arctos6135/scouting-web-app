@@ -14,10 +14,11 @@ import * as conn from './connection';
 import './styles.css';
 import FormsList from './FormsList';
 import { Workbox } from 'workbox-window';
+import QRReader from './QRReader';
 
 function App() {
 	return (<div>
-		<Container><FormsList /></Container>
+		<Container><FormsList /><br/><QRReader /></Container>
 	</div>
 	);
 }
