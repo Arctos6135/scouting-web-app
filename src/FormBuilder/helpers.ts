@@ -2,17 +2,18 @@ import Num from '../../shared/dataClasses/FormClass/Number';
 import Picker from '../../shared/dataClasses/FormClass/Picker';
 import Text from '../../shared/dataClasses/FormClass/Text';
 import Timer from '../../shared/dataClasses/FormClass/Timer';
+import Toggle from '../../shared/dataClasses/FormClass/Toggle';
 import FormComponent from '../../shared/dataClasses/FormClass/FormComponent';
 import { Group, Row, Section } from '../../shared/dataClasses/FormClass';
 import { SectionBuilderProps, RowBuilderProps, GroupBuilderProps } from './types';
 
-export type Component = Num | Picker | Text | Timer;
+export type Component = Num | Picker | Text | Timer | Toggle;
 
-export const options = ['num', 'text', 'picker', 'timer'];
+export const options = ['num', 'text', 'picker', 'timer', 'toggle'];
 
 export const createComponent = (
 	component: FormComponent,
-	newType: 'num' | 'text' | 'picker' | 'timer'
+	newType: 'num' | 'text' | 'picker' | 'timer' | 'toggle'
 ): Component => {
 	const newComponent = { type: newType, valueID: component.valueID };
 	switch (newComponent.type) {
@@ -23,7 +24,9 @@ export const createComponent = (
 	case 'picker':
 		return { options: [], ...newComponent } as Component;
 	case 'timer':
-		return {...newComponent} as Component;
+		return { ...newComponent } as Component;
+	case 'toggle':
+		return { ...newComponent, falseLabel: 'No', trueLabel: 'Yes' } as Component;
 	default:
 		break;
 	}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Form } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { useRecoilState } from 'recoil';
 import { FormIDContext, formData } from './formState';
 import Num from '../../shared/dataClasses/FormClass/Number';
@@ -15,7 +15,11 @@ export function NumInput(props: {
 			setValue(props.component.default ?? '0');
 		}
 	});
-	return <Form.Control
-		value={value ?? 0}
-		onChange={value => setValue(value.target.value)} type='number' />;
+	return <div className='d-flex'>
+		<Button onClick={() => setValue(Number.parseInt(value.toString())-1)}>-</Button>
+		<Form.Control
+			value={value ?? 0}
+			onChange={value => setValue(value.target.value)} type='number' />
+		<Button onClick={() => setValue(Number.parseInt(value.toString())+1)}>+</Button>
+	</div>;
 }

@@ -5,6 +5,7 @@ import { TextInput } from './TextInput';
 import { NumInput } from './NumInput';
 import { PickerInput } from './PickerInput';
 import { TimerInput } from './TimerInput';
+import { ToggleInput } from './ToggleInput';
 
 export function FormGroup(props: {
 	group: Group;
@@ -14,7 +15,8 @@ export function FormGroup(props: {
 		'text': (component) => <TextInput component={component} />,
 		'num': (component) => <NumInput component={component} />,
 		'picker': (component) => <PickerInput component={component} />,
-		'timer': (component) => <TimerInput component={component} />
+		'timer': (component) => <TimerInput component={component} />,
+		'toggle': (component) => <ToggleInput component={component} />
 	};
 	return <Form.Group className='mb-3' as={Col}>
 		<Form.Label>{props.group.label}</Form.Label>

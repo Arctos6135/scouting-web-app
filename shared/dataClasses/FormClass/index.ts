@@ -3,8 +3,9 @@ import Num from './Number';
 import Picker from './Picker';
 import Text from './Text';
 import Timer from './Timer';
+import Toggle from './Toggle';
 
-type Component = Num | Picker | Text | Timer;
+type Component = Num | Picker | Text | Timer | Toggle;
 export class Row {
 	@prop()
 	readonly type: string = 'row';
@@ -31,11 +32,13 @@ const constructorMap: {
 	'picker': typeof Picker;
 	'text': typeof Text;
 	'timer': typeof Timer;
+	'toggle': typeof Toggle;
 } = {
 	'num': Num,
 	'picker': Picker,
 	'text': Text,
-	'timer': Timer
+	'timer': Timer,
+	'toggle': Toggle
 };
 
 function extractGroups(schema: Section[]): Group[] {

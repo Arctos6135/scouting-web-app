@@ -196,6 +196,30 @@ function GroupBuilder(props: GroupBuilderProps) {
 					}}
 				/>
 			) : undefined}
+			{group.component.type === 'toggle' ? (
+				<TextInput
+					text={group.component.falseLabel}
+					label='False Label'
+					onChange={(value) => {
+						if (group.component.type === 'toggle') {
+							group.component.falseLabel = value;
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
+			{group.component.type === 'toggle' ? (
+				<TextInput
+					text={group.component.trueLabel}
+					label='True Label'
+					onChange={(value) => {
+						if (group.component.type === 'toggle') {
+							group.component.trueLabel = value;
+							onChange(group);
+						}
+					}}
+				/>
+			) : undefined}
 
 			<Select
 				options={options.map((option) => {
