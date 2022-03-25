@@ -15,11 +15,16 @@ export function NumInput(props: {
 			setValue(props.component.default ?? '0');
 		}
 	});
+	const setNum = (num: number) => {
+		if (props.component.min <= num && num >= props.component.max) {
+			setValue(num);
+		}
+	};
 	return <div className='d-flex'>
-		<Button onClick={() => setValue(Number.parseInt(value.toString())-1)}>-</Button>
+		<Button onClick={() => setNum(Number.parseInt(value.toString()) - 1)}>-</Button>
 		<Form.Control
 			value={value ?? 0}
-			onChange={value => setValue(value.target.value)} type='number' />
-		<Button onClick={() => setValue(Number.parseInt(value.toString())+1)}>+</Button>
+			onChange={value => setNum(Number.parseInt(value.target.value))} type='number' />
+		<Button onClick={() => setNum(Number.parseInt(value.toString()) + 1)}>+</Button>
 	</div>;
 }

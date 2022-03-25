@@ -18,7 +18,7 @@ export function ToggleInput(props: {
 	return <div>
 		<ButtonGroup>
 			<ToggleButton
-				id='false'
+				id={`false-${props.component.valueID}`}
 				onChange={(e) => setValue(e.currentTarget.value)}
 				type='radio'
 				name="radio"
@@ -27,7 +27,7 @@ export function ToggleInput(props: {
 				{props.component.falseLabel}
 			</ToggleButton>
 			<ToggleButton
-				id='true'
+				id={`true-${props.component.valueID}`}
 				onChange={(e) => setValue(e.currentTarget.value)}
 				type='radio'
 				name="radio"
