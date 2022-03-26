@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { Button, Card, Col, Alert, FormSelect, Row } from 'react-bootstrap';
-import { BrowserQRCodeReader, BrowserCodeReader } from '@zxing/browser';
+import { BrowserQRCodeReader } from '@zxing/browser';
 import { deserialize } from '../../shared/dataClasses/FormClass';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import * as conn from '../connection';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
-import Text from '../../shared/dataClasses/FormClass/Text';
-
 
 export default function QRReader() {
 	const [reader, setReader] = React.useState(new BrowserQRCodeReader());

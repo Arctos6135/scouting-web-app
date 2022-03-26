@@ -23,7 +23,7 @@ const sess = session({
 	secret: process.env.SECRET,
 	store: MongoStore.create({ mongoUrl }),
 	cookie: {
-		maxAge: 60000*60*24
+		maxAge: 30 * 24 * 60 * 60 * 1000
 	}
 });
 

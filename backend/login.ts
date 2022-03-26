@@ -68,7 +68,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	socket.on('status', syncStatus);
 
 	const cleanup = async () => {
-		req.session.loggedIn = false;
 		setTimeout(syncStatus, 10);
 
 	};
