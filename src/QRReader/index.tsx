@@ -31,10 +31,12 @@ export default function QRReader() {
 					try {
 						const text = result.getText();
 						const [formId, scoutId, serializedResponse] = text.split(';');
-						const data = deserialize(BigInt(serializedResponse), forms.find((form) => form.id === formId).sections);
+						const formUUID = BigInt(formId).toString(16);
+						const form = forms.find((form) => form.id.replace(/-/g, '') === formUUID);
+						const data = deserialize(BigInt(serializedResponse), form.sections);
 						const response: ResponseClass = {
 							data: data,
-							form: formId,
+							form: form.id,
 							id: crypto.randomUUID(),
 							name: '',
 							org: scout.org,
@@ -45,7 +47,8 @@ export default function QRReader() {
 						controls.stop();
 						setScanned(true);
 						setTimeout(() => setScanned(false), 5000);
-					} catch {
+					} catch (err) {
+						console.log(err);
 						setInvalidQR(true);
 						setTimeout(() => setInvalidQR(false), 5000);
 					}

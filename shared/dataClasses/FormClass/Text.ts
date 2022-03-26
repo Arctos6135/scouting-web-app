@@ -16,7 +16,7 @@ class Text extends FormComponent {
 	}) charset?: string;
 
 	static serialize(data: string, previous: bigint, text: Text): bigint {
-		let charmap = {};
+		const charmap = {};
 		for (let i = 0; i < text.charset.length; i++) {
 			charmap[text.charset[i]] = BigInt(i);
 		}
@@ -31,7 +31,7 @@ class Text extends FormComponent {
 	}
 
 	static deserialize(data: bigint, text: Text): { data: string, remaining: bigint } {
-		let length = data % BigInt(text.maxlength);
+		const length = data % BigInt(text.maxlength);
 		data /= BigInt(text.maxlength);
 		let out = '';
 		for (let i = 0n; i < length; i++) {

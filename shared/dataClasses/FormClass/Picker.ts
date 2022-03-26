@@ -12,14 +12,14 @@ class Picker extends FormComponent {
 
 	static serialize(data: string, previous: bigint, picker: Picker): bigint {
 		if (!picker.options.includes(data)) throw new TypeError('Invalid choice');
-		return previous * BigInt(picker.options.length) + BigInt(picker.options.indexOf(data))
+		return previous * BigInt(picker.options.length) + BigInt(picker.options.indexOf(data));
 	}
 
 	static deserialize(data: bigint, picker: Picker): { data: string, remaining: bigint } {
 		return {
 			data: picker.options[Number(data%BigInt(picker.options.length))],
 			remaining: data/BigInt(picker.options.length)
-		}
+		};
 	}
 }
 

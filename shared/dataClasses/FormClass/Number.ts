@@ -16,7 +16,7 @@ class Num extends FormComponent {
 		const max = num.max/num.increment;
 		const intVal = Math.round((data-min)/num.increment);
 		console.log(intVal, max, min);
-		return previous * BigInt(max-min) + BigInt(intVal)
+		return previous * BigInt(max-min) + BigInt(intVal);
 	}
 
 	static deserialize(data: bigint, num: Num): { data: number, remaining: bigint } {
@@ -28,7 +28,7 @@ class Num extends FormComponent {
 		return {
 			data: val,
 			remaining: data/BigInt(max-min)
-		}
+		};
 	}
 }
 
