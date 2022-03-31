@@ -1,5 +1,5 @@
 import io, { Socket } from 'socket.io-client';
-import { atom, useSetRecoilState } from 'recoil';
+import { atom, useRecoilState, useSetRecoilState } from 'recoil';
 import { useEffect } from 'react';
 import * as React from 'react';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
@@ -10,41 +10,71 @@ import FormClass from '../shared/dataClasses/FormClass';
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
 socket.connect();
 
-const localStorageEffect = key => ({setSelf, onSet}) => {
-	const savedValue = localStorage.getItem(key);
-	if (savedValue != null && savedValue != 'undefined') {
-		setSelf(JSON.parse(savedValue));
+class LocalStorageEffect {
+	private user = '';
+	listeners: Set<(id: string) => void> = new Set();
+	constructor() {
+		this.user = localStorage.getItem('currentScoutId') ?? '';
+	}
+	setUser(id: string) {
+		this.user = id;
+		localStorage.setItem('currentScoutId', this.user);
+		for (const listener of this.listeners) listener(id);
 	}
 
-	onSet((newValue, _, isReset) => {
-		isReset
-			? localStorage.removeItem(key)
-			: localStorage.setItem(key, JSON.stringify(newValue));
-	});
-};
+	getUser() {
+		return this.user;
+	}
+
+	effect(key: string, defaultValue: any, staticValue: boolean = false) {
+		return ({setSelf, onSet}) => {
+			const listener = () => {
+				const fullKey = (staticValue ? '' : this.user) + '/' + key;
+				const savedValue = localStorage.getItem(fullKey);
+				if (savedValue != null && savedValue != 'undefined') {
+					setSelf(JSON.parse(savedValue) ?? defaultValue);
+				}
+				else {
+					setSelf(defaultValue);
+				}
+			};
+			listener();
+			if (!staticValue) this.listeners.add(listener);
+			
+			onSet((newValue, _, isReset) => {
+				const fullKey = (staticValue ? '' : this.user) + '/' + key;
+				if (this.user == '' && !staticValue) return;
+				isReset
+					? localStorage.setItem(fullKey, JSON.stringify(defaultValue))
+					: localStorage.setItem(fullKey, JSON.stringify(newValue));
+			});
+		}
+	}
+}
+const localStorageEffect = new LocalStorageEffect();
 
 export const signedIn = atom<boolean>({
 	key: 'loggedIn',
 	default: false,
-	effects: [localStorageEffect('loggedIn')]
+	effects: [localStorageEffect.effect('loggedIn', false, true)]
 });
 // Store whether or not the currently logged in account is a scout or an admin
 export const scout = atom<ScoutClass>({
 	key: 'scout',
 	default: new ScoutClass(), 
-	effects: [localStorageEffect('scout')]
+	effects: [localStorageEffect.effect('scout', new ScoutClass(), true)]
 });
 
 export const scouts = atom<ScoutClass[]>({
 	key: 'scouts',
 	default: [], 
-	effects: [localStorageEffect('scouts')]
+	effects: [localStorageEffect.effect('scouts', [])]
 });
 
 export const forms = atom<FormClass[]>({
 	key: 'forms',
 	default: [], 
-	effects: [localStorageEffect('forms')]
+	effects: [localStorageEffect.effect('forms', [])]
 });
 
 export const online = atom<boolean>({
@@ -56,19 +86,19 @@ export const online = atom<boolean>({
 export const activeForms = atom<ResponseClass[]>({
 	key: 'activeReponses',
 	default: [],
-	effects: [localStorageEffect('activeResponses')]
+	effects: [localStorageEffect.effect('activeResponses', [])]
 });
 
 export const submitQueue = atom<ResponseClass[]>({
 	key: 'submitQueue',
 	default: [],
-	effects: [localStorageEffect('submitQueue')]
+	effects: [localStorageEffect.effect('submitQueue', [])]
 });
 
 export const responses = atom<ResponseClass[]>({
 	key: 'responses',
 	default: [],
-	effects: [localStorageEffect('responses')]
+	effects: [localStorageEffect.effect('responses', [])]
 });
 
 export const useSocketEffect = (event: string, listener: any, ...args: any[]) => {
@@ -89,7 +119,7 @@ socket.emit('data:get responses');
 // Invisible component that listens for changes
 export default function LoginSitter() {
 	const setSignedIn = useSetRecoilState(signedIn);
-	const setScout = useSetRecoilState(scout);
+	const [scoutValue, setScout] = useRecoilState(scout);
 	const setScouts = useSetRecoilState(scouts);
 	const setForms = useSetRecoilState(forms);
 	const setOnline = useSetRecoilState(online);
@@ -98,7 +128,7 @@ export default function LoginSitter() {
 	useEffect(() => {
 		const lis = (val: any) => {
 			setSignedIn(!!val.scout);
-			setScout(val.scout);
+			setScout(val.scout ?? {});
 			socket.emit('organization:get forms');
 			socket.emit('data:get responses');
 		};
@@ -108,6 +138,10 @@ export default function LoginSitter() {
 		};
 	});
 
+	const scoutPath = (scoutValue?.org ?? '') + '/' + (scoutValue?.login ?? '');
+	useEffect(() => {
+		localStorageEffect.setUser(scoutPath);
+	}, [scoutPath]);
 
 	useSocketEffect('connect', () => {
 		setOnline(true);
@@ -124,7 +158,6 @@ export default function LoginSitter() {
 		setScouts(scouts);
 	});
 	useSocketEffect('organization:get forms', (forms: FormClass[]) => {
-		console.log(forms);
 		setForms(forms);
 	});
 	return <></>;
