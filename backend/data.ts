@@ -1,5 +1,8 @@
+import {getLogger} from 'logging';
 import models from './db';
 import { IOServer, Socket } from './server';
+
+const logger = getLogger("data");
 
 const responseEvents = models.Response.watch();
 responseEvents.setMaxListeners(Infinity);
@@ -14,9 +17,15 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		socket.emit('data:get responses', scouts);
 	};
 	socket.on('data:respond', async (response) => {
-		if (!req.session.scout) return;
+		if (!req.session.scout) {
+			logger.warn(`Response received when not logged in`, { ip: socket.handshake.address });
+			return;
+		}
 		try {
-			if (response.scout != req.session.scout.login && !req.session.scout.admin) return;
+			if (response.scout != req.session.scout.login && !req.session.scout.admin) {
+				logger.warn(`Scout submitted for another scout`, { response, scout: req.session.scout, ip: socket.handshake.address });
+				return;
+			}
 			await models.Response.deleteOne({
 				org: req.session.scout.org,
 				scout: response.scout,
@@ -31,6 +40,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 				id: response.id,
 				name: response.name
 			});
+			logger.verbose(`Response received`, { response, scout: req.session.scout, ip: socket.handshake.address });
 			await res.save();
 		}
 		catch (e) {

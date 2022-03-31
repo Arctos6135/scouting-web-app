@@ -1,6 +1,9 @@
 import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 import models from './db';
 import { IOServer, Socket } from './server';
+import { getLogger } from './logging';
+
+const logger = getLogger("admin");
 
 const scoutEvents = models.Scout.watch();
 const formEvents = models.Form.watch();
@@ -41,30 +44,47 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	socket.on('organization:update password', async ({login, newPassword}: {login: string; newPassword: string;}) => {
 		// Don't allow operation for non-admins
 		// TODO: This method of controlling permissions is super scuffed
-		if (!admin()) return socket.emit('organization:update password', false);
+		if (!admin()) {
+			logger.warn(`Non-admin attempt to change password`, { login, scout: session.scout, ip: socket.handshake.address });
+			return socket.emit('organization:update password', false);
+		}
 		
-		const scout = await models.Scout.findOne({ org: session.scout.org, login }).exec();
+		const scout = await models.Scout.findOne({ org: session.scout.org, scout: session.scout }).exec();
+		logger.verbose(`Changing password`, { login, org: session.scout.org, ip: socket.handshake.address });
 		socket.emit('organization:update password', !!(await scout?.updatePassword?.(newPassword)));
 	});
 
 	socket.on('organization:create scout', async ({login, name}: {login: string; name: string}) => {
-		if (!admin()) return socket.emit('organization:create scout', false);
+		if (!admin()) {
+			logger.warn(`Non-admin attempt to create scout`, { login, name, scout: session.scout, ip: socket.handshake.address });
+			return socket.emit('organization:create scout', false);
+		}
 
 		const result = await models.Scout.register(login, '', session.scout.org, name);
 
+		logger.info(`Create scout`, { login, name, scout: session.scout, ip: socket.handshake.address });
 		if (result != RegisterResult.Successful) socket.emit('organization:create scout', false);
 		else socket.emit('organization:create scout', true);
 	});
 
 	socket.on('organization:delete scout', async (login) => {
-		if (!admin()) return socket.emit('organization:delete scout', false);
+		if (!admin()) {
+			logger.warn(`Non-admin attempt to delete scout`, { login, scout: session.scout, ip: socket.handshake.address });
+			return socket.emit('organization:delete scout', false);
+		}
 		const scout = await models.Scout.findOne({org: session.scout.org, login}).exec();
 		if (scout && !scout.admin) if (await scout.delete()) return socket.emit('organization:delete scout', true); 
+		logger.info(`Delete scout`, { login, scout: session.scout, ip: socket.handshake.address });
 		socket.emit('organization:delete scout', false);
 	});
 	
 	socket.on('organization:update form', async (form) => {
-		if (!admin()) return socket.emit('organization:update form', false);
+		if (!admin()) {
+			logger.warn(`Non-admin attempt to update form`, { form, scout: session.scout, ip: socket.handshake.address });
+			return socket.emit('organization:update form', false);
+		}
+		logger.info(`Update form`, { scout: session.scout, ip: socket.handshake.address });
+		logger.silly(`Update form`, { form, scout: session.scout, ip: socket.handshake.address });
 		let oldForm = await models.Form.findOne({id: form.id, ownerOrg: session.scout.org});
 		if (!oldForm) oldForm = new models.Form({id: form.id, ownerOrg: session.scout.org});
 		oldForm.sections = form.sections;
@@ -74,12 +94,16 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			await oldForm.save();
 		}
 		catch (e) {
-			// ignore errors
+			logger.warn(`Unable to update form`, { form, scout: session.scout, error: e, ip: socket.handshake.address });
 		}
 	});
 
 	socket.on('organization:delete form', async (form: { id: string }) => {
-		if (!admin()) return socket.emit('organization:update form', false);
+		if (!admin()) {
+			logger.warn(`Non-admin attempt to delete form`, { form, scout: session.scout, ip: socket.handshake.address });
+			return socket.emit('organization:update form', false);
+		}
+		logger.info(`Delete form`, { form, scout: session.scout, ip: socket.handshake.address });
 		const current = await models.Form.findOne({ id: form.id, org: session.scout.org }).exec();
 		if (current) await current.delete();
 	});
