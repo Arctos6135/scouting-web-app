@@ -123,7 +123,6 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	formEvents.on('change', formListener);
 
 	socket.on('disconnect', () => {
-		console.log('disconnect');
 		scoutEvents.off('change', scoutListener);
 		formEvents.off('change', formListener);
 	});
