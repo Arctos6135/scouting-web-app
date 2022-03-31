@@ -44,6 +44,8 @@ export default function FormsList() {
 	const responses = useRecoilValue(conn.responses);
 	const [activeForms, setActiveForms] = useRecoilState(conn.activeForms);
 	const scout = useRecoilValue(conn.scout);
+	const signedIn = useRecoilValue(conn.signedIn);
+	console.log(signedIn);
 
 	const [addingForm, setAddingForm] = React.useState<boolean>(false);
 	const [showingQR, setShowingQR] = React.useState(false);
@@ -68,7 +70,7 @@ export default function FormsList() {
 		<QRCodeModal show={showingQR} onClose={() => setShowingQR(false)}/>
 		<Card>
 			<Card.Body>
-				{activeForms.length ? <Accordion>
+				{signedIn ? (activeForms.length ? <Accordion>
 					{activeForms
 						// Don't display responses queued for submission
 						.filter((response) => !submitQueue.find((a) => a.id == response.id))
@@ -84,22 +86,22 @@ export default function FormsList() {
 								</Accordion.Body>
 							</Accordion.Item>
 						)}
-				</Accordion> : 'No forms'}
+				</Accordion> : 'No forms') : 'You are not logged in as a scout' }
 			</Card.Body>
 		</Card>
 		<br/>
 		<Card>
 			<Card.Body>
 				<Stack className="mb-3" direction='horizontal' gap={3}>
-					<Button onClick={() => setAddingForm(true)} disabled={!scout}>
+					<Button onClick={() => setAddingForm(true)} disabled={!signedIn}>
 						Add form
 					</Button>
 				</Stack>
 				<Stack direction='horizontal' gap={3}>
-					<Button variant='outline-primary' onClick={() => submitResponses(submitQueue)} disabled={!scout}>
+					<Button variant='outline-primary' onClick={() => submitResponses(submitQueue)} disabled={!signedIn}>
 						Sync ({submitQueue.filter(resp => !responses.find(res => res.id == resp.id)).length} forms)
 					</Button>
-					<Button variant='outline-secondary' disabled={!scout} onClick={() => setShowingQR(true)}>Sync by QR Code</Button>
+					<Button variant='outline-secondary' disabled={!signedIn} onClick={() => setShowingQR(true)}>Sync by QR Code</Button>
 				</Stack>
 			</Card.Body>
 		</Card>
