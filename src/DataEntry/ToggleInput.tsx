@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { ToggleButton, ButtonGroup } from 'react-bootstrap';
+import { FormCheck } from 'react-bootstrap';
 import { useRecoilState } from 'recoil';
 import { FormIDContext, formData } from './formState';
 import Toggle from '../../shared/dataClasses/FormClass/Toggle';
@@ -16,27 +16,10 @@ export function ToggleInput(props: {
 		}
 	});
 	return <div>
-		<ButtonGroup>
-			<ToggleButton
-				id={`false-${props.component.valueID}`}
-				onChange={(e) => setValue(e.currentTarget.value)}
-				type='radio'
-				name="radio"
-				variant={value == 0 ? 'danger' : 'outline-danger'}
-				checked={value == 0}
-				value={0}>
-				{props.component.falseLabel}
-			</ToggleButton>
-			<ToggleButton
-				id={`true-${props.component.valueID}`}
-				onChange={(e) => setValue(e.currentTarget.value)}
-				type='radio'
-				name="radio"
-				variant={value == 1 ? 'success' : 'outline-success'}
-				checked={value == 1}
-				value={1}>
-				{props.component.trueLabel}
-			</ToggleButton>
-		</ButtonGroup>
+		<FormCheck
+			type='switch'
+			onChange={() => setValue(value == 0 ? 1 : 0)}
+			defaultChecked={value == 1}
+		/>
 	</div>;
 }
