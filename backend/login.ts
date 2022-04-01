@@ -40,13 +40,12 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			req.session.scout = await models.Scout.findOne({ login: data.login, org }).lean().exec();
 			req.session.save();
 			break;
-
 		case LoginResult.Unverified:
 			socket.emit('login:unverified');
 			logger.verbose('Unverified login attempt', { data, ip: socket.handshake.address });
 			break;
 		default:
-			socket.emit('login:failed', );
+			socket.emit('login:failed');
 			logger.verbose('Failed login attempt', { data, result, ip: socket.handshake.address });
 			break;
 		}

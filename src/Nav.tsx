@@ -80,7 +80,7 @@ export default function TopNav() {
 				<Nav className="container-fluid">
 					<Nav.Link as={Link} to="/">Home</Nav.Link>
 					{signedIn ? <>
-						<Nav.Link as={Link} to="/admin">Admin</Nav.Link>
+						{ scout.admin ? <Nav.Link as={Link} to="/admin">Admin</Nav.Link> : '' }
 						<Nav.Link onClick={() => conn.socket.emit('logout')}>Log out</Nav.Link>
 					</> : <><Nav.Link as={Link} to="/login">Log In</Nav.Link><Nav.Link as={Link} to="/register">Register</Nav.Link></>}
 					{ scout?.admin ? <XLSXDownloadButton/> : <></> }
