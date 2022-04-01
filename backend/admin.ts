@@ -2,6 +2,7 @@ import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 import models from './db';
 import { IOServer, Socket } from './server';
 import { getLogger } from './logging';
+import ScoutClass from '../shared/dataClasses/ScoutClass';
 
 const logger = getLogger("admin");
 
@@ -10,6 +11,10 @@ const formEvents = models.Form.watch();
 
 scoutEvents.setMaxListeners(Infinity);
 formEvents.setMaxListeners(Infinity);
+
+export async function admin(org: string, login: string): Promise<boolean> {
+	return await models.Scout.findOne({org, login}).then(scout => scout?.admin);
+}
 
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const session = socket.request.session;
@@ -21,10 +26,8 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		}
 	});
 
-	const admin = () => !!session.scout?.admin;
-
 	const sendScouts = async () => {
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			socket.emit('organization:get scouts', []);
 			return;
 		}
@@ -44,18 +47,19 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	socket.on('organization:update password', async ({login, newPassword}: {login: string; newPassword: string;}) => {
 		// Don't allow operation for non-admins
 		// TODO: This method of controlling permissions is super scuffed
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn(`Non-admin attempt to change password`, { login, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:update password', false);
 		}
 		
-		const scout = await models.Scout.findOne({ org: session.scout.org, scout: session.scout }).exec();
-		logger.verbose(`Changing password`, { login, org: session.scout.org, ip: socket.handshake.address });
+		const scout = await models.Scout.findOne({ org: session.scout.org, login }).exec();
+		console.log(scout);
+		logger.verbose(`Changing password`, { login, scout: session.scout, ip: socket.handshake.address });
 		socket.emit('organization:update password', !!(await scout?.updatePassword?.(newPassword)));
 	});
 
 	socket.on('organization:create scout', async ({login, name}: {login: string; name: string}) => {
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn(`Non-admin attempt to create scout`, { login, name, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:create scout', false);
 		}
@@ -68,7 +72,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:delete scout', async (login) => {
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn(`Non-admin attempt to delete scout`, { login, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:delete scout', false);
 		}
@@ -79,7 +83,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 	
 	socket.on('organization:update form', async (form) => {
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn(`Non-admin attempt to update form`, { form, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:update form', false);
 		}
@@ -99,13 +103,21 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:delete form', async (form: { id: string }) => {
-		if (!admin()) {
+		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn(`Non-admin attempt to delete form`, { form, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:update form', false);
 		}
 		logger.info(`Delete form`, { form, scout: session.scout, ip: socket.handshake.address });
 		const current = await models.Form.findOne({ id: form.id, org: session.scout.org }).exec();
 		if (current) await current.delete();
+	});
+
+	socket.on('organization:set admin', async (data: {scout: ScoutClass, admin: boolean}) => {
+		if (!await admin(session.scout.org, session.scout.login)) {
+			logger.warn(`Non-admin attempt set admin`, { data, scout: session.scout, ip: socket.handshake.address });
+		}
+		logger.info(`Set admin`, { target: data.scout, newValue: data.admin, scout: session.scout, ip: socket.handshake.address });
+		await models.Scout.updateOne({ ...data.scout, org: session.scout.org }, { $set: {admin: data.admin } }).exec();
 	});
 
 	// TODO: There should only be one set of these listeners in the server
