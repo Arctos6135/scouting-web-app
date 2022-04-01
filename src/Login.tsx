@@ -58,7 +58,7 @@ export default function LoginPage() {
 				</Card.Header>
 				<Card.Body>
 					<Form.Group className="mb-3" >
-						<Form.Label htmlFor="emailInput">Email</Form.Label>
+						<Form.Label htmlFor="emailInput">Login</Form.Label>
 						<Form.Control type="text" id="emailInput" name="email"></Form.Control>
 					</Form.Group>
 					<Form.Group className="mb-3" >
