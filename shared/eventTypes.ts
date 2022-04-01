@@ -27,6 +27,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
     'organization': () => void;
+	'organization:set admin': (data: {scout: ScoutClass, admin: boolean}) => void;
     'organization:get scouts': () => void;
     'organization:get forms': () => void;
     'organization:update password': (data: {
