@@ -31,7 +31,7 @@ export default function QRReader() {
 						const text = result.getText();
 						const [formIdBigInt, scoutId, serializedResponse] = text.split(';');
 						const formId = BigInt(formIdBigInt).toString(16);
-						const form = forms.find((form) => form.id === formId);
+						const form = forms.find((form) => form.id.replace(/-/g, '') === formId);
 						const data = deserialize(BigInt(serializedResponse), form.sections);
 						const response: ResponseClass = {
 							data: data,
