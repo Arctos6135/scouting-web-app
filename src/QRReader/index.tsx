@@ -5,6 +5,7 @@ import { deserialize } from '../../shared/dataClasses/FormClass';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import * as conn from '../connection';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
+import uniqueID from '../../shared/uniqueId';
 
 export default function QRReader() {
 	const [reader, setReader] = React.useState(new BrowserQRCodeReader());
@@ -28,14 +29,14 @@ export default function QRReader() {
 				if (result && scanning) {
 					try {
 						const text = result.getText();
-						const [formId, scoutId, serializedResponse] = text.split(';');
-						const formUUID = BigInt(formId).toString(16);
-						const form = forms.find((form) => form.id.replace(/-/g, '') === formUUID);
+						const [formIdBigInt, scoutId, serializedResponse] = text.split(';');
+						const formId = BigInt(formIdBigInt).toString(16);
+						const form = forms.find((form) => form.id === formId);
 						const data = deserialize(BigInt(serializedResponse), form.sections);
 						const response: ResponseClass = {
 							data: data,
 							form: form.id,
-							id: crypto.randomUUID(),
+							id: uniqueID(),
 							name: '',
 							org: scout.org,
 							scout: scoutId

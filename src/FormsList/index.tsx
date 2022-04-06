@@ -8,6 +8,7 @@ import FormClass from '../../shared/dataClasses/FormClass';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
 import { AddingFormModal } from './AddingFormModal';
 import {QRCodeModal} from './QRCodeModal';
+import { uniqueId } from 'react-bootstrap-typeahead/types/utils';
 
 function Response(props: {
 	form?: FormClass;
@@ -58,7 +59,7 @@ export default function FormsList() {
 					{
 						data: {},
 						form: response.form,
-						id: crypto.randomUUID(),
+						id: uniqueId(),
 						name: response.name,
 						org: scout.org,
 						scout: scout.login

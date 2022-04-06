@@ -85,9 +85,8 @@ export function QRCodeModal(props: {
 	const size = useWindowSize();
 
 	const createSVG = (submission: ResponseClass) => {
-		const formId = submission.form.replace(/-/g, '');
 		const serializedData = serialize(submission.data, forms.find(form => form.id === submission.form).sections);
-		const segments = [qrcodegen.QrSegment.makeNumeric(BigInt('0x' + formId).toString()), qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';'+submission.scout+';')), qrcodegen.QrSegment.makeNumeric(serializedData.toString())];
+		const segments = [qrcodegen.QrSegment.makeNumeric(BigInt('0x' + submission.form).toString()), qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';'+submission.scout+';')), qrcodegen.QrSegment.makeNumeric(serializedData.toString())];
 		const qr = qrcodegen.QrCode.encodeSegments(segments, qrcodegen.QrCode.Ecc.LOW).getModules();
 		return { qr: qr, submission: submission };
 	};
