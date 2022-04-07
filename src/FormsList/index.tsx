@@ -8,7 +8,7 @@ import FormClass from '../../shared/dataClasses/FormClass';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
 import { AddingFormModal } from './AddingFormModal';
 import {QRCodeModal} from './QRCodeModal';
-import { uniqueId } from 'react-bootstrap-typeahead/types/utils';
+import { uniqueId } from '../../shared/uniqueId';
 
 function Response(props: {
 	form?: FormClass;
