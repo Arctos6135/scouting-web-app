@@ -35,7 +35,7 @@ export class Scout extends ScoutClass {
 			if (!(await user.save())) return RegisterResult.Invalid;
 		} 
 		catch (e) {
-			console.log(e);
+			console.error(e);
 			return RegisterResult.Invalid;
 		}
 		return RegisterResult.Successful;

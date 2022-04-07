@@ -7,7 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 
 module.exports = (env) => ({
-	entry: path.resolve(__dirname, './src/App.tsx'),
+	entry: path.resolve(__dirname, './app/App.tsx'),
 	output: {
 		path: path.join(__dirname, 'dist')
 	},
@@ -19,11 +19,11 @@ module.exports = (env) => ({
 	},
 	plugins: [
 		new HTMLWebpackPlugin({
-			template: path.join(__dirname, 'src', 'index.html'),
+			template: path.join(__dirname, 'app', 'index.html'),
 		}),
 		new MiniCssExtractPlugin(),
 		new WorkboxWebpackPlugin.InjectManifest({
-			swSrc: path.join(__dirname, 'src', 'sw.ts'),
+			swSrc: path.join(__dirname, 'app', 'sw.ts'),
 			swDest: 'sw.js',
 			maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
 		}),
