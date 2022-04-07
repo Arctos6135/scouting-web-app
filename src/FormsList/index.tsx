@@ -7,7 +7,7 @@ import DataEntry, { forms } from '../DataEntry';
 import FormClass from '../../shared/dataClasses/FormClass';
 import ResponseClass from '../../shared/dataClasses/ResponseClass';
 import { AddingFormModal } from './AddingFormModal';
-import {QRCodeModal} from './QRCodeModal';
+import { QRCodeModal } from './QRCodeModal';
 import { uniqueId } from 'react-bootstrap-typeahead/types/utils';
 
 function Response(props: {
@@ -16,18 +16,18 @@ function Response(props: {
 }) {
 	const [submitQueue, setSubmitQueue] = useRecoilState(conn.submitQueue);
 	const scout = useRecoilValue(conn.scout);
+	const onSubmit = () => setSubmitQueue([...submitQueue, {
+		form: props.form.id,
+		data: forms[props.response.name] ?? {},
+		org: scout.org,
+		scout: scout.login,
+		id: props.response.id,
+		name: props.response.name
+	}]);
 	return <>
 		{props.form ?
 			<>
-				{props.form && <DataEntry form={props.form} formID={props.response.name} />}
-				<Button onClick={() => setSubmitQueue([...submitQueue, {
-					form: props.form.id,
-					data: forms[props.response.name] ?? {},
-					org: scout.org,
-					scout: scout.login,
-					id: props.response.id,
-					name: props.response.name
-				}])}>Submit</Button>
+				{props.form && <DataEntry form={props.form} formID={props.response.name} onSubmit={onSubmit} />}
 			</> : 'Invalid form'
 		}
 	</>;
@@ -55,7 +55,7 @@ export default function FormsList() {
 		<AddingFormModal show={addingForm} onClose={response => {
 			if (response) {
 				setActiveForms([
-					...activeForms, 
+					...activeForms,
 					{
 						data: {},
 						form: response.form,
@@ -68,7 +68,7 @@ export default function FormsList() {
 			}
 			setAddingForm(false);
 		}}></AddingFormModal>
-		<QRCodeModal show={showingQR} onClose={() => setShowingQR(false)}/>
+		<QRCodeModal show={showingQR} onClose={() => setShowingQR(false)} />
 		<Card>
 			<Card.Body>
 				{signedIn ? (activeForms.length ? <Accordion>
@@ -87,10 +87,10 @@ export default function FormsList() {
 								</Accordion.Body>
 							</Accordion.Item>
 						)}
-				</Accordion> : 'No forms') : 'You are not logged in as a scout' }
+				</Accordion> : 'No forms') : 'You are not logged in as a scout'}
 			</Card.Body>
 		</Card>
-		<br/>
+		<br />
 		<Card>
 			<Card.Body>
 				<Stack className="mb-3" direction='horizontal' gap={3}>

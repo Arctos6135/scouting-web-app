@@ -31,3 +31,10 @@ export const formData = selectorFamily<string | number, string>({
 			localStorage.setItem('formData', JSON.stringify(forms));
 	}
 });
+
+export const FormErrorsContext = React.createContext<{
+	errors: { [key: string]: boolean }, setErrors: React.Dispatch<React.SetStateAction<{
+		[key: string]: boolean;
+	}>>
+} | undefined>(undefined);
+export const useFormErrors = () => React.useContext(FormErrorsContext);
