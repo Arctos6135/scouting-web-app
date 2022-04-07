@@ -12,19 +12,12 @@ import './styles.css';
 
 import { ScoutsTable } from './ScoutsTable';
 import { FormsTable } from './FormsTable';
-
-const {useState, useEffect} = React;
-
-// https://github.com/denoland/deno/issues/12754
-declare global {
-	interface Crypto {
-		randomUUID: () => string;
-	}
-}
+import uniqueId from '../../shared/uniqueId';
+const { useState, useEffect } = React;
 
 
 function createForm() {
-	conn.socket.emit('organization:update form', { id: self.crypto.randomUUID(), name: 'Form', sections: [] });
+	conn.socket.emit('organization:update form', { id: uniqueId(), name: 'Form', sections: [] });
 }
 
 export default function AdminPage() {
@@ -36,7 +29,7 @@ export default function AdminPage() {
 
 	useEffect(() => {
 		if (!signedIn) {
-			navigate('/home', {replace: true});
+			navigate('/home', { replace: true });
 		}
 		else {
 			conn.socket.emit('organization:get scouts');
@@ -61,7 +54,7 @@ export default function AdminPage() {
 	conn.useSocketEffect('organization:delete scout', (result: boolean) => {
 		if (!result) setErrorPopup('Failed to delete scout');
 	}, [signedIn]);
-	
+
 	conn.useSocketEffect('organization:create scout', (result: boolean) => {
 		if (!result) setErrorPopup('Failed to create scout');
 	}, [signedIn]);
@@ -71,40 +64,40 @@ export default function AdminPage() {
 	}, [signedIn]);
 
 	//TODO: Move all of these tables into their own components so the admin page doesn't need to re-render after every change
-	
+
 	return <>
-		{ online ? <></> : <div id="screen-cover">You are not connected to the internet.</div> }
+		{online ? <></> : <div id="screen-cover">You are not connected to the internet.</div>}
 		<ErrorModal show={errorPopup != null} content={errorPopup} onClose={
 			() => setErrorPopup(null)
-		}/>
+		} />
 
 		<RegisterModal show={creatingScout} onClose={(user) => {
 			setCreatingScout(false);
 			if (user) conn.socket.emit('organization:create scout', user);
-		}}/>
+		}} />
 
-		<Container style={{overflow: online ? 'visible' : 'hidden', maxHeight: online ? undefined : '80vh'}}>
+		<Container style={{ overflow: online ? 'visible' : 'hidden', maxHeight: online ? undefined : '80vh' }}>
 			<InputGroup>
 				<InputGroup.Text>Organization login link</InputGroup.Text>
 				<Form.Control id="login-link" readOnly={true} value={loginLink}></Form.Control>
 				<Button onClick={() => navigator.clipboard.writeText(loginLink)}>Copy</Button>
 			</InputGroup>
-			<br/>
+			<br />
 			<Card>
 				<Card.Header>
 					<Card.Title as='h2'>Scouts</Card.Title>
 				</Card.Header>
-				<Card.Body style={{overflow:'scroll'}}>
+				<Card.Body style={{ overflow: 'scroll' }}>
 					<ScoutsTable></ScoutsTable>
 				</Card.Body>
 				<Card.Footer>
 					<Button onClick={() => setCreatingScout(true)}>
-						Add scout <BsPlus size={20} style={{marginLeft: 8}}/>
+						Add scout <BsPlus size={20} style={{ marginLeft: 8 }} />
 					</Button>
 				</Card.Footer>
 			</Card>
 
-			<br/>
+			<br />
 			<Card>
 				<Card.Header>
 					<Card.Title as='h2'>Forms</Card.Title>
@@ -114,7 +107,7 @@ export default function AdminPage() {
 				</Card.Body>
 				<Card.Footer>
 					<Button onClick={() => createForm()}>
-						Add form <BsPlus size={20} style={{marginLeft: 8}}/>
+						Add form <BsPlus size={20} style={{ marginLeft: 8 }} />
 					</Button>
 				</Card.Footer>
 			</Card>

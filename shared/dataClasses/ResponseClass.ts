@@ -1,5 +1,5 @@
 import { prop } from '@typegoose/typegoose';
-import * as crypto from 'crypto';
+import uniqueID from '../uniqueId';
 
 export default class ResponseClass {
 	@prop({ required: true }) 
@@ -13,6 +13,6 @@ export default class ResponseClass {
 
 	@prop({ required: true }) 
 	public name: string;
-	@prop({ required: true, unique: true, default: () => crypto.randomUUID() }) 
+	@prop({ required: true, unique: true, default: () => uniqueID() }) 
 	public id: string;
 }
