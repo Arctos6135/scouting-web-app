@@ -11,7 +11,7 @@ import _ from 'lodash';
 function downloadXLSX() {
 	const state = store.getState();
 	const responses = state.user.responses.all.concat(state.user.responses.submitQueue);
-	const forms = state.forms.schemas.list;
+	const forms = state.user.forms.schemas.list;
 	const wb = XLSX.utils.book_new();
 	const cols = {};
 	for (const form of forms) {

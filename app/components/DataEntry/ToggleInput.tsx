@@ -4,14 +4,14 @@ import { FormCheck } from 'react-bootstrap';
 import { FormIDContext } from './formState';
 import Toggle from 'shared/dataClasses/FormClass/Toggle';
 import { useSelector, useDispatch } from 'app/hooks';
-import { setFormData } from 'app/store/reducers/forms';
+import { setFormData } from 'app/store/reducers/user';
 
 export function ToggleInput(props: {
 	component: Toggle;
 }) {
 	const formID = React.useContext(FormIDContext);
 	const dispatch = useDispatch();
-	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
+	const value = useSelector(state => state.user.forms.data[formID]?.[props.component.valueID]);
 	useEffect(() => {
 		if (value == undefined) {
 			dispatch(setFormData({

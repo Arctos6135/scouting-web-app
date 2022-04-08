@@ -13,7 +13,7 @@ export default function QRReader() {
 	const [inputs, setInputs] = React.useState<MediaDeviceInfo[]>(undefined);
 	const [deviceId, setDeviceId] = React.useState<string>(undefined);
 	const videoRef = React.useRef<HTMLVideoElement>(null);
-	const forms = useSelector(state => state.forms.schemas.list, _.isEqual);
+	const forms = useSelector(state => state.user.forms.schemas.list, _.isEqual);
 	const scoutOrg = useSelector(state => state.user.scout?.org);
 	const [scanning, setScanning] = React.useState(false);
 	const [scanned, setScanned] = React.useState(false);

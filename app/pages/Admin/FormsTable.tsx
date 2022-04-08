@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { socket } from 'app/store';
 
 export function FormsTable() {
-	const forms = useSelector(state => state.forms.schemas.list, _.isEqual);
+	const forms = useSelector(state => state.user.forms.schemas.list, _.isEqual);
 
 	const [deletingForm, setDeletingForm] = useState<FormClass>(null);
 	const [editingForm, setEditingForm] = useState<FormClass>(null);

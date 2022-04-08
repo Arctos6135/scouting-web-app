@@ -2,34 +2,56 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import ScoutClass from 'shared/dataClasses/ScoutClass';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
 import { socket } from '..';
+import FormClass from 'shared/dataClasses/FormClass';
+
+const defaultForms: () => {
+	schemas: {
+		map: { [key: string]: FormClass };
+		list: FormClass[]
+	},
+	data: {
+		[formID: string]: {
+			[key: string]: number | string
+		}
+	}
+} = () => ({
+	schemas: {
+		map: {}, list: []
+	},
+	data: {}
+});
+
+const defaultResponses: () => {
+	submitQueue: ResponseClass[];
+	activeResponses: ResponseClass[];
+	all: ResponseClass[];
+} = () => ({
+	submitQueue: [],
+	activeResponses: [],
+	all: []
+});
 
 let initialState: {
 	scout?: ScoutClass;
 	online: boolean;
-	responses: {
-		submitQueue: ResponseClass[];
-		activeResponses: ResponseClass[];
-		all: ResponseClass[];
-	},
+	responses: ReturnType<typeof defaultResponses>;
+	forms: ReturnType<typeof defaultForms>;
 	storedResponses: {
-		[key: string]: {
-			submitQueue: ResponseClass[];
-			activeResponses: ResponseClass[];
-			all: ResponseClass[];
-		}
+		[key: string]: ReturnType<typeof defaultResponses>;
+	},
+	storedForms: {
+		[org: string]: ReturnType<typeof defaultForms>;
 	}
 } = {
 	scout: undefined,
 	online: false,
-	responses: {
-		submitQueue: [],
-		activeResponses: [],
-		all: []
-	},
-	storedResponses: {}
+	responses: defaultResponses(),
+	storedResponses: {},
+	forms: defaultForms(),
+	storedForms: {}
 };
 
-const stored = localStorage.getItem('scout');
+const stored = localStorage.getItem('user');
 if (stored) {
 	try {
 		const val = JSON.parse(stored);
@@ -45,14 +67,14 @@ const user = createSlice({
 	initialState,
 	reducers: {
 		setScout(state, action: PayloadAction<ScoutClass>) {
-			if (state.scout) state.storedResponses[state.scout.org + '-' + state.scout.login] = state.responses;
+			if (state.scout) {
+				state.storedResponses[state.scout.org + '-' + state.scout.login] = state.responses;
+				state.storedForms[state.scout.org] = state.forms;
+			}
 			state.scout = action.payload;
 			state.responses = (state.scout && 
-				state.storedResponses[state.scout.org + '-' + state.scout.login]) || {
-				submitQueue: [],
-				activeResponses: [],
-				all: []
-			};
+				state.storedResponses[state.scout.org + '-' + state.scout.login]) || defaultResponses();
+			state.forms = (state.scout && state.storedForms[state.scout.org]) || defaultForms();
 		},
 		setOnline(state, action: PayloadAction<boolean>) {
 			state.online = action.payload;
@@ -78,6 +100,17 @@ const user = createSlice({
 		},
 		setResponses(state, responses: PayloadAction<ResponseClass[]>) {
 			state.responses.all = responses.payload;
+		},
+		setForms(state, action: PayloadAction<FormClass[]>) {
+			state.forms.schemas.list = action.payload;
+			state.forms.schemas.map = {};
+			for (let i = 0; i < action.payload.length; i++) {
+				state.forms.schemas.map[action.payload[i].id] = action.payload[i];
+			}
+		},
+		setFormData(state, action: PayloadAction<{form: string, valueID: string, value: string | number}>) {
+			if (!state.forms.data[action.payload.form]) state.forms.data[action.payload.form] = {};
+			state.forms.data[action.payload.form][action.payload.valueID] = action.payload.value;
 		}
 	}
 });
@@ -89,6 +122,8 @@ export const {
 	submit, 
 	createResponse, 
 	setResponses, 
-	addToSubmitQueue
+	addToSubmitQueue,
+	setForms,
+	setFormData
 } = user.actions;
 export default user;

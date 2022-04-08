@@ -81,7 +81,7 @@ export function QRCodeModal(props: {
 	onClose: () => void;
 }) {
 	const submitQueue = useSelector(state => state.user.responses.submitQueue, _.isEqual);
-	const forms = useSelector(state => state.forms.schemas.map);
+	const forms = useSelector(state => state.user.forms.schemas.map);
 	const size = useWindowSize();
 
 	const createSVG = (submission: ResponseClass) => {

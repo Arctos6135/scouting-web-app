@@ -8,7 +8,7 @@ export function AddingFormModal(props: {
 	show: boolean;
 	onClose: (res?: { name: string; form: string; }) => void;
 }) {
-	const forms = useSelector(state => state.forms.schemas.list, (l, r) => _.isEqual(l, r));
+	const forms = useSelector(state => state.user.forms.schemas.list, (l, r) => _.isEqual(l, r));
 
 	const [name, setName] = useState<string>('');
 	const [form, setForm] = useState<string>();

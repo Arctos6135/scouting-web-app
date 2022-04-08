@@ -4,7 +4,7 @@ import { Button, FormControl } from 'react-bootstrap';
 import { FormIDContext, useFormErrors } from './formState';
 import Num from 'shared/dataClasses/FormClass/Number';
 import { useSelector, useDispatch } from 'app/hooks';
-import { setFormData } from 'app/store/reducers/forms';
+import { setFormData } from 'app/store/reducers/user';
 
 export function NumInput(props: {
 	component: Num;
@@ -12,7 +12,7 @@ export function NumInput(props: {
 }) {
 	const formID = React.useContext(FormIDContext);
 	const dispatch = useDispatch();
-	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
+	const value = useSelector(state => state.user.forms.data[formID]?.[props.component.valueID]);
 	const [error, setError] = React.useState<string | undefined>(undefined);
 	const { setErrors } = useFormErrors();
 

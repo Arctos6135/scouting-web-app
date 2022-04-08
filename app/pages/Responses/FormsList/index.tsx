@@ -60,7 +60,7 @@ export default function FormsList() {
 	const activeResponses = useSelector(state => state.user.responses.activeResponses, _.isEqual);
 	const submitQueueLength = useSelector(state => state.user.responses.submitQueue.length);
 	const dispatch = useDispatch();
-	const forms = useSelector(state => state.forms.schemas.map, _.isEqual);
+	const forms = useSelector(state => state.user.forms.schemas.map, _.isEqual);
 	const [addingForm, setAddingForm] = React.useState<boolean>(false);
 	const [showingQR, setShowingQR] = React.useState(false);
 	const scout = useSelector(state => state.user.scout, _.isEqual);

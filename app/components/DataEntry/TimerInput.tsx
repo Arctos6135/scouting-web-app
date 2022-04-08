@@ -4,14 +4,14 @@ import { Button, ButtonGroup, FormControl } from 'react-bootstrap';
 import { FormIDContext } from './formState';
 import Timer from 'shared/dataClasses/FormClass/Timer';
 import { useSelector, useDispatch } from 'app/hooks';
-import { setFormData } from 'app/store/reducers/forms';
+import { setFormData } from 'app/store/reducers/user';
 
 export function TimerInput(props: {
 	component: Timer;
 }) {
 	const formID = React.useContext(FormIDContext);
 	const dispatch = useDispatch();
-	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
+	const value = useSelector(state => state.user.forms.data[formID]?.[props.component.valueID]);
 	useEffect(() => {
 		if (value == undefined) {
 			dispatch(setFormData({
