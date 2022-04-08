@@ -19,32 +19,23 @@ export function NumInput(props: {
 			setValue(props.component.default ?? '0');
 		}
 	});
+	const changeError = (error: boolean) => setErrors((errors) => {
+		errors[props.component.valueID] = error;
+		return Object.assign({}, errors);
+	});
 	React.useEffect(() => {
-		if (props.component.min > Number.parseInt(value.toString())) {
+		if (value === undefined || value.toString().length === 0) {
+			setError('Value can\'t be empty');
+			changeError(true);
+		} else if (props.component.min > Number.parseInt(value.toString())) {
 			setError(`Value must be at least ${props.component.min}`);
-			setErrors((errors) => {
-				errors[props.component.valueID] = true;
-				return errors;
-			});
+			changeError(true);
 		} else if (props.component.max < Number.parseInt(value.toString())) {
 			setError(`Value can't be higher then ${props.component.max}`);
-			setErrors((errors) => {
-				errors[props.component.valueID] = true;
-				return errors;
-			});
-		} else if (value === undefined || value.toString().length === 0) {
-			setError('Value can\'t be empty');
-			setErrors((errors) => {
-				errors[props.component.valueID] = true;
-				return errors;
-			});
-		}
-		else {
+			changeError(true);
+		} else {
 			setError(undefined);
-			setErrors((errors) => {
-				errors[props.component.valueID] = false;
-				return errors;
-			});
+			changeError(false);
 		}
 	}, [value]);
 

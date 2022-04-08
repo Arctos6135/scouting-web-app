@@ -16,18 +16,19 @@ function Response(props: {
 }) {
 	const [submitQueue, setSubmitQueue] = useRecoilState(conn.submitQueue);
 	const scout = useRecoilValue(conn.scout);
-	const onSubmit = () => setSubmitQueue([...submitQueue, {
-		form: props.form.id,
-		data: forms[props.response.name] ?? {},
-		org: scout.org,
-		scout: scout.login,
-		id: props.response.id,
-		name: props.response.name
-	}]);
+	const [valid, setValid] = React.useState(true);
 	return <>
 		{props.form ?
 			<>
-				{props.form && <DataEntry form={props.form} formID={props.response.name} onSubmit={onSubmit} />}
+				{props.form && <DataEntry form={props.form} formID={props.response.name} setValid={setValid} />}
+				<Button disabled={!valid} onClick={() => valid && setSubmitQueue([...submitQueue, {
+					form: props.form.id,
+					data: forms[props.response.name] ?? {},
+					org: scout.org,
+					scout: scout.login,
+					id: props.response.id,
+					name: props.response.name
+				}])}>Submit</Button>
 			</> : 'Invalid form'
 		}
 	</>;
