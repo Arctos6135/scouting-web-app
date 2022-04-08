@@ -2,22 +2,23 @@ import * as React from 'react';
 import { Button, Card, Col, Alert, FormSelect, Row } from 'react-bootstrap';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import { deserialize } from 'shared/dataClasses/FormClass';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import * as conn from 'app/connection';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
 import uniqueID from 'shared/uniqueId';
+import { useDispatch, useSelector } from 'app/hooks';
+import _ from 'lodash';
+import { addToSubmitQueue } from '../../../store/reducers/responses';
 
 export default function QRReader() {
 	const [reader, setReader] = React.useState(new BrowserQRCodeReader());
 	const [inputs, setInputs] = React.useState<MediaDeviceInfo[]>(undefined);
 	const [deviceId, setDeviceId] = React.useState<string>(undefined);
 	const videoRef = React.useRef<HTMLVideoElement>(null);
-	const forms = useRecoilValue(conn.forms);
-	const setSubmitQueue = useSetRecoilState(conn.submitQueue);
-	const scout = useRecoilValue(conn.scout);
+	const forms = useSelector(state => state.forms.schemas.list, _.isEqual);
+	const scoutOrg = useSelector(state => state.user.scout?.org);
 	const [scanning, setScanning] = React.useState(false);
 	const [scanned, setScanned] = React.useState(false);
 	const [invalidQR, setInvalidQR] = React.useState(false);
+	const dispatch = useDispatch();
 
 	React.useEffect(() => {
 		BrowserQRCodeReader.listVideoInputDevices().then((value) => setInputs(value));
@@ -38,10 +39,10 @@ export default function QRReader() {
 							form: form.id,
 							id: uniqueID(),
 							name: '',
-							org: scout.org,
+							org: scoutOrg,
 							scout: scoutId
 						};
-						setSubmitQueue((submitQueue) => [...submitQueue, response]);
+						dispatch(addToSubmitQueue(response));
 						setScanning(false);
 						controls.stop();
 						setScanned(true);

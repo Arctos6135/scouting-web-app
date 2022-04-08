@@ -1,21 +1,32 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
-import { useRecoilState } from 'recoil';
-import { FormIDContext, formData } from './formState';
+import { FormIDContext } from './formState';
 import Text from 'shared/dataClasses/FormClass/Text';
+import { useSelector, useDispatch } from 'app/hooks';
+import { setFormData } from 'app/store/reducers/forms';
 
 export function TextInput(props: {
 	component: Text;
 }) {
 	const formID = React.useContext(FormIDContext);
-	const [value, setValue] = useRecoilState(formData(formID + '/' + props.component.valueID));
+	const dispatch = useDispatch();
+	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
 	useEffect(() => {
 		if (value == undefined) {
-			setValue('');
+			dispatch(setFormData({
+				form: formID, 
+				valueID: props.component.valueID, 
+				value: ''
+			}));
 		}
 	});
 	return <Form.Control
 		value={value ?? ''}
-		onChange={(value) => (setValue(value.target.value))} />;
+		onChange={(value) =>
+			dispatch(setFormData({
+				form: formID,
+				valueID: props.component.valueID,
+				value: value.target.value
+			}))} />;
 }

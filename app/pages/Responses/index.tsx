@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Container} from "react-bootstrap";
+import {Container} from 'react-bootstrap';
 import FormsList from './FormsList';
 import QRReader from './QRReader';
 

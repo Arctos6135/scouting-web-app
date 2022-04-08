@@ -2,11 +2,14 @@ import ResponseClass from './dataClasses/ResponseClass';
 import FormClass, { Section } from './dataClasses/FormClass';
 import ScoutClass from './dataClasses/ScoutClass';
 
+const alertTypes = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'] as const;
+
+export type AlertType = { page: string, message: string, type: typeof alertTypes[number] }
+
 export interface ServerToClientEvents {
-    'login:failed': () => void;
-    'login:unverified': () => void;
-    'register:email taken': () => void;
-    'register:failed': () => void;
+    'alert': (alert: AlertType) => void;
+    'register:error': (message: string) => void;
+    'admin:error': (message: string) => void;
     'register': (status: boolean) => void;
 
     'organization': () => void;

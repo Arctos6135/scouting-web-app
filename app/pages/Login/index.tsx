@@ -1,41 +1,23 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import * as conn from 'app/connection';
 import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
-import {useRecoilValue} from 'recoil';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'app/hooks';
+import { socket } from 'app/store';
+import { closeAlert } from 'app/store/reducers/alerts';
 
 export default function LoginPage() {
-	const [failedLogin, setFailedLogin] = useState<boolean>(false);
-	const [unverified, setUnverified] = useState<boolean>(false);
-	const loggedIn = useRecoilValue(conn.signedIn);
-	const scout = useRecoilValue(conn.scout);
+	const loggedIn = useSelector(state => !!state.user.scout);
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace?.(/ /g, '+');
+	const alerts = useSelector(state => state.alerts['login'] ?? []);
 	const onSubmit = (e) => {
-		conn.socket.emit('login', { login: e.target?.email?.value as string | undefined, password: e.target?.password?.value as string | undefined, org });
+		socket.emit('login', { login: e.target?.email?.value as string | undefined, password: e.target?.password?.value as string | undefined, org });
 
 		e.preventDefault();
 		return false;
 	};
-	useEffect(() => {
-		const listen = () => {
-			setFailedLogin(true);
-		};
-		conn.socket.on('login:failed', listen);
-		return () => {
-			conn.socket.off('login:failed', listen);
-		};
-	});
-	useEffect(() => {
-		const listen = () => {
-			setUnverified(true);
-		};
-		conn.socket.on('login:unverified', listen);
-		return () => {
-			conn.socket.off('login:unverified', listen);
-		};
-	});
 	useEffect(() => {
 		if (loggedIn) {
 			navigate('/home', {replace: true});
@@ -44,12 +26,11 @@ export default function LoginPage() {
 
 
 	return (<Container>
-		<Alert variant='danger' dismissible show={failedLogin} onClose={() => setFailedLogin(false)}>
-			<Alert.Heading>Failed login, please try again</Alert.Heading>
-		</Alert>
-		<Alert variant='danger' dismissible show={unverified} onClose={() => setUnverified(false)}>
-			<Alert.Heading>This account has not been verified yet. Please check your email.</Alert.Heading>
-		</Alert>
+		{alerts.map(alert =>
+			<Alert variant={alert.type} key={alert.id} dismissible onClose={() => dispatch(closeAlert(alert))}>
+				<Alert.Heading>{alert}</Alert.Heading>
+			</Alert>
+		)};
 		<Card>
 			<Form onSubmit={(e) => onSubmit(e)}>
 				<Card.Header>

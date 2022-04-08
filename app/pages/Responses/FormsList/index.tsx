@@ -1,22 +1,23 @@
 import * as React from 'react';
 import { Accordion, Button, Card, CloseButton, Dropdown, Stack, Table } from 'react-bootstrap';
-import { useRecoilValue, useRecoilState } from 'recoil';
-import * as conn from 'app/connection';
 
-import DataEntry, { forms } from 'app/components/DataEntry';
+import DataEntry from 'app/components/DataEntry';
 import FormClass from 'shared/dataClasses/FormClass';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
 import { AddingFormModal } from './AddingFormModal';
 import {QRCodeModal} from './QRCodeModal';
 import uniqueId from 'shared/uniqueId';
 import DeleteModal from 'app/components/DeleteModal';
+import { useDispatch, useSelector } from 'app/hooks';
+import { moveToSubmitQueue, submit, createResponse } from 'app/store/reducers/responses';
+import _ from 'lodash';
 
 function Response(props: {
 	form?: FormClass;
 	response: ResponseClass;
 }) {
-	const [submitQueue, setSubmitQueue] = useRecoilState(conn.submitQueue);
-	const scout = useRecoilValue(conn.scout);
+	const scout = useSelector(state => state.user.scout, _.isEqual);
+	const dispatch = useDispatch();
 	const [deleting, setDeleting] = React.useState<boolean>(false);
 	return <>
 		{props.form ?
@@ -30,14 +31,16 @@ function Response(props: {
 					show={deleting}/>
 				{props.form && <DataEntry form={props.form} formID={props.response.name} />}
 				<Stack gap={3} direction={'horizontal'}>
-					<Button onClick={() => setSubmitQueue([...submitQueue, {
-						form: props.form.id,
-						data: forms[props.response.name] ?? {},
-						org: scout.org,
-						scout: scout.login,
-						id: props.response.id,
-						name: props.response.name
-					}])}>Submit</Button>
+					<Button onClick={() => dispatch(moveToSubmitQueue(props.response.id
+						/*{
+							form: props.form.id,
+							data: forms[props.response.name] ?? {},
+							org: scout.org,
+							scout: scout.login,
+							id: props.response.id,
+							name: props.response.name
+						}*/
+					))}>Submit</Button>
 					<Button variant='outline-secondary'>
 						Rename
 					</Button>
@@ -50,57 +53,42 @@ function Response(props: {
 	</>;
 }
 
-function submitResponses(queue: ResponseClass[]) {
-	for (const resp of queue) {
-		conn.socket.emit('data:respond', resp);
-	}
-}
-
 export default function FormsList() {
-	const forms = useRecoilValue(conn.forms);
-	const submitQueue = useRecoilValue(conn.submitQueue);
-	const responses = useRecoilValue(conn.responses);
-	const [activeForms, setActiveForms] = useRecoilState(conn.activeForms);
-	const scout = useRecoilValue(conn.scout);
-	const signedIn = useRecoilValue(conn.signedIn);
-	console.log(signedIn);
-
+	const signedIn = useSelector(state => !!state.user.scout);
+	const activeResponses = useSelector(state => state.responses.activeResponses, _.isEqual);
+	const submitQueueLength = useSelector(state => state.responses.submitQueue.length);
+	const dispatch = useDispatch();
+	const forms = useSelector(state => state.forms.schemas.map, _.isEqual);
 	const [addingForm, setAddingForm] = React.useState<boolean>(false);
 	const [showingQR, setShowingQR] = React.useState(false);
+	const scout = useSelector(state => state.user.scout, _.isEqual);
 
 	return <>
 		<AddingFormModal show={addingForm} onClose={response => {
 			if (response) {
-				setActiveForms([
-					...activeForms, 
-					{
-						data: {},
-						form: response.form,
-						id: uniqueId(),
-						name: response.name,
-						org: scout.org,
-						scout: scout.login
-					}
-				]);
+				dispatch(createResponse({
+					data: {},
+					form: response.form,
+					id: uniqueId(),
+					name: response.name,
+					org: scout.org,
+					scout: scout.login
+				}));
 			}
 			setAddingForm(false);
 		}}></AddingFormModal>
 		<QRCodeModal show={showingQR} onClose={() => setShowingQR(false)}/>
 		<Card>
 			<Card.Body>
-				{signedIn ? (activeForms.length ? <Accordion>
-					{activeForms
-						// Don't display responses queued for submission
-						.filter((response) => !submitQueue.find((a) => a.id == response.id))
-						// Don't display responses that have already been submitted
-						.filter((response) => !responses.find((r) => r.id == response.id))
+				{signedIn ? (activeResponses.length ? <Accordion>
+					{activeResponses
 						.map((response, idx) =>
 							<Accordion.Item key={response.id} eventKey={response.id}>
 								<Accordion.Header>
 									{response.name}
 								</Accordion.Header>
 								<Accordion.Body>
-									<Response form={forms.find(f => f.id == response.form)} response={response} />
+									<Response form={forms[response.form]} response={response} />
 								</Accordion.Body>
 							</Accordion.Item>
 						)}
@@ -116,8 +104,8 @@ export default function FormsList() {
 					</Button>
 				</Stack>
 				<Stack direction='horizontal' gap={3}>
-					<Button variant='outline-primary' onClick={() => submitResponses(submitQueue)} disabled={!signedIn}>
-						Sync ({submitQueue.filter(resp => !responses.find(res => res.id == resp.id)).length} responses)
+					<Button variant='outline-primary' onClick={() => dispatch(submit())} disabled={!signedIn}>
+						Sync ({submitQueueLength} responses)
 					</Button>
 					<Button variant='outline-secondary' disabled={!signedIn} onClick={() => setShowingQR(true)}>Sync by QR Code</Button>
 				</Stack>
@@ -125,10 +113,3 @@ export default function FormsList() {
 		</Card>
 	</>;
 }
-function ResponseEditor(props: {
-	response: ResponseClass
-}): JSX.Element {
-	const forms = useRecoilValue(conn.forms);
-	return ;
-}
-

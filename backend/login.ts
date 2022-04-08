@@ -5,7 +5,7 @@ import { IOServer, Socket } from './server';
 import { RegisterResult } from '../shared/dataClasses/OrganizationClass';
 import { getLogger } from './logging';
 
-const logger = getLogger("login");
+const logger = getLogger('login');
 
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const req = socket.request;
@@ -22,7 +22,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	};
 
 	socket.on('login', async (data) => {
-		logger.verbose(`Scout login`, { data, ip: socket.handshake.address });
+		logger.verbose('Scout login', { data, ip: socket.handshake.address });
 		let org: string;
 		if (data.org) org = data.org;
 		else {
@@ -30,7 +30,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			if (organization) org = organization.orgID;
 			else {
 				logger.warn('No org found', { data, ip: socket.handshake.address });
-				socket.emit('login:failed');
+				socket.emit('alert', { message: 'This team does not exist.', page: 'login', type: 'danger' });
 				return;
 			}
 		}
@@ -41,11 +41,11 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			req.session.save();
 			break;
 		case LoginResult.Unverified:
-			socket.emit('login:unverified');
+			socket.emit('alert', { message: 'You are attempting to login with an unverified email address.', page: 'login', type: 'danger' });
 			logger.verbose('Unverified login attempt', { data, ip: socket.handshake.address });
 			break;
 		default:
-			socket.emit('login:failed');
+			socket.emit('alert', { message: 'Unable to login.', page: 'login', type: 'danger' });
 			logger.verbose('Failed login attempt', { data, result, ip: socket.handshake.address });
 			break;
 		}
@@ -53,7 +53,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('register', async (data) => {
-		logger.verbose(`Register organization`, { data, ip: socket.handshake.address });
+		logger.verbose('Register organization', { data, ip: socket.handshake.address });
 		const result = await models.Organization.register(data.email, data.password, data.name);
 		switch (result) {
 		case RegisterResult.Successful:
@@ -61,13 +61,13 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			break;
 
 		case RegisterResult.EmailTaken:
-			logger.verbose(`Email taken`, { data, ip: socket.handshake.address });
-			socket.emit('register:email taken');
+			logger.verbose('Email taken', { data, ip: socket.handshake.address });
+			socket.emit('register:error', 'That email address is already in use.');
 			break;
 
 		default:
-			logger.verbose(`Register failed`, { data, result, ip: socket.handshake.address });
-			socket.emit('register:failed');
+			logger.verbose('Register failed', { data, result, ip: socket.handshake.address });
+			socket.emit('register:error', 'Unable to register.');
 			break;
 		}
 	});
@@ -81,7 +81,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	
 	socket.on('logout', async () => {
 		await cleanup();
-		logger.verbose(`Scout logout`, { scout: req.session.scout, ip: socket.handshake.address });
+		logger.verbose('Scout logout', { scout: req.session.scout, ip: socket.handshake.address });
 		delete req.session.scout;
 		req.session.save();
 	});

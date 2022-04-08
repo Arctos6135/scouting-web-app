@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Button, Card, Container, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import { useRecoilValue } from 'recoil';
-import * as conn from 'app/connection';
 import { ErrorModal } from './ErrorModal';
 import { RegisterModal } from './RegisterModal';
 
@@ -12,19 +10,22 @@ import './styles.css';
 
 import { ScoutsTable } from './ScoutsTable';
 import { FormsTable } from './FormsTable';
+import { useDispatch, useSelector } from 'app/hooks';
 import uniqueId from 'shared/uniqueId';
+import { socket } from 'app/store';
 const { useState, useEffect } = React;
 
 
 function createForm() {
-	conn.socket.emit('organization:update form', { id: uniqueId(), name: 'Form', sections: [] });
+	socket.emit('organization:update form', { id: uniqueId(), name: 'Form', sections: [] });
 }
 
 export default function AdminPage() {
-	const [loginLink, setLoginLink] = useState<string>('Loading...');
-	const signedIn = useRecoilValue(conn.signedIn);
+	const loginLink = useSelector(state => state.admin.orgURL);
+	const dispatch = useDispatch();
+	const signedIn = useSelector(state => !!state.user.scout);
+	const online = useSelector(state => state.user.online);
 
-	const online = useRecoilValue(conn.online);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -32,38 +33,14 @@ export default function AdminPage() {
 			navigate('/home', { replace: true });
 		}
 		else {
-			conn.socket.emit('organization:get scouts');
-			conn.socket.emit('organization:get forms');
+			socket.emit('organization:get scouts');
+			socket.emit('organization:get forms');
+			socket.emit('organization:get url');
 		}
 	}, [signedIn]);
 
-	useEffect(() => {
-		conn.socket.emit('organization:get url');
-	}, [signedIn]);
-	conn.useSocketEffect('organization:get url', (url: string) => {
-		setLoginLink(url);
-	});
-
 	const [errorPopup, setErrorPopup] = useState<string>(null);
 	const [creatingScout, setCreatingScout] = useState(false);
-
-	conn.useSocketEffect('organization:update password', (result: boolean) => {
-		if (!result) setErrorPopup('Password update failed');
-	}, [signedIn]);
-
-	conn.useSocketEffect('organization:delete scout', (result: boolean) => {
-		if (!result) setErrorPopup('Failed to delete scout');
-	}, [signedIn]);
-
-	conn.useSocketEffect('organization:create scout', (result: boolean) => {
-		if (!result) setErrorPopup('Failed to create scout');
-	}, [signedIn]);
-
-	conn.useSocketEffect('organization:update form', (result: boolean) => {
-		if (!result) setErrorPopup('Failed to update form');
-	}, [signedIn]);
-
-	//TODO: Move all of these tables into their own components so the admin page doesn't need to re-render after every change
 
 	return <>
 		{online ? <></> : <div id="screen-cover">You are not connected to the internet.</div>}
@@ -73,7 +50,7 @@ export default function AdminPage() {
 
 		<RegisterModal show={creatingScout} onClose={(user) => {
 			setCreatingScout(false);
-			if (user) conn.socket.emit('organization:create scout', user);
+			if (user) socket.emit('organization:create scout', user);
 		}} />
 
 		<Container style={{ overflow: online ? 'visible' : 'hidden', maxHeight: online ? undefined : '80vh' }}>

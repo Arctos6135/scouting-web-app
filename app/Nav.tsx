@@ -1,7 +1,5 @@
 import * as React from 'react';
 import './nav.css';
-import { atom, RecoilRoot, useRecoilValue } from 'recoil';
-import * as conn from './connection';
 import {Navbar, Nav, Container, Button} from 'react-bootstrap';
 import ResponseClass from '../shared/dataClasses/ResponseClass';
 import * as XLSX from 'xlsx';
@@ -9,8 +7,14 @@ import { saveAs } from 'file-saver';
 import ScoutClass from '../shared/dataClasses/ScoutClass';
 import {Link} from 'react-router-dom';
 import FormClass from '../shared/dataClasses/FormClass';
+import { socket, store } from './store';
+import { useSelector } from './hooks';
+import _ from 'lodash';
 
-function downloadXLSX(responses: ResponseClass[], forms: FormClass[]) {
+function downloadXLSX() {
+	const state = store.getState();
+	const responses = state.responses.activeResponses.concat(state.responses.submitQueue);
+	const forms = state.forms.schemas.list;
 	const wb = XLSX.utils.book_new();
 	const cols = {};
 	for (const form of forms) {
@@ -62,16 +66,12 @@ function downloadXLSX(responses: ResponseClass[], forms: FormClass[]) {
 }
 
 function XLSXDownloadButton() {
-	const responses = useRecoilValue(conn.responses);
-	const queued = useRecoilValue(conn.submitQueue);
-	const forms = useRecoilValue(conn.forms);
-
-	return <Button onClick={() => downloadXLSX(responses.concat(queued), forms)} className='ms-auto'>Download XLSX</Button>;
+	return <Button onClick={() => downloadXLSX()} className='ms-auto'>Download XLSX</Button>;
 }
 
 export default function TopNav() {
-	const signedIn = useRecoilValue(conn.signedIn);
-	const scout = useRecoilValue(conn.scout);
+	const signedIn = useSelector(state => !!state.user.scout);
+	const scout = useSelector(state => state.user.scout, _.isEqual);
 	return (<Navbar bg="light" expand="lg" style={{zIndex: 100}}>
 		<Container>
 			<Navbar.Brand>Scouting app</Navbar.Brand>
@@ -81,7 +81,7 @@ export default function TopNav() {
 					<Nav.Link as={Link} to="/">Home</Nav.Link>
 					{signedIn ? <>
 						{ scout.admin ? <Nav.Link as={Link} to="/admin">Admin</Nav.Link> : '' }
-						<Nav.Link onClick={() => conn.socket.emit('logout')}>Log out</Nav.Link>
+						<Nav.Link onClick={() => socket.emit('logout')}>Log out</Nav.Link>
 					</> : <><Nav.Link as={Link} to="/login">Log In</Nav.Link><Nav.Link as={Link} to="/register">Register</Nav.Link></>}
 					{ scout?.admin ? <XLSXDownloadButton/> : <></> }
 				</Nav>

@@ -1,18 +1,24 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Button, ButtonGroup, FormControl } from 'react-bootstrap';
-import { useRecoilState } from 'recoil';
-import { FormIDContext, formData } from './formState';
+import { FormIDContext } from './formState';
 import Timer from 'shared/dataClasses/FormClass/Timer';
+import { useSelector, useDispatch } from 'app/hooks';
+import { setFormData } from 'app/store/reducers/forms';
 
 export function TimerInput(props: {
 	component: Timer;
 }) {
 	const formID = React.useContext(FormIDContext);
-	const [value, setValue] = useRecoilState(formData(formID + '/' + props.component.valueID));
+	const dispatch = useDispatch();
+	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
 	useEffect(() => {
 		if (value == undefined) {
-			setValue(0);
+			dispatch(setFormData({
+				form: formID, 
+				valueID: props.component.valueID, 
+				value: 0
+			}));
 		}
 	});
 	const [millis, setMillis] = useState(typeof value === 'number' ? value : 0);
@@ -34,7 +40,11 @@ export function TimerInput(props: {
 			clearInterval(intervalRef);
 			setIntervalRef(undefined);
 			setMillis(millis + endTime - startTime);
-			setValue(millis + endTime - startTime);
+			dispatch(setFormData({
+				form: formID, 
+				valueID: props.component.valueID, 
+				value: millis + endTime - startTime
+			}));
 			setStartTime(Date.now());
 			setEndTime(Date.now());
 			setEditableTime(((millis + endTime - startTime)/1000).toFixed(2));
@@ -42,7 +52,11 @@ export function TimerInput(props: {
 	};
 	const restartTimer = () => {
 		setMillis(0);
-		setValue(0);
+		dispatch(setFormData({
+			form: formID, 
+			valueID: props.component.valueID, 
+			value: 0
+		}));
 		setEditableTime('0');
 		setStartTime(Date.now());
 		setEndTime(Date.now());
@@ -51,7 +65,11 @@ export function TimerInput(props: {
 	const onChange = (value: string) => {
 		const newTime = Math.floor(Number.parseFloat(value) * 1000);
 		setMillis(newTime);
-		setValue(newTime);
+		dispatch(setFormData({
+			form: formID, 
+			valueID: props.component.valueID, 
+			value: newTime
+		}));
 		setEditableTime(value);
 	};
 

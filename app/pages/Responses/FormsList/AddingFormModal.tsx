@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Button, DropdownButton, Form, InputGroup, Modal } from 'react-bootstrap';
-import { useRecoilValue } from 'recoil';
-import * as conn from 'app/connection';
+import { useSelector } from 'app/hooks';
+import _ from 'lodash';
 
 export function AddingFormModal(props: {
 	show: boolean;
 	onClose: (res?: { name: string; form: string; }) => void;
 }) {
-	const forms = useRecoilValue(conn.forms);
+	const forms = useSelector(state => state.forms.schemas.list, (l, r) => _.isEqual(l, r));
 
 	const [name, setName] = useState<string>('');
 	const [form, setForm] = useState<string>();

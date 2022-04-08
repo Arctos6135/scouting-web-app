@@ -1,17 +1,18 @@
 import * as React from 'react';
 import {useState, useEffect} from 'react';
 import { Button, Card, Col, Modal, Row, Stack } from 'react-bootstrap';
-import { useRecoilValue } from 'recoil';
 import FormClass from 'shared/dataClasses/FormClass';
-import * as conn from 'app/connection';
 import FormBuilder from './FormBuilder';
 import DeleteModal from 'app/components/DeleteModal';
 import DataEntry from 'app/components/DataEntry';
 
 import './forms-table-styles.css';
+import { useSelector } from 'app/hooks';
+import _ from 'lodash';
+import { socket } from 'app/store';
 
 export function FormsTable() {
-	const forms = useRecoilValue(conn.forms);
+	const forms = useSelector(state => state.forms.schemas.list, _.isEqual);
 
 	const [deletingForm, setDeletingForm] = useState<FormClass>(null);
 	const [editingForm, setEditingForm] = useState<FormClass>(null);
@@ -30,7 +31,7 @@ export function FormsTable() {
 	return <>
 		<DeleteModal bodyText={`All information related to this form will be deleted. Name: ${deletingForm?.name}`} show={!!deletingForm} onClose={(del) => {
 			if (del)
-				conn.socket.emit('organization:delete form', { id: deletingForm.id });
+				socket.emit('organization:delete form', { id: deletingForm.id });
 			setDeletingForm(null);
 		}} />
 
@@ -41,7 +42,7 @@ export function FormsTable() {
 			<Modal.Body>
 				<FormBuilder form={editingForm} onChange={(update) => {
 					setEditingForm(update);
-					conn.socket.emit('organization:update form', update);
+					socket.emit('organization:update form', update);
 				}}></FormBuilder>
 			</Modal.Body>
 			<Modal.Footer>

@@ -1,63 +1,36 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import * as conn from 'app/connection';
 import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
+import { useSelector, useSocketEffect, useDispatch } from 'app/hooks';
+
+import { closeAlert } from 'app/store/reducers/alerts';
+
+import { socket } from 'app/store';
 
 export default function RegisterPage() {
-	const [emailTaken, setEmailTaken] = useState<boolean>(false);
-	const [failed, setFailed] = useState<boolean>(false);
 	const [success, setSuccess] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const [password2, setPassword2] = useState<string>('');
+	const dispatch = useDispatch();
+
+	const alerts = useSelector(state => state.alerts['register'] ?? []);
+
 	const onSubmit = (e) => {
-		conn.socket.emit('register', {email: e.target?.email?.value, password: e.target?.password?.value, name: e.target?.team?.value});
+		socket.emit('register', {email: e.target?.email?.value, password: e.target?.password?.value, name: e.target?.team?.value});
 		e.preventDefault();
 		return false;
 	};
-	useEffect(() => {
-		const listen = () => {
-			setEmailTaken(true);
-			setFailed(false);
-		};
-		conn.socket.on('register:email taken', listen);
-		return () => {
-			conn.socket.off('register:email taken', listen);
-		};
-	});
 
-	useEffect(() => {
-		const listen = () => {
-			setFailed(true);
-			setEmailTaken(false);
-		};
-		conn.socket.on('register:failed', listen);
-		return () => {
-			conn.socket.off('register:failed', listen);
-		};
-	});
-
-	useEffect(() => {
-		const listen = () => {
-			setSuccess(true);
-			setFailed(false);
-			setEmailTaken(false);
-		};
-		conn.socket.on('register', listen);
-		return () => {
-			conn.socket.off('register', listen);
-		};
+	useSocketEffect('register', registered => {
+		setSuccess(registered);
 	});
 
 	return (<Container>
-		<Alert variant='danger' dismissible show={emailTaken} onClose={() => setEmailTaken(false)}>
-			<Alert.Heading>That email is taken, please try again</Alert.Heading>
-		</Alert>
-		<Alert variant='danger' dismissible show={failed} onClose={() => setFailed(false)}>
-			<Alert.Heading>Email or password is invalid</Alert.Heading>
-		</Alert>
-		<Alert variant='success' dismissible show={success} onClose={() => setSuccess(false)}>
-			<Alert.Heading>An email has been sent to that address</Alert.Heading>
-		</Alert>
+		{alerts.map(alert =>
+			<Alert variant={alert.type} key={alert.id} dismissible onClose={() => dispatch(closeAlert(alert))}>
+				<Alert.Heading>{alert}</Alert.Heading>
+			</Alert>
+		)});
 		<Card>
 			<Form onSubmit={onSubmit}>
 				<Card.Header>

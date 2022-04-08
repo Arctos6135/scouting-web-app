@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Carousel, Modal } from 'react-bootstrap';
 import { serialize } from 'shared/dataClasses/FormClass';
-import { useRecoilValue } from 'recoil';
-import * as conn from 'app/connection';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
 import qrcodegen from '3rd_party/qrcodegen';
+import _ from 'lodash';
+import { useSelector } from '../../../hooks';
 
 const useWindowSize = () => {
 	const [size, setSize] = useState(Math.min(window.innerWidth, window.innerHeight));
@@ -80,13 +80,13 @@ export function QRCodeModal(props: {
 	show: boolean;
 	onClose: () => void;
 }) {
-	const submitQueue = useRecoilValue(conn.submitQueue);
-	const forms = useRecoilValue(conn.forms);
+	const submitQueue = useSelector(state => state.responses.submitQueue, _.isEqual);
+	const forms = useSelector(state => state.forms.schemas.map);
 	const size = useWindowSize();
 
 	const createSVG = (submission: ResponseClass) => {
 		const formId = submission.form.replace(/-/g, '');
-		const serializedData = serialize(submission.data, forms.find(form => form.id === submission.form).sections);
+		const serializedData = serialize(submission.data, forms[submission.form].sections);
 		const segments = [qrcodegen.QrSegment.makeNumeric(BigInt('0x' + formId).toString()), qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';'+submission.scout+';')), qrcodegen.QrSegment.makeNumeric(serializedData.toString())];
 		const qr = qrcodegen.QrCode.encodeSegments(segments, qrcodegen.QrCode.Ecc.LOW).getModules();
 		return { qr: qr, submission: submission };

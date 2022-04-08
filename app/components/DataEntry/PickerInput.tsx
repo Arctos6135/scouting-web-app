@@ -1,21 +1,31 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
-import { useRecoilState } from 'recoil';
-import { FormIDContext, formData } from './formState';
+import { FormIDContext } from './formState';
 import Picker from 'shared/dataClasses/FormClass/Picker';
+import { useSelector, useDispatch } from 'app/hooks';
+import { setFormData } from 'app/store/reducers/forms';
 
 export function PickerInput(props: {
 	component: Picker;
 }) {
 	const formID = React.useContext(FormIDContext);
-	const [value, setValue] = useRecoilState(formData(formID + '/' + props.component.valueID));
+	const dispatch = useDispatch();
+	const value = useSelector(state => state.forms.data[formID]?.[props.component.valueID]);
 	useEffect(() => {
 		if (value == undefined) {
-			setValue(props.component.default ?? props.component.options[0]);
+			dispatch(setFormData({
+				form: formID, 
+				valueID: props.component.valueID, 
+				value: props.component.default ?? props.component.options[0]
+			}));
 		}
 	});
-	return <Form.Select value={value ?? ''} onChange={(value) => setValue(value.target.value)}>
+	return <Form.Select value={value ?? ''} onChange={(value) => dispatch(setFormData({
+		form: formID,
+		valueID: props.component.valueID,
+		value: value.target.value
+	}))}>
 		{props.component.options.map(opt => <option key={opt}>{opt}</option>)}
 	</Form.Select>;
 }
