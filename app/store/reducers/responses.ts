@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'; 
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
 import { socket } from '..';
 
@@ -12,12 +12,14 @@ let initialState: {
 	responses: []
 };
 const stored = localStorage.getItem('responses');
-try {
-	// TODO: Proper validation of parsed data
-	initialState = JSON.parse(stored);
-}
-catch (e) {
-	localStorage.removeItem('responses');
+if (stored) {
+	try {
+		// TODO: Proper validation of parsed data
+		initialState = JSON.parse(stored);
+	}
+	catch (e) {
+		localStorage.removeItem('responses');
+	}
 }
 
 const alerts = createSlice({
