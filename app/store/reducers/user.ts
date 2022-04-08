@@ -101,6 +101,14 @@ const user = createSlice({
 		setResponses(state, responses: PayloadAction<ResponseClass[]>) {
 			state.responses.all = responses.payload;
 		},
+		deleteResponse(state, id: PayloadAction<string>) {
+			const idx = state.responses.activeResponses.findIndex(resp => resp.id == id.payload);
+			if (idx > -1) state.responses.activeResponses.splice(idx, 1);
+		},
+		updateResponse(state, action: PayloadAction<{id: string, update: ResponseClass}>) {
+			const idx = state.responses.activeResponses.findIndex(resp => resp.id == action.payload.id);
+			if (idx > -1) state.responses.activeResponses[idx] = action.payload.update;
+		},
 		setForms(state, action: PayloadAction<FormClass[]>) {
 			state.forms.schemas.list = action.payload;
 			state.forms.schemas.map = {};
@@ -123,6 +131,8 @@ export const {
 	createResponse, 
 	setResponses, 
 	addToSubmitQueue,
+	deleteResponse,
+	updateResponse,
 	setForms,
 	setFormData
 } = user.actions;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Accordion, Button, Card, CloseButton, Dropdown, Stack, Table } from 'react-bootstrap';
+import { Accordion, Button, Card, CloseButton, Collapse, Dropdown, Form, InputGroup, Stack, Table } from 'react-bootstrap';
 
 import DataEntry from 'app/components/DataEntry';
 import FormClass from 'shared/dataClasses/FormClass';
@@ -9,7 +9,7 @@ import {QRCodeModal} from './QRCodeModal';
 import uniqueId from 'shared/uniqueId';
 import DeleteModal from 'app/components/DeleteModal';
 import { useDispatch, useSelector } from 'app/hooks';
-import { moveToSubmitQueue, submit, createResponse } from 'app/store/reducers/user';
+import { moveToSubmitQueue, submit, createResponse, deleteResponse, updateResponse } from 'app/store/reducers/user';
 import _ from 'lodash';
 
 function Response(props: {
@@ -19,7 +19,9 @@ function Response(props: {
 	const scout = useSelector(state => state.user.scout, _.isEqual);
 	const dispatch = useDispatch();
 	const [deleting, setDeleting] = React.useState<boolean>(false);
+	const [renaming, setRenaming] = React.useState<boolean>(false);
 	const [valid, setValid] = React.useState(true);
+	const [newName, setNewName] = React.useState(props.response.name);
 
 	return <>
 		{props.form ?
@@ -29,24 +31,31 @@ function Response(props: {
 					titleText="Are you sure you want to delete this response?"
 					onClose={del => {
 						setDeleting(false);
+						// Delete with a delay to let the modal fade out
+						if (del) setTimeout(() => dispatch(deleteResponse(props.response.id)), 100);
 					}}
 					show={deleting}/>
 				{props.form && <DataEntry form={props.form} formID={props.response.name} setValid={setValid}/>}
 				<Stack gap={3} direction={'horizontal'}>
-					<Button disabled={!valid} onClick={() => valid && dispatch(moveToSubmitQueue(props.response.id
-						/*{
-							form: props.form.id,
-							data: forms[props.response.name] ?? {},
-							org: scout.org,
-							scout: scout.login,
-							id: props.response.id,
-							name: props.response.name
-						}*/
-					))}>Submit</Button>
-					<Button variant='outline-secondary'>
-						Rename
-					</Button>
-					<Button variant='danger' onClick={() => setDeleting(true) }>
+					<Button disabled={!valid} onClick={() => valid && dispatch(moveToSubmitQueue(props.response.id))}>Submit</Button>
+					{renaming ?
+						<InputGroup>
+							<InputGroup.Text>Renaming</InputGroup.Text>
+							<Form.Control value={newName} onChange={val => setNewName(val.target.value)} />
+							<Button variant='outline-secondary' onClick={() => {
+								setRenaming(false);
+								const response = _.cloneDeep(props.response);
+								response.name = newName;
+								dispatch(updateResponse({
+									id: props.response.id,
+									update: response
+								}));
+							}}>Done</Button>
+						</InputGroup> :
+						<Button variant='outline-secondary' onClick={() => setRenaming(true)}>
+							Rename
+						</Button>}
+					<Button variant='danger' onClick={() => setDeleting(true)}>
 						Delete
 					</Button>
 				</Stack>
