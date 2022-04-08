@@ -8,7 +8,6 @@ socket.connect();
 import * as user from './reducers/user';
 import * as forms from './reducers/forms';
 import * as alerts from './reducers/alerts';
-import * as responses from './reducers/responses';
 import * as admin from './reducers/admin';
 import debounce from 'lodash.debounce';
 import { throttle } from 'lodash';
@@ -18,7 +17,6 @@ export const store = configureStore({
 		user: user.default.reducer,
 		forms: forms.default.reducer,
 		alerts: alerts.default.reducer,
-		responses: responses.default.reducer,
 		admin: admin.default.reducer
 	}
 });
@@ -31,14 +29,12 @@ socket.on('disconnect', () => store.dispatch(user.setOnline(false)));
 
 store.subscribe(throttle(() => {
 	localStorage.setItem('scout', JSON.stringify(store.getState().user));
-	localStorage.setItem('responses', JSON.stringify(store.getState().responses));
 	localStorage.setItem('admin', JSON.stringify(store.getState().admin));
 	localStorage.setItem('forms', JSON.stringify(store.getState().forms));
-	console.log(JSON.stringify(store.getState().responses));
 }, 0));
 
 socket.on('data:get responses', (resps) => {
-	store.dispatch(responses.setResponses(resps));
+	store.dispatch(user.setResponses(resps));
 });
 
 socket.on('organization:get forms', f => store.dispatch(forms.setForms(f)));
@@ -52,3 +48,5 @@ socket.on('status', (data) => {
 
 socket.emit('organization:get forms');
 socket.emit('data:get responses');
+
+socket.emit('status');

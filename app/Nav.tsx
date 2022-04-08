@@ -1,19 +1,16 @@
 import * as React from 'react';
 import './nav.css';
 import {Navbar, Nav, Container, Button} from 'react-bootstrap';
-import ResponseClass from '../shared/dataClasses/ResponseClass';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import ScoutClass from '../shared/dataClasses/ScoutClass';
 import {Link} from 'react-router-dom';
-import FormClass from '../shared/dataClasses/FormClass';
 import { socket, store } from './store';
 import { useSelector } from './hooks';
 import _ from 'lodash';
 
 function downloadXLSX() {
 	const state = store.getState();
-	const responses = state.responses.activeResponses.concat(state.responses.submitQueue);
+	const responses = state.user.responses.all.concat(state.user.responses.submitQueue);
 	const forms = state.forms.schemas.list;
 	const wb = XLSX.utils.book_new();
 	const cols = {};

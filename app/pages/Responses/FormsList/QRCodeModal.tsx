@@ -80,7 +80,7 @@ export function QRCodeModal(props: {
 	show: boolean;
 	onClose: () => void;
 }) {
-	const submitQueue = useSelector(state => state.responses.submitQueue, _.isEqual);
+	const submitQueue = useSelector(state => state.user.responses.submitQueue, _.isEqual);
 	const forms = useSelector(state => state.forms.schemas.map);
 	const size = useWindowSize();
 

@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { socket, store } from '..';
-import debounce from 'lodash.debounce';
 import ScoutClass from 'shared/dataClasses/ScoutClass';
 
 let initialState: {

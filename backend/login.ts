@@ -15,7 +15,10 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			delete req.session.scout;
 			req.session.save();
 		}
+		logger.info('Connection made from scout', { scout: req.session.scout, ip: socket.handshake.address });
 	}
+	logger.info('Connection made from ip', { ip: socket.handshake.address });
+
 
 	const syncStatus = async () => {
 		socket.emit('status', { scout: req.session.scout });

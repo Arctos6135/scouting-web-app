@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import debounce from 'lodash.debounce';
 import FormClass from 'shared/dataClasses/FormClass';
 
 let initialState: {

@@ -6,7 +6,7 @@ import ResponseClass from 'shared/dataClasses/ResponseClass';
 import uniqueID from 'shared/uniqueId';
 import { useDispatch, useSelector } from 'app/hooks';
 import _ from 'lodash';
-import { addToSubmitQueue } from '../../../store/reducers/responses';
+import { addToSubmitQueue } from 'app/store/reducers/user';
 
 export default function QRReader() {
 	const [reader, setReader] = React.useState(new BrowserQRCodeReader());

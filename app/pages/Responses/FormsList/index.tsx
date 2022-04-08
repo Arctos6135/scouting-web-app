@@ -9,7 +9,7 @@ import {QRCodeModal} from './QRCodeModal';
 import uniqueId from 'shared/uniqueId';
 import DeleteModal from 'app/components/DeleteModal';
 import { useDispatch, useSelector } from 'app/hooks';
-import { moveToSubmitQueue, submit, createResponse } from 'app/store/reducers/responses';
+import { moveToSubmitQueue, submit, createResponse } from 'app/store/reducers/user';
 import _ from 'lodash';
 
 function Response(props: {
@@ -57,8 +57,8 @@ function Response(props: {
 
 export default function FormsList() {
 	const signedIn = useSelector(state => !!state.user.scout);
-	const activeResponses = useSelector(state => state.responses.activeResponses, _.isEqual);
-	const submitQueueLength = useSelector(state => state.responses.submitQueue.length);
+	const activeResponses = useSelector(state => state.user.responses.activeResponses, _.isEqual);
+	const submitQueueLength = useSelector(state => state.user.responses.submitQueue.length);
 	const dispatch = useDispatch();
 	const forms = useSelector(state => state.forms.schemas.map, _.isEqual);
 	const [addingForm, setAddingForm] = React.useState<boolean>(false);
