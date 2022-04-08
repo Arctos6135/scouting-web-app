@@ -19,6 +19,8 @@ function Response(props: {
 	const scout = useSelector(state => state.user.scout, _.isEqual);
 	const dispatch = useDispatch();
 	const [deleting, setDeleting] = React.useState<boolean>(false);
+	const [valid, setValid] = React.useState(true);
+
 	return <>
 		{props.form ?
 			<>
@@ -29,9 +31,9 @@ function Response(props: {
 						setDeleting(false);
 					}}
 					show={deleting}/>
-				{props.form && <DataEntry form={props.form} formID={props.response.name} />}
+				{props.form && <DataEntry form={props.form} formID={props.response.name} setValid={setValid}/>}
 				<Stack gap={3} direction={'horizontal'}>
-					<Button onClick={() => dispatch(moveToSubmitQueue(props.response.id
+					<Button disabled={!valid} onClick={() => valid && dispatch(moveToSubmitQueue(props.response.id
 						/*{
 							form: props.form.id,
 							data: forms[props.response.name] ?? {},
