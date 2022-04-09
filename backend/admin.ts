@@ -27,6 +27,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	const sendScouts = async () => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			socket.emit('organization:get scouts', []);
 			return;
@@ -45,6 +46,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	socket.on('organization:get forms', sendForms);
 
 	socket.on('organization:update password', async ({login, newPassword}: {login: string; newPassword: string;}) => {
+		if (!session.scout) return;
 		// Don't allow operation for non-admins
 		// TODO: This method of controlling permissions is super scuffed
 		if (!await admin(session.scout.org, session.scout.login)) {
@@ -59,6 +61,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:create scout', async ({login, name}: {login: string; name: string}) => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn('Non-admin attempt to create scout', { login, name, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:create scout', false);
@@ -72,6 +75,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:delete scout', async (login) => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn('Non-admin attempt to delete scout', { login, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:delete scout', false);
@@ -83,6 +87,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 	
 	socket.on('organization:update form', async (form) => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn('Non-admin attempt to update form', { form, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:update form', false);
@@ -103,6 +108,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:delete form', async (form: { id: string }) => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn('Non-admin attempt to delete form', { form, scout: session.scout, ip: socket.handshake.address });
 			return socket.emit('organization:update form', false);
@@ -113,6 +119,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	});
 
 	socket.on('organization:set admin', async (data: {scout: ScoutClass, admin: boolean}) => {
+		if (!session.scout) return;
 		if (!await admin(session.scout.org, session.scout.login)) {
 			logger.warn('Non-admin attempt set admin', { data, scout: session.scout, ip: socket.handshake.address });
 		}
