@@ -63,7 +63,10 @@ function downloadXLSX() {
 }
 
 function XLSXDownloadButton() {
-	return <Button onClick={() => downloadXLSX()} className='ms-auto'>Download XLSX</Button>;
+	return <Button onClick={() => {
+		socket.emit('data:get responses');
+		setTimeout(() => downloadXLSX(), 500);
+	}} className='ms-auto'>Download XLSX</Button>;
 }
 
 export default function TopNav() {
