@@ -35,7 +35,7 @@ function Response(props: {
 						if (del) setTimeout(() => dispatch(deleteResponse(props.response.id)), 100);
 					}}
 					show={deleting}/>
-				{props.form && <DataEntry form={props.form} formID={props.response.name} setValid={setValid}/>}
+				{props.form && <DataEntry form={props.form} formID={props.response.id} setValid={setValid}/>}
 				<Stack gap={3} direction={'horizontal'}>
 					<Button disabled={!valid} onClick={() => valid && dispatch(moveToSubmitQueue(props.response.id))}>Submit</Button>
 					{renaming ?

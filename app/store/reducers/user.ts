@@ -82,6 +82,7 @@ const user = createSlice({
 		moveToSubmitQueue(state, id: PayloadAction<string>) {
 			const idx = state.responses.activeResponses.findIndex(resp => resp.id == id.payload);
 			if (idx > -1) {
+				state.responses.activeResponses[idx].data = state.forms.data[id.payload];
 				state.responses.submitQueue.push(state.responses.activeResponses[idx]);
 				state.responses.activeResponses.splice(idx, 1);
 			}
