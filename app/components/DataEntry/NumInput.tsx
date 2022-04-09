@@ -37,7 +37,7 @@ export function NumInput(props: {
 		return Object.assign({}, errors);
 	});
 	React.useEffect(() => {
-		if (isNaN(parseInt(value.toString())) || value === undefined || value.toString().length === 0) {
+		if ( value === undefined || isNaN(parseInt(value.toString())) || value.toString().length === 0) {
 			setError('Value can\'t be empty');
 			changeError(true);
 		} else if (props.component.min > Number.parseInt(value.toString())) {
