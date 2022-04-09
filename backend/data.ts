@@ -13,7 +13,9 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			socket.emit('data:get responses', []);
 			return;
 		}
-		const scouts = await models.Response.find({ org: req.session.scout.org, scout: req.session.scout.admin ? undefined : req.session.scout.login }).lean().exec();
+		const query: any = { org: req.session.scout.org };
+		if (!req.session.scout.admin) query.scout = req.session.scout.login;
+		const scouts = await models.Response.find(query).lean().exec();
 		socket.emit('data:get responses', scouts);
 	};
 	socket.on('data:respond', async (response) => {
