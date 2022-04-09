@@ -39,6 +39,7 @@ socket.on('organization:get scouts', scouts => store.dispatch(admin.setScouts(sc
 socket.on('organization:get url', url => store.dispatch(admin.setURL(url)));
 
 socket.on('status', (data) => {
+	if (data.scout?.org != store.getState().user?.scout?.org) socket.emit('organization:get forms');
 	store.dispatch(user.setScout(data.scout));
 });
 
