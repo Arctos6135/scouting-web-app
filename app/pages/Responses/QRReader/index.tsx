@@ -3,7 +3,6 @@ import { Button, Card, Col, Alert, FormSelect, Row } from 'react-bootstrap';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import { deserialize } from 'shared/dataClasses/FormClass';
 import ResponseClass from 'shared/dataClasses/ResponseClass';
-import uniqueID from 'shared/uniqueId';
 import { useDispatch, useSelector } from 'app/hooks';
 import _ from 'lodash';
 import { addToSubmitQueue } from 'app/store/reducers/user';
@@ -30,15 +29,16 @@ export default function QRReader() {
 				if (result && scanning) {
 					try {
 						const text = result.getText();
-						const [formIdBigInt, scoutId, serializedResponse] = text.split(';');
+						const [submissionIDBigInt, name,  formIdBigInt, scoutId, serializedResponse] = text.split(';');
 						const formId = BigInt(formIdBigInt).toString(16);
+						const submissionId = BigInt(submissionIDBigInt).toString(16);
 						const form = forms.find((form) => form.id.replace(/-/g, '') === formId);
 						const data = deserialize(BigInt(serializedResponse), form.sections);
 						const response: ResponseClass = {
 							data: data,
 							form: form.id,
-							id: uniqueID(),
-							name: '',
+							id: submissionId,
+							name: name,
 							org: scoutOrg,
 							scout: scoutId
 						};
@@ -48,7 +48,7 @@ export default function QRReader() {
 						setScanned(true);
 						setTimeout(() => setScanned(false), 5000);
 					} catch (err) {
-						console.log(err);
+						console.error(err);
 						setInvalidQR(true);
 						setTimeout(() => setInvalidQR(false), 5000);
 					}

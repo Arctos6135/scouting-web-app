@@ -85,11 +85,21 @@ export function QRCodeModal(props: {
 	const size = useWindowSize();
 
 	const createSVG = (submission: ResponseClass) => {
-		const formId = submission.form.replace(/-/g, '');
-		const serializedData = serialize(submission.data, forms[submission.form].sections);
-		const segments = [qrcodegen.QrSegment.makeNumeric(BigInt('0x' + formId).toString()), qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';'+submission.scout+';')), qrcodegen.QrSegment.makeNumeric(serializedData.toString())];
-		const qr = qrcodegen.QrCode.encodeSegments(segments, qrcodegen.QrCode.Ecc.LOW).getModules();
-		return { qr: qr, submission: submission };
+		try {
+			const formId = submission.form.replace(/-/g, '');
+			const serializedData = serialize(submission.data, forms[submission.form].sections);
+			const segments = [
+				qrcodegen.QrSegment.makeNumeric(BigInt('0x' + submission.id).toString()),
+				qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';'+ submission.name +';')),
+				qrcodegen.QrSegment.makeNumeric(BigInt('0x' + formId).toString()),
+				qrcodegen.QrSegment.makeBytes(toUtf8ByteArray(';' + submission.scout + ';')),
+				qrcodegen.QrSegment.makeNumeric(serializedData.toString())];
+			const qr = qrcodegen.QrCode.encodeSegments(segments, qrcodegen.QrCode.Ecc.LOW).getModules();
+			return { qr: qr, submission: submission };
+		} catch (err) {
+			console.error(err);
+			return { qr: [], submission: submission };
+		}
 	};
 
 	return <Modal show={props.show} onHide={props.onClose}>
@@ -108,7 +118,7 @@ export function QRCodeModal(props: {
 							viewBox={`0 0 ${qr.length + 0 * 2} ${qr.length + 0 * 2}`}
 							shapeRendering='crispEdges'
 						>
-							<rect d={`M0,0 h${qr.length + 0 * 2}v${qr.length + 0 * 2}H0z`}  fill='white' />
+							<rect d={`M0,0 h${qr.length + 0 * 2}v${qr.length + 0 * 2}H0z`} fill='white' />
 							<path d={generatePath(qr)} fill='black' />
 						</svg>
 					</div>
