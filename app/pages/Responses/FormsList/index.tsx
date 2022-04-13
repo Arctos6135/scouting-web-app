@@ -76,7 +76,7 @@ export default function FormsList() {
 
 	return <>
 		<AddingFormModal show={addingForm} onClose={response => {
-			if (response) {
+			if (response && !response.error) {
 				dispatch(createResponse({
 					data: {},
 					form: response.form,
