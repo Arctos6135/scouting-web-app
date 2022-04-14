@@ -79,8 +79,8 @@ export function QRCodeModal(props: {
 				<Carousel.Item key={submission.id}>
 					<div style={{ marginBottom: 64 }} className='d-flex flex-column align-items-center'>
 						<svg
-							height={Math.min(Math.ceil(size * 0.9), 400)}
-							width={Math.min(Math.ceil(size * 0.9), 400)}
+							height={Math.min(Math.ceil(size * 0.8), 400)}
+							width={Math.min(Math.ceil(size * 0.8), 400)}
 							viewBox={`0 0 ${qr.length + 0 * 2} ${qr.length + 0 * 2}`}
 							shapeRendering='crispEdges'
 						>
