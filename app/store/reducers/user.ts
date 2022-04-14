@@ -90,6 +90,10 @@ const user = createSlice({
 		addToSubmitQueue(state, response: PayloadAction<ResponseClass>) {
 			state.responses.submitQueue.push(response.payload);
 		},
+		deleteFromSubmitQueue(state, id: PayloadAction<string>) {
+			const idx = state.responses.submitQueue.findIndex(resp => resp.id == id.payload);
+			if (idx > -1) state.responses.submitQueue.splice(idx, 1);
+		},
 		submit(state) {
 			for (const resp of state.responses.submitQueue) {
 				socket.emit('data:respond', resp);
@@ -127,7 +131,8 @@ const user = createSlice({
 export const { 
 	setScout, 
 	setOnline,
-	moveToSubmitQueue, 
+	moveToSubmitQueue,
+	deleteFromSubmitQueue,
 	submit, 
 	createResponse, 
 	setResponses, 
