@@ -2,6 +2,7 @@ import {getLogger} from './logging';
 import models from './db';
 import { IOServer, Socket } from './server';
 import { Response } from 'shared/dataClasses/Response';
+import { Filter } from 'mongodb';
 
 const logger = getLogger('data');
 
@@ -12,7 +13,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			socket.emit('data:get responses', []);
 			return;
 		}
-		const query: any = { team: req.session?.scout.team };
+		const query: Filter<Response> = { team: req.session?.scout.team };
 		if (!req.session?.scout.admin) query.scout = req.session?.scout.login;
 		const scouts = await models.Response.collection.find(query).toArray();
 		if (scouts) socket.emit('data:get responses', scouts);
@@ -42,7 +43,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 				name: response.name
 			});
 			logger.verbose('Response received', { response, scout: req.session?.scout, ip: socket.handshake.address });
-			await models.Response.collection.findOneAndUpdate({ id: response.id, }, res, {upsert: true});
+			await models.Response.collection.findOneAndUpdate({ id: response.id, }, { $set: res }, {upsert: true});
 		}
 		catch (e) {
 			// do nothing

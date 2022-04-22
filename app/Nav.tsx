@@ -1,22 +1,17 @@
 import * as React from 'react';
 import './nav.css';
 import {Navbar, Nav, Container, Button} from 'react-bootstrap';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import {Link} from 'react-router-dom';
 import { socket, store } from './store';
 import { useSelector } from './hooks';
 import _ from 'lodash';
 
-function downloadXLSX() {
+function downloadCSV() {
 	const state = store.getState();
 	const responses = state.user.responses.all.concat(state.user.responses.submitQueue);
 	const forms = state.user.forms.schemas.list;
-	const wb = XLSX.utils.book_new();
 	const cols: Record<string, string[]> = {};
-	for (const form of forms) {
-		wb.SheetNames.push(form.name);
-	}
 
 	const data: Record<string, Record<string, (string|number)[]>> = {};
 	for (const resp of responses) {
@@ -49,24 +44,15 @@ function downloadXLSX() {
 			rows.push(row);
 		}
 		console.log(rows);
-		wb.Sheets[form.name] = XLSX.utils.aoa_to_sheet(rows);
+		saveAs(new Blob([rows.map(x => x.join(',')).join('\n')]), form.name + '.csv');
 	}
-
-	const out = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-	console.log(out.constructor, typeof out);
-
-	const buf = new ArrayBuffer(out.length);
-	const view = new Uint8Array(buf); 
-	for (let i=0; i < out.length; i++) view[i] = out.charCodeAt(i) & 0xFF; //convert to octet
-
-	saveAs(new Blob([buf], {type: 'application/octet-stream'}), 'scouting-data.xlsx');
 }
 
 function XLSXDownloadButton() {
 	return <Button onClick={() => {
 		socket.emit('data:get responses');
-		setTimeout(() => downloadXLSX(), 500);
-	}} className='ms-auto'>Download XLSX</Button>;
+		setTimeout(() => downloadCSV(), 500);
+	}} className='ms-auto'>Download CSV</Button>;
 }
 
 export default function TopNav() {
