@@ -15,7 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.1",
-    "@typegoose/typegoose": "^9.6.2",
     "@zxing/browser": "^0.1.1",
     "3rd_party": "file:./3rd_party",
     "app": "file:./app",
@@ -29,8 +28,7 @@
     "express-session": "^1.17.2",
     "file-saver": "^2.0.5",
     "lodash.debounce": "^4.0.8",
-    "mongodb": "^4.4.0",
-    "mongoose": "^6.2.3",
+    "mongodb": "^4.5.0",
     "nodemailer": "^6.7.2",
     "react": "^17.0.2",
     "react-bootstrap": "^2.1.2",
@@ -52,7 +50,8 @@
     "workbox-strategies": "^6.5.1",
     "workbox-webpack-plugin": "^6.5.1",
     "workbox-window": "^6.5.1",
-    "xlsx": "^0.18.4"
+    "xlsx": "^0.18.4",
+    "zod": "^3.14.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

@@ -10,10 +10,12 @@ export default function LoginPage() {
 	const loggedIn = useSelector(state => !!state.user.scout);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const org = (new URLSearchParams(window.location.search)).get('orgID')?.replace?.(/ /g, '+');
-	const alerts = useSelector(state => state.alerts['login'] ?? []);
-	const onSubmit = (e) => {
-		socket.emit('login', { login: e.target?.email?.value as string | undefined, password: e.target?.password?.value as string | undefined, org });
+	const team = (new URLSearchParams(window.location.search)).get('teamID')?.replace?.(/ /g, '+');
+	const alerts = useSelector(state => state.alerts?.login ?? []);
+	const onSubmit = (e: any) => {
+		console.log(e);
+		if (e.target?.email?.value && e.target?.password?.value)
+			socket.emit('login', { login: e.target?.email?.value, password: e.target?.password?.value, team });
 
 		e.preventDefault();
 		return false;
@@ -26,16 +28,17 @@ export default function LoginPage() {
 
 
 	return (<Container>
-		{alerts.map(alert =>
+		{alerts?.map?.(alert =>
 			<Alert variant={alert.type} key={alert.id} dismissible onClose={() => dispatch(closeAlert(alert))}>
-				<Alert.Heading>{alert}</Alert.Heading>
+				<Alert.Heading>{alert.message}</Alert.Heading>
+				{alert.body ?? ''}
 			</Alert>
 		)};
 		<Card>
 			<Form onSubmit={(e) => onSubmit(e)}>
 				<Card.Header>
 					<Card.Title>Login</Card.Title>
-					{!org ? <Card.Subtitle>Are you looking to log in as a scout? Ask your organization for a link.</Card.Subtitle> : <></>}
+					{!team ? <Card.Subtitle>Are you looking to log in as a scout? Ask your team for a link.</Card.Subtitle> : <></>}
 				</Card.Header>
 				<Card.Body>
 					<Form.Group className="mb-3" >

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { FormIDContext } from './formState';
-import Text from 'shared/dataClasses/FormClass/Text';
+import { Text } from 'shared/dataClasses/Form/Text';
 import { useSelector, useDispatch } from 'app/hooks';
 import { setFormData } from 'app/store/reducers/user';
 

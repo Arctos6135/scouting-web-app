@@ -17,11 +17,11 @@ const { useState, useEffect } = React;
 
 
 function createForm() {
-	socket.emit('organization:update form', { id: uniqueId(), name: 'Form', sections: [] });
+	socket.emit('team:update form', { id: uniqueId(), name: 'Form', sections: [] });
 }
 
 export default function AdminPage() {
-	const loginLink = useSelector(state => state.admin.orgURL);
+	const loginLink = useSelector(state => state.admin.teamURL);
 	const dispatch = useDispatch();
 	const signedIn = useSelector(state => !!state.user.scout);
 	const online = useSelector(state => state.user.online);
@@ -33,29 +33,29 @@ export default function AdminPage() {
 			navigate('/home', { replace: true });
 		}
 		else {
-			socket.emit('organization:get scouts');
-			socket.emit('organization:get forms');
-			socket.emit('organization:get url');
+			socket.emit('team:get scouts');
+			socket.emit('team:get forms');
+			socket.emit('team:get url');
 		}
 	}, [signedIn]);
 
-	const [errorPopup, setErrorPopup] = useState<string>(null);
+	const [errorPopup, setErrorPopup] = useState<string | null>(null);
 	const [creatingScout, setCreatingScout] = useState(false);
 
 	return <>
 		{online ? <></> : <div id="screen-cover">You are not connected to the internet.</div>}
-		<ErrorModal show={errorPopup != null} content={errorPopup} onClose={
+		<ErrorModal show={errorPopup != null} content={errorPopup ?? ''} onClose={
 			() => setErrorPopup(null)
 		} />
 
 		<RegisterModal show={creatingScout} onClose={(user) => {
 			setCreatingScout(false);
-			if (user) socket.emit('organization:create scout', user);
+			if (user) socket.emit('team:create scout', user);
 		}} />
 
 		<Container style={{ overflow: online ? 'visible' : 'hidden', maxHeight: online ? undefined : '80vh' }}>
 			<InputGroup>
-				<InputGroup.Text>Organization login link</InputGroup.Text>
+				<InputGroup.Text>team login link</InputGroup.Text>
 				<Form.Control id="login-link" readOnly={true} value={loginLink}></Form.Control>
 				<Button onClick={() => navigator.clipboard.writeText(loginLink)}>Copy</Button>
 			</InputGroup>

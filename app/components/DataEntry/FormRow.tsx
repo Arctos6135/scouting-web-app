@@ -1,4 +1,4 @@
-import { Row as RowType } from 'shared/dataClasses/FormClass';
+import { Row as RowType } from 'shared/dataClasses/Form';
 import * as React from 'react';
 import { Row } from 'react-bootstrap';
 import { FormGroup } from './FormGroup';

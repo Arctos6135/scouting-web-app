@@ -1,35 +1,31 @@
-import Num from 'shared/dataClasses/FormClass/Number';
-import Picker from 'shared/dataClasses/FormClass/Picker';
-import Text from 'shared/dataClasses/FormClass/Text';
-import Timer from 'shared/dataClasses/FormClass/Timer';
-import Toggle from 'shared/dataClasses/FormClass/Toggle';
-import FormComponent from 'shared/dataClasses/FormClass/FormComponent';
-import { Group, Row, Section } from 'shared/dataClasses/FormClass';
+import { Group, Row, Section, Component, formTypeMap } from 'shared/dataClasses/Form';
+import { Num } from 'shared/dataClasses/Form/Number';
+import { Picker } from 'shared/dataClasses/Form/Picker';
+import { Text } from 'shared/dataClasses/Form/Text';
+import { Toggle } from 'shared/dataClasses/Form/Toggle';
+import { Timer } from 'shared/dataClasses/Form/Timer';
 import { SectionBuilderProps, RowBuilderProps, GroupBuilderProps } from './types';
 
-export type Component = Num | Picker | Text | Timer | Toggle;
-
-export const options = ['num', 'text', 'picker', 'timer', 'toggle'];
-
 export const createComponent = (
-	component: FormComponent,
-	newType: 'num' | 'text' | 'picker' | 'timer' | 'toggle'
+	component: { valueID: string, type: keyof typeof formTypeMap },
+	newType: keyof typeof formTypeMap
 ): Component => {
 	const newComponent = { type: newType, valueID: component.valueID };
 	switch (newComponent.type) {
 	case 'num':
-		return { min: 0, max: 10, ...newComponent } as Component;
+		return Num.parse({ min: 0, max: 10, ...newComponent });
 	case 'text':
-		return { ...newComponent } as Component;
+		return Text.parse({ ...newComponent });
 	case 'picker':
-		return { options: [], ...newComponent } as Component;
+		return Picker.parse({ options: [], ...newComponent });
 	case 'timer':
-		return { ...newComponent } as Component;
+		return Timer.parse({ ...newComponent });
 	case 'toggle':
-		return { ...newComponent, falseLabel: 'No', trueLabel: 'Yes' } as Component;
+		return Toggle.parse({ ...newComponent, falseLabel: 'No', trueLabel: 'Yes' });
 	default:
 		break;
 	}
+	return {...newComponent} as Component;
 };
 
 function objectEqual<T extends object>(prevObject: T, nextObject: T, predicate: (key: string) => boolean) {

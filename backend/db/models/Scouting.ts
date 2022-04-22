@@ -1,21 +1,36 @@
-import { getModelForClass, DocumentType, ReturnModelType, buildSchema } from '@typegoose/typegoose';
+import { Team } from './User';
+import { LoginResult, Scout as ScoutSchema } from 'shared/dataClasses/Scout';
 import * as bcrypt from 'bcrypt';
-import { RegisterResult } from '../../../shared/dataClasses/OrganizationClass';
-import ScoutClass, { LoginResult } from '../../../shared/dataClasses/ScoutClass';
-import { OrganizationModel } from './User';
+import _ from 'lodash';
+import { RegisterResult } from 'shared/dataClasses/Team';
+import { Collection } from 'mongodb';
 
-export class Scout extends ScoutClass {
-	public async updatePassword(this: DocumentType<Scout>, newPassword: string): Promise<boolean> {
-		this.passwordHash = await bcrypt.hash(newPassword, 10);
-		await this.save();
+export class Scout {
+	public static collection: Collection<ScoutSchema>;
+	public static validate(data: unknown): data is ScoutSchema {
+		try {
+			ScoutSchema.parse(data);
+			return true;
+		}
+		catch (e) {
+			return false;
+		}
+	}
+	public static async updatePassword(scout: ScoutSchema, newPassword: string): Promise<boolean> {
+		const old = _.cloneDeep(scout);
+		const updated = _.cloneDeep(scout);
+		updated.passwordHash = await bcrypt.hash(newPassword, 10);
+		await this.collection.findOneAndUpdate(old, { $set: updated });
 		return true;
 	}
 
-	public static async login(this: ReturnModelType<typeof Scout>, org: string, login: string, password: string): Promise<LoginResult> {
-		const organization = await OrganizationModel.findOne({ orgID: org }).exec();
-		if (!organization) return LoginResult.NoOrg;
-		if (!organization.verified) return LoginResult.Unverified;
-		const user = await ScoutModel.findOne({ login: login, org }).exec();
+	public static async login(teamID: string, login: string, password: string): Promise<LoginResult> {
+		const team = await Team.collection.findOne({ teamID });
+		if (!team) {
+			return LoginResult.NoOrg;
+		}
+		if (!team.verified) return LoginResult.Unverified;
+		const user = await this.collection.findOne({ login, team: teamID });
 
 		if (!user) return LoginResult.NoUser;
 
@@ -25,14 +40,14 @@ export class Scout extends ScoutClass {
 		}
 	}
 
-	public static async register(this: ReturnModelType<typeof Scout>, login: string, password: string, org: string, name: string): Promise<RegisterResult> {
-		if (await ScoutModel.count({ login, org }).exec() > 0) return RegisterResult.LoginTaken;
+	public static async register(login: string, password: string, team: string, name: string): Promise<RegisterResult> {
+		if (await this.collection.count({ login, team }) > 0) return RegisterResult.LoginTaken;
 		const passwordHash = await bcrypt.hash(password, 10);
-		const user = new ScoutModel({
-			name, passwordHash, login, org
+		const user = ScoutSchema.parse({
+			name, passwordHash, login, team
 		});
 		try {
-			if (!(await user.save())) return RegisterResult.Invalid;
+			if (!(await this.collection.insertOne(user))) return RegisterResult.Invalid;
 		} 
 		catch (e) {
 			console.error(e);
@@ -41,7 +56,3 @@ export class Scout extends ScoutClass {
 		return RegisterResult.Successful;
 	}
 }
-
-
-export const ScoutModel = getModelForClass(Scout);
-export const ScoutSchema = buildSchema(Scout);

@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import ScoutClass from 'shared/dataClasses/ScoutClass';
-import ResponseClass from 'shared/dataClasses/ResponseClass';
+import { Scout } from 'shared/dataClasses/Scout';
+import { Response } from 'shared/dataClasses/Response';
 import { socket } from '..';
-import FormClass from 'shared/dataClasses/FormClass';
+import { Form } from 'shared/dataClasses/Form';
 
 const defaultForms: () => {
 	schemas: {
-		map: { [key: string]: FormClass };
-		list: FormClass[]
+		map: { [key: string]: Form };
+		list: Form[]
 	},
 	data: {
 		[formID: string]: {
@@ -22,9 +22,9 @@ const defaultForms: () => {
 });
 
 const defaultResponses: () => {
-	submitQueue: ResponseClass[];
-	activeResponses: ResponseClass[];
-	all: ResponseClass[];
+	submitQueue: Response[];
+	activeResponses: Response[];
+	all: Response[];
 } = () => ({
 	submitQueue: [],
 	activeResponses: [],
@@ -32,7 +32,7 @@ const defaultResponses: () => {
 });
 
 let initialState: {
-	scout?: ScoutClass;
+	scout: Scout | undefined;
 	online: boolean;
 	responses: ReturnType<typeof defaultResponses>;
 	forms: ReturnType<typeof defaultForms>;
@@ -40,7 +40,7 @@ let initialState: {
 		[key: string]: ReturnType<typeof defaultResponses>;
 	},
 	storedForms: {
-		[org: string]: ReturnType<typeof defaultForms>;
+		[team: string]: ReturnType<typeof defaultForms>;
 	}
 } = {
 	scout: undefined,
@@ -66,15 +66,15 @@ const user = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
-		setScout(state, action: PayloadAction<ScoutClass>) {
+		setScout(state, action: PayloadAction<Scout | undefined>) {
 			if (state.scout) {
-				state.storedResponses[state.scout.org + '-' + state.scout.login] = state.responses;
-				state.storedForms[state.scout.org] = state.forms;
+				state.storedResponses[state.scout.team + '-' + state.scout.login] = state.responses;
+				state.storedForms[state.scout.team] = state.forms;
 			}
 			state.scout = action.payload;
 			state.responses = (state.scout && 
-				state.storedResponses[state.scout.org + '-' + state.scout.login]) || defaultResponses();
-			state.forms = (state.scout && state.storedForms[state.scout.org]) || defaultForms();
+				state.storedResponses[state.scout.team + '-' + state.scout.login]) || defaultResponses();
+			state.forms = (state.scout && state.storedForms[state.scout.team]) || defaultForms();
 		},
 		setOnline(state, action: PayloadAction<boolean>) {
 			state.online = action.payload;
@@ -87,7 +87,7 @@ const user = createSlice({
 				state.responses.activeResponses.splice(idx, 1);
 			}
 		},
-		addToSubmitQueue(state, response: PayloadAction<ResponseClass>) {
+		addToSubmitQueue(state, response: PayloadAction<Response>) {
 			state.responses.submitQueue.push(response.payload);
 		},
 		submit(state) {
@@ -96,21 +96,21 @@ const user = createSlice({
 			}
 			state.responses.submitQueue = [];
 		},
-		createResponse(state, response: PayloadAction<ResponseClass>) {
+		createResponse(state, response: PayloadAction<Response>) {
 			state.responses.activeResponses.push(response.payload);
 		},
-		setResponses(state, responses: PayloadAction<ResponseClass[]>) {
+		setResponses(state, responses: PayloadAction<Response[]>) {
 			state.responses.all = responses.payload;
 		},
 		deleteResponse(state, id: PayloadAction<string>) {
 			const idx = state.responses.activeResponses.findIndex(resp => resp.id == id.payload);
 			if (idx > -1) state.responses.activeResponses.splice(idx, 1);
 		},
-		updateResponse(state, action: PayloadAction<{id: string, update: ResponseClass}>) {
+		updateResponse(state, action: PayloadAction<{id: string, update: Response}>) {
 			const idx = state.responses.activeResponses.findIndex(resp => resp.id == action.payload.id);
 			if (idx > -1) state.responses.activeResponses[idx] = action.payload.update;
 		},
-		setForms(state, action: PayloadAction<FormClass[]>) {
+		setForms(state, action: PayloadAction<Form[]>) {
 			state.forms.schemas.list = action.payload;
 			state.forms.schemas.map = {};
 			for (let i = 0; i < action.payload.length; i++) {

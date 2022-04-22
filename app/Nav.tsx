@@ -13,12 +13,12 @@ function downloadXLSX() {
 	const responses = state.user.responses.all.concat(state.user.responses.submitQueue);
 	const forms = state.user.forms.schemas.list;
 	const wb = XLSX.utils.book_new();
-	const cols = {};
+	const cols: Record<string, string[]> = {};
 	for (const form of forms) {
 		wb.SheetNames.push(form.name);
 	}
 
-	const data = {};
+	const data: Record<string, Record<string, (string|number)[]>> = {};
 	for (const resp of responses) {
 		if (!cols[resp.form]) {
 			cols[resp.form] = [];
@@ -41,7 +41,7 @@ function downloadXLSX() {
 	for (const form of forms) {
 		console.log(form);
 		if (!data[form.id]) continue;
-		const rows = [ [ 'scout', ...cols[form.id]] ];
+		const rows: (string|number)[][] = [ [ 'scout', ...cols[form.id]] ];
 		for (let i = 0; i < data[form.id]['scout'].length; i++) {
 			const row = [];
 			row.push(data[form.id]['scout'][i]);
@@ -72,6 +72,7 @@ function XLSXDownloadButton() {
 export default function TopNav() {
 	const signedIn = useSelector(state => !!state.user.scout);
 	const scout = useSelector(state => state.user.scout, _.isEqual);
+	console.log(scout?.admin);
 	return (<Navbar bg="light" expand="lg" style={{zIndex: 100}}>
 		<Container>
 			<Navbar.Brand>Scouting app</Navbar.Brand>
@@ -80,7 +81,7 @@ export default function TopNav() {
 				<Nav className="container-fluid">
 					<Nav.Link as={Link} to="/">Home</Nav.Link>
 					{signedIn ? <>
-						{ scout.admin ? <Nav.Link as={Link} to="/admin">Admin</Nav.Link> : '' }
+						{ scout?.admin ? <Nav.Link as={Link} to="/admin">Admin</Nav.Link> : '' }
 						<Nav.Link onClick={() => socket.emit('logout')}>Log out</Nav.Link>
 					</> : <><Nav.Link as={Link} to="/login">Log In</Nav.Link><Nav.Link as={Link} to="/register">Register</Nav.Link></>}
 					{ scout?.admin ? <XLSXDownloadButton/> : <></> }

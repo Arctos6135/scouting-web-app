@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Group, Row as RowType } from 'shared/dataClasses/FormClass';
+import { formTypeMap, Group, Row as RowType } from 'shared/dataClasses/Form';
 import { Row, Col, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { createComponent, options, rowsPropsAreEqual } from './helpers';
+import { createComponent, rowsPropsAreEqual } from './helpers';
 import { RowBuilderProps } from './types';
 import GroupBuilder from './GroupBuilder';
 import Select from './inputs/Select';
@@ -36,12 +36,12 @@ function RowBuilder(props: RowBuilderProps) {
 				))}
 			</Row>
 			<Select
-				options={options.map((option) => {
+				options={Object.keys(formTypeMap).map((option) => {
 					return { value: option, selected: false };
 				})}
 				onChange={(value) => {
 					const component = createComponent(
-						{ valueID: '', type: value },
+						{ valueID: '', type: value as keyof typeof formTypeMap },
 						value as 'num' | 'text' | 'picker'
 					);
 					const group: Group = {

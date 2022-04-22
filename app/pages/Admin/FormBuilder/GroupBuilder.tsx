@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Group } from 'shared/dataClasses/FormClass';
+import { formTypeMap, Group } from 'shared/dataClasses/Form';
 import { useState, useEffect } from 'react';
-import { createComponent, groupsPropsAreEqual, options } from './helpers';
+import { createComponent, groupsPropsAreEqual } from './helpers';
 import { GroupBuilderProps } from './types';
 import TextInput from './inputs/Text';
 import Select from './inputs/Select';
@@ -9,7 +9,7 @@ import NumberInput from './inputs/Number';
 import Toggle from './inputs/Toggle';
 import TextWithConfirm from './inputs/TextWithConfirm';
 import EditSelection from './inputs/EditSelection';
-import Picker from 'shared/dataClasses/FormClass/Picker';
+import { Picker } from 'shared/dataClasses/Form/Picker';
 
 function GroupBuilder(props: GroupBuilderProps) {
 	const [group, setGroup] = useState(props.group);
@@ -31,7 +31,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 				}}
 			/>
 			<TextInput
-				text={group.description}
+				text={group.description ?? ''}
 				label='Group Description'
 				onChange={(value) => {
 					group.description = value;
@@ -91,18 +91,6 @@ function GroupBuilder(props: GroupBuilderProps) {
 					onChange={(value) => {
 						if (group.component.type === 'text') {
 							group.component.charset = value;
-							onChange(group);
-						}
-					}}
-				/>
-			) : undefined}
-			{group.component.type === 'text' ? (
-				<NumberInput
-					label='Minimum Length'
-					number={group.component.minlength}
-					onChange={(value) => {
-						if (group.component.type === 'text') {
-							group.component.minlength = Number.parseInt(value);
 							onChange(group);
 						}
 					}}
@@ -186,11 +174,11 @@ function GroupBuilder(props: GroupBuilderProps) {
 			) : undefined}
 			{group.component.type === 'num' ? (
 				<TextInput
-					text={group.component.default}
+					text={group.component.default?.toString() ?? ''}
 					label='Default Value'
 					onChange={(value) => {
 						if (group.component.type === 'num') {
-							group.component.default = value;
+							group.component.default = parseFloat(value);
 							onChange(group);
 						}
 					}}
@@ -222,7 +210,7 @@ function GroupBuilder(props: GroupBuilderProps) {
 			) : undefined}
 
 			<Select
-				options={options.map((option) => {
+				options={Object.keys(formTypeMap).map((option) => {
 					return { value: option, selected: option === group.component.type };
 				})}
 				onChange={(value) => {

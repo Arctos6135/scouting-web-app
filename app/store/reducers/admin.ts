@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import ScoutClass from 'shared/dataClasses/ScoutClass';
+import { Scout } from 'shared/dataClasses/Scout';
 
 let initialState: {
-	scouts: ScoutClass[];
-	orgURL: string;
-} = { scouts: [], orgURL: '' };
+	scouts: Scout[];
+	teamURL: string;
+} = { scouts: [], teamURL: '' };
 
 const stored = localStorage.getItem('admin');
 if (stored) {
@@ -21,11 +21,11 @@ const forms = createSlice({
 	name: 'forms',
 	initialState,
 	reducers: {
-		setScouts(state, action: PayloadAction<ScoutClass[]>) {
+		setScouts(state, action: PayloadAction<Scout[]>) {
 			state.scouts = action.payload;
 		},
 		setURL(state, action: PayloadAction<string>) {
-			state.orgURL = action.payload;
+			state.teamURL = action.payload;
 		}
 	}
 });

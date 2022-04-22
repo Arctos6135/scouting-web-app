@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
-import { Group, Row, Section } from 'shared/dataClasses/FormClass';
+import { formTypeMap, Group, Row, Section } from 'shared/dataClasses/Form';
 import { Button, Accordion } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { createComponent, options, sectionsPropsAreEqual } from './helpers';
+import { createComponent, sectionsPropsAreEqual } from './helpers';
 import { SectionBuilderProps } from './types';
 import RowBuilder from './RowBuilder';
 import GroupBuilder from './GroupBuilder';
@@ -43,7 +43,7 @@ function SectionBuilder(props: SectionBuilderProps) {
 		<div className={props.className}>
 			<TextInput
 				className="mb-2"
-				text={section.header}
+				text={section.header ?? ''}
 				label="Section Header"
 				onChange={(value) => {
 					section.header = value;
@@ -61,26 +61,25 @@ function SectionBuilder(props: SectionBuilderProps) {
 								section.groups.splice(index, 1);
 								onChange(section);
 							}}>Delete {group.type}</Button>
-							{builders[group.type](group, index)}
+							{builders[group.type](group as any, index)}
 						</Accordion.Body>
 					</Accordion.Item>
 				))}
 			</Accordion>
 			<Button className='mb-1 mt-2'
 				onClick={() => {
-					section.groups.push({ type: 'row', components: [] });
-					onChange(section);
+					onChange({...section, groups: section.groups.concat([{type: 'row', components: []}])});
 				}}
 			>
 				Add Row
 			</Button>
 			<Select className='mb-2'
-				options={options.map((option) => {
+				options={Object.keys(formTypeMap).map((option) => {
 					return { value: option, selected: false };
 				})}
 				onChange={(value) => {
 					const component = createComponent(
-						{ valueID: '', type: value },
+						{ valueID: '', type: value as keyof typeof formTypeMap },
 						value as 'num' | 'text' | 'picker'
 					);
 					const group: Group = {
@@ -88,8 +87,7 @@ function SectionBuilder(props: SectionBuilderProps) {
 						label: '',
 						component: component,
 					};
-					section.groups.push(group);
-					onChange(section);
+					onChange({ ...section, groups: section.groups.concat([group])});
 				}}
 				label="New Group"
 				buttonText="Add Group"

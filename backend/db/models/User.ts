@@ -1,38 +1,44 @@
-import { prop, getModelForClass, DocumentType, ReturnModelType, pre } from '@typegoose/typegoose';
-import { promisify } from 'util';
-import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import {ScoutModel} from './Scouting';
-import OrganizationClass, { RegisterResult } from '../../../shared/dataClasses/OrganizationClass';
-import VerificationCodeClass from '../../../shared/dataClasses/VerificationCodeClass';
+import { Scout } from './Scouting';
+import { Team as TeamSchema, RegisterResult } from 'shared/dataClasses/Team';
+import { VerificationCode as VerificationCodeSchema } from 'shared/dataClasses/VerificationCode';
+import { Collection } from 'mongodb';
 
-export class Organization extends OrganizationClass {
-	public async verify(this: DocumentType<Organization>, password: string): Promise<boolean> {
-		if (this.verified) return true;
-		const code = VerificationCodeModel.getUserCode(this.email);
+export class Team {
+	static collection: Collection<TeamSchema>;
+	static validate(team: unknown): team is TeamSchema {
+		try {
+			TeamSchema.parse(team);
+			return true;
+		}
+		catch (e) {
+			return false;
+		}
+	}
+	public static async verify(team: TeamSchema, password: string): Promise<boolean> {
+		if (team.verified) return true;
+		const code = VerificationCode.getUserCode(team.email);
 
 		// TODO: Send verification email
 		// For now we can just verify manually
-		await this.save();
 		return true;
 	}
 
-	public static async hasUser(this: ReturnModelType<typeof Organization>, email: string): Promise<boolean> {
-		return await OrganizationModel.count({ $or: [{ email }] }).exec() == 1;
+	public static async hasUser(email: string): Promise<boolean> {
+		return await this.collection.count({ $or: [{ email }] }) == 1;
 	}
 
-	public static async register(this: ReturnModelType<typeof Organization>, email: string, password: string, name: string): Promise<RegisterResult> {
-		if (await OrganizationModel.hasUser(email)) return RegisterResult.EmailTaken;
-		const user = new OrganizationModel({
-			email, orgName: name
-		});
+	public static async register(email: string, password: string, name: string): Promise<RegisterResult> {
+		if (await Team.hasUser(email)) return RegisterResult.EmailTaken;
 		try {
-			if (!(await user.save())) return RegisterResult.Invalid;
-			await ScoutModel.register(email, password, user.orgID, 'admin');
-			await ScoutModel.updateOne({email, org: user.orgID}, { admin: true }).exec();
-			// TODO: Potentially handle errors by deleting the org
-			// If for some reason the admin user is not created then the org is inaccessible
+			const user = TeamSchema.parse({
+				email, teamName: name
+			});
+			if (!(this.collection.insertOne(user))) return RegisterResult.Invalid;
+			await Scout.register(email, password, user.teamID, 'admin');
+			await Scout.collection.findOneAndUpdate({email, team: user.teamID}, { $set: { admin: true } });
+			// TODO: Potentially handle errors by deleting the team
+			// If for some reason the admin user is not created then the team is inaccessible
 		} 
 		catch (e) {
 			console.log(e);
@@ -42,17 +48,24 @@ export class Organization extends OrganizationClass {
 	}
 }
 
-export class VerificationCode extends VerificationCodeClass{
-	public static async getUserCode(this: ReturnModelType<typeof VerificationCode>, email: string) {
-		let code = await this.findOne({ email }).exec();
+export class VerificationCode {
+	static collection: Collection<VerificationCodeSchema>;
+	static validate(team: unknown): team is VerificationCodeSchema {
+		try {
+			VerificationCodeSchema.parse(team);
+			return true;
+		}
+		catch (e) {
+			return false;
+		}
+	}
+	public static async getUserCode(email: string) {
+		let code: VerificationCodeSchema | null = await this.collection.findOne({ email });
 		if (!code) {
-			code = new VerificationCodeModel({ code: crypto.randomBytes(128).toString('base64'), email });
-			code.save();
+			code = VerificationCodeSchema.parse({ code: crypto.randomBytes(128).toString('base64'), email });
+			await this.collection.insertOne(code);
 		}
 
 		return code.code;
 	}
 }
-
-export const OrganizationModel = getModelForClass(Organization);
-export const VerificationCodeModel = getModelForClass(VerificationCode);

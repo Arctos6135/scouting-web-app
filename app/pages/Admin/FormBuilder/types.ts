@@ -1,8 +1,8 @@
-import FormClass, { Group, Row, Section } from 'shared/dataClasses/FormClass';
+import { Form, Group, Row, Section } from 'shared/dataClasses/Form';
 
 export type FormBuilderProps = {
-	form: FormClass;
-	onChange: (param: FormClass) => void;
+	form: Form;
+	onChange: (param: Form) => void;
 };
 type BuilderProps = {
 	index: number;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
 import { FormIDContext, useFormErrors } from './formState';
-import Num from 'shared/dataClasses/FormClass/Number';
+import { Num } from 'shared/dataClasses/Form/Number';
 import { useSelector, useDispatch } from 'app/hooks';
 import { setFormData } from 'app/store/reducers/user';
 
@@ -14,7 +14,7 @@ export function NumInput(props: {
 	const dispatch = useDispatch();
 	const value = useSelector(state => state.user.forms.data[formID]?.[props.component.valueID]);
 	const [error, setError] = React.useState<string | undefined>(undefined);
-	const { setErrors } = useFormErrors();
+	const { setErrors } = useFormErrors() ?? {};
 
 	useEffect(() => {
 		if (value == undefined) {
@@ -32,7 +32,7 @@ export function NumInput(props: {
 			value: num
 		}));
 	};
-	const changeError = (error: boolean) => setErrors((errors) => {
+	const changeError = (error: boolean) => setErrors?.((errors) => {
 		errors[props.component.valueID] = error;
 		return Object.assign({}, errors);
 	});

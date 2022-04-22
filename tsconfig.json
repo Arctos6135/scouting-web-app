@@ -9,7 +9,8 @@
 		"emitDecoratorMetadata": true,
 		"outDir": "./build",
 		"baseUrl": "./backend/",
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"strict": true
 	},
 	"exclude": ["src"]
 }

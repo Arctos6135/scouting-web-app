@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import assert from 'assert';
+assert(process.env.SECRET && process.env.MONGO_URL && process.env.DB_NAME);
 import express from 'express';
 import * as path from 'path';
 import session, { Session, SessionData } from 'express-session';
@@ -6,18 +8,17 @@ import MongoStore from 'connect-mongo';
 import socketio from 'socket.io';
 import * as http from 'http';
 import * as bodyParser from 'body-parser';
-import mongoose from 'mongoose';
 import login from './login';
 import admin from './admin';
 import data from './data';
-import {ScoutModel} from './db/models/Scouting';
 import { ClientToServerEvents, ServerToClientEvents } from '../shared/eventTypes';
-import ScoutClass from '../shared/dataClasses/ScoutClass';
 import {IncomingMessage} from 'http';
+import { Scout } from 'shared/dataClasses/Scout';
+import models, { mongoUrl } from './db';
 
-const mongoUrl = process.env.MONGO_URL + '/' + process.env.DB_NAME;
-console.log(mongoUrl);
-mongoose.connect(mongoUrl);
+// Add browser crypto to globalThis
+import { webcrypto } from 'crypto';
+globalThis.crypto = webcrypto as unknown as Crypto;
 
 const sess = session({
 	secret: process.env.SECRET,
@@ -58,7 +59,7 @@ export type IOServer = typeof io;
 
 declare module 'express-session' {
 	interface SessionData {
-		scout: ScoutClass;
+		scout: Scout;
 		loggedIn: boolean;
 	}
 }
@@ -72,7 +73,6 @@ app.get('*', function (req, res) {
 ].forEach(function (sig) {
 	process.on(sig, async () => {
 		server.close();
-		await ScoutModel.updateMany({}, {connections: 0}).exec();
 		process.exit(0);
 	});
 });

@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import path from 'path';
+import HTMLWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import WorkboxWebpackPlugin from 'workbox-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import * as webpack from 'webpack';
 
 
-module.exports = (env) => ({
+const getconfig: (env: any) => webpack.Configuration = (env: any) => ({
 	entry: path.resolve(__dirname, './app/App.tsx'),
 	output: {
 		path: path.join(__dirname, 'dist')
@@ -36,6 +37,8 @@ module.exports = (env) => ({
 	resolve: {
 		extensions: ['.js', '.json', '.jsx', '.ts', '.tsx']
 	},
-	devtool: env.production ? undefined : 'source-map',
-	mode: env.production ? 'production' : 'development'
+	devtool: (env?.production as string|undefined) ? undefined : 'source-map',
+	mode: (env?.production as string|undefined) ? 'production' : 'development'
 });
+
+export default getconfig;

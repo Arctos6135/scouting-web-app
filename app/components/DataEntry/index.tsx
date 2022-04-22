@@ -1,11 +1,11 @@
-import FormSchema from 'shared/dataClasses/FormClass';
-import * as React from 'react';
 import { Form, ListGroup } from 'react-bootstrap';
+import { Form as FormType } from 'shared/dataClasses/Form';
+import * as React from 'react';
 import { FormIDContext, FormErrorsContext } from './formState';
 import { FormSection } from './FormSection';
 
 export default function DataEntry(props: {
-	form: FormSchema;
+	form: FormType;
 	formID?: string;
 	inputComponent?: any;
 	setValid?: React.Dispatch<React.SetStateAction<boolean>>;

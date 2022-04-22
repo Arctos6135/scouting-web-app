@@ -10,7 +10,7 @@ export function RegisterModal(props: {
 	const [login, setLogin] = useState<string>('');
 	const [name, setName] = useState<string>('');
 
-	const handleClose = (res?) => {
+	const handleClose = (res?: any) => {
 		props.onClose(res);
 		setTimeout(() => {
 			setLogin('');

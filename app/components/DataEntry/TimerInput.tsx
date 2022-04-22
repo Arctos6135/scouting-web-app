@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Button, ButtonGroup, FormControl } from 'react-bootstrap';
 import { FormIDContext } from './formState';
-import Timer from 'shared/dataClasses/FormClass/Timer';
+import { Timer } from 'shared/dataClasses/Form/Timer';
 import { useSelector, useDispatch } from 'app/hooks';
 import { setFormData } from 'app/store/reducers/user';
 

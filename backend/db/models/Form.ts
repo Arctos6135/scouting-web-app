@@ -1,5 +1,15 @@
-import {buildSchema, getModelForClass} from '@typegoose/typegoose';
-import FormClass from '../../../shared/dataClasses/FormClass'; 
+import { Collection } from 'mongodb';
+import { Form as FormSchema } from 'shared/dataClasses/Form';
 
-export const FormModel = getModelForClass(FormClass);
-export const FormSchema = buildSchema(FormClass);
+export class Form {
+	static collection: Collection<FormSchema>;
+	static validate(data: unknown): data is FormSchema {
+		try {
+			FormSchema.parse(data);
+			return true;
+		}
+		catch (e) {
+			return false;
+		}
+	}
+}

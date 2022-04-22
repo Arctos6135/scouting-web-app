@@ -26,7 +26,7 @@ export default function Select(props: SelectProps) {
 				</Form.Select>
 				<Button
 					variant="outline-secondary"
-					onClick={() => props.onChange(selection)}
+					onClick={() => props.onChange(selection ?? '')}
 				>
 					{props.buttonText}
 				</Button>

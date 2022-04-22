@@ -1,7 +1,15 @@
-import {buildSchema, getModelForClass, index} from '@typegoose/typegoose';
-import ResponseClass from '../../../shared/dataClasses/ResponseClass'; 
+import { Collection } from 'mongodb';
+import { Response as ResponseSchema } from 'shared/dataClasses/Response';
 
-class Response extends ResponseClass {}
-
-export const ResponseModel = getModelForClass(Response);
-export const ResponseSchema = buildSchema(Response);
+export class Response {
+	static collection: Collection<ResponseSchema>;
+	static validate(data: unknown): data is ResponseSchema {
+		try {
+			ResponseSchema.parse(data);
+			return true;
+		}
+		catch (e) {
+			return false;
+		}
+	}
+}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { FormCheck } from 'react-bootstrap';
 import { FormIDContext } from './formState';
-import Toggle from 'shared/dataClasses/FormClass/Toggle';
+import { Toggle } from 'shared/dataClasses/Form/Toggle';
 import { useSelector, useDispatch } from 'app/hooks';
 import { setFormData } from 'app/store/reducers/user';
 

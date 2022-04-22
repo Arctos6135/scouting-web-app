@@ -5,7 +5,8 @@ import * as React from 'react';
 export const FormIDContext = React.createContext('');
 
 export const FormErrorsContext = React.createContext<{
-	errors: { [key: string]: boolean }, setErrors: React.Dispatch<React.SetStateAction<{
+	errors: { [key: string]: boolean }, 
+	setErrors: React.Dispatch<React.SetStateAction<{
 		[key: string]: boolean;
 	}>>
 } | undefined>(undefined);

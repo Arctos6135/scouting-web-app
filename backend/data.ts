@@ -1,49 +1,48 @@
 import {getLogger} from './logging';
 import models from './db';
 import { IOServer, Socket } from './server';
+import { Response } from 'shared/dataClasses/Response';
 
 const logger = getLogger('data');
 
-const responseEvents = models.Response.watch();
-responseEvents.setMaxListeners(Infinity);
 export default async function addListeners(socket: Socket, io: IOServer) {
 	const req = socket.request;
 	const sendResponses = async () => {
-		if (!req.session.scout) {
+		if (!req.session?.scout) {
 			socket.emit('data:get responses', []);
 			return;
 		}
-		const query: any = { org: req.session.scout.org };
-		if (!req.session.scout.admin) query.scout = req.session.scout.login;
-		const scouts = await models.Response.find(query).lean().exec();
-		socket.emit('data:get responses', scouts);
+		const query: any = { team: req.session?.scout.team };
+		if (!req.session?.scout.admin) query.scout = req.session?.scout.login;
+		const scouts = await models.Response.collection.find(query).toArray();
+		if (scouts) socket.emit('data:get responses', scouts);
 	};
 	socket.on('data:respond', async (response) => {
-		if (!req.session.scout) {
+		if (!req.session?.scout) {
 			logger.warn('Response received when not logged in', { ip: socket.handshake.address });
 			return;
 		}
 		try {
-			if (response.scout != req.session.scout.login && !req.session.scout.admin) {
-				logger.warn('Scout submitted for another scout', { response, scout: req.session.scout, ip: socket.handshake.address });
+			if (response.scout != req.session?.scout.login && !req.session?.scout.admin) {
+				logger.warn('Scout submitted for another scout', { response, scout: req.session?.scout, ip: socket.handshake.address });
 				return;
 			}
-			await models.Response.deleteOne({
-				org: req.session.scout.org,
+			await models.Response.collection.deleteOne({
+				team: req.session?.scout.team,
 				scout: response.scout,
 				form: response.form,
 				id: response.id
-			}).exec();
-			const res = new models.Response({
-				org: req.session.scout.org,
+			});
+			const res = Response.parse({
+				team: req.session?.scout.team,
 				scout: response.scout,
 				form: response.form,
 				data: response.data,
 				id: response.id,
 				name: response.name
 			});
-			logger.verbose('Response received', { response, scout: req.session.scout, ip: socket.handshake.address });
-			await res.save();
+			logger.verbose('Response received', { response, scout: req.session?.scout, ip: socket.handshake.address });
+			await models.Response.collection.findOneAndUpdate({ id: response.id, }, res, {upsert: true});
 		}
 		catch (e) {
 			// do nothing
@@ -53,7 +52,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 	socket.on('data:get responses', async () => {
 		await sendResponses();
 	});
-	responseEvents.on('change', (change) => {
+	models.responseEvents.on('change', () => {
 		sendResponses();
 	});
 }

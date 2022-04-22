@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 export function AddingFormModal(props: {
 	show: boolean;
-	onClose: (res?: { name: string; form: string; }) => void;
+	onClose: (res?: { name: string; form?: string; }) => void;
 }) {
 	const forms = useSelector(state => state.user.forms.schemas.list, (l, r) => _.isEqual(l, r));
 
@@ -16,7 +16,7 @@ export function AddingFormModal(props: {
 		setForm(forms[0]?.id ?? '');
 	}, [forms]);
 
-	const handleClose = (res?) => {
+	const handleClose = (res?: { name: string; form?: string; }) => {
 		props.onClose(res);
 		setTimeout(() => {
 			setName('');

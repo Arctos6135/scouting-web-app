@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useState, useEffect} from 'react';
 import { Button, Card, Col, Modal, Row, Stack } from 'react-bootstrap';
-import FormClass from 'shared/dataClasses/FormClass';
+import { Form } from 'shared/dataClasses/Form';
 import FormBuilder from './FormBuilder';
 import DeleteModal from 'app/components/DeleteModal';
 import DataEntry from 'app/components/DataEntry';
@@ -14,8 +14,8 @@ import { socket } from 'app/store';
 export function FormsTable() {
 	const forms = useSelector(state => state.user.forms.schemas.list, _.isEqual);
 
-	const [deletingForm, setDeletingForm] = useState<FormClass>(null);
-	const [editingForm, setEditingForm] = useState<FormClass>(null);
+	const [deletingForm, setDeletingForm] = useState<Form | null>(null);
+	const [editingForm, setEditingForm] = useState<Form | null>(null);
 
 	useEffect(() => {
 		if (editingForm) {
@@ -30,8 +30,8 @@ export function FormsTable() {
 
 	return <>
 		<DeleteModal bodyText={`All information related to this form will be deleted. Name: ${deletingForm?.name}`} show={!!deletingForm} onClose={(del) => {
-			if (del)
-				socket.emit('organization:delete form', { id: deletingForm.id });
+			if (del && deletingForm)
+				socket.emit('team:delete form', { id: deletingForm.id });
 			setDeletingForm(null);
 		}} />
 
@@ -40,10 +40,10 @@ export function FormsTable() {
 				<Modal.Title>Editing Form</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<FormBuilder form={editingForm} onChange={(update) => {
+				{ editingForm ? <FormBuilder form={editingForm} onChange={(update) => {
 					setEditingForm(update);
-					socket.emit('organization:update form', update);
-				}}></FormBuilder>
+					socket.emit('team:update form', update);
+				}}></FormBuilder> : '' }
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="primary" onClick={() => setEditingForm(null)}>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { FormIDContext } from './formState';
-import Picker from 'shared/dataClasses/FormClass/Picker';
+import { Picker } from 'shared/dataClasses/Form/Picker';
 import { useSelector, useDispatch } from 'app/hooks';
 import { setFormData } from 'app/store/reducers/user';
 

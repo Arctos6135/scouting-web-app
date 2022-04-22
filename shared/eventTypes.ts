@@ -1,10 +1,10 @@
-import ResponseClass from './dataClasses/ResponseClass';
-import FormClass, { Section } from './dataClasses/FormClass';
-import ScoutClass from './dataClasses/ScoutClass';
+import { Response } from './dataClasses/Response';
+import { Form, Section } from './dataClasses/Form';
+import { Scout } from './dataClasses/Scout';
 
 const alertTypes = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'] as const;
 
-export type AlertType = { page: string, message: string, type: typeof alertTypes[number] }
+export type AlertType = { page: string, message: string, type: typeof alertTypes[number], body?: string }
 
 export interface ServerToClientEvents {
     'alert': (alert: AlertType) => void;
@@ -12,51 +12,51 @@ export interface ServerToClientEvents {
     'admin:error': (message: string) => void;
     'register': (status: boolean) => void;
 
-    'organization': () => void;
-    'organization:get scouts': (scouts: ScoutClass[]) => void;
-    'organization:get forms': (forms: FormClass[]) => void;
-    'organization:update password': (status: boolean) => void;
-    'organization:create scout': (status: boolean) => void;
-    'organization:delete scout': (status: boolean) => void;
-    'organization:update form': (status: boolean) => void;
-    'organization:delete form': () => void;
-    'organization:get url': (url: string) => void;
-	'organization:assign': (status: boolean) => void;
+    'team': () => void;
+    'team:get scouts': (scouts: Scout[]) => void;
+    'team:get forms': (forms: Form[]) => void;
+    'team:update password': (status: boolean) => void;
+    'team:create scout': (status: boolean) => void;
+    'team:delete scout': (status: boolean) => void;
+    'team:update form': (status: boolean) => void;
+    'team:delete form': () => void;
+    'team:get url': (url: string) => void;
+	'team:assign': (status: boolean) => void;
 
-	'data:get responses': (responses: ResponseClass[]) => void;
+	'data:get responses': (responses: Response[]) => void;
 
-    'status': (data: { scout: ScoutClass }) => void;
+    'status': (data: { scout: Scout | undefined }) => void;
 }
 
 export interface ClientToServerEvents {
-    'organization': () => void;
-	'organization:set admin': (data: {scout: ScoutClass, admin: boolean}) => void;
-    'organization:get scouts': () => void;
-    'organization:get forms': () => void;
-    'organization:update password': (data: {
+    'team': () => void;
+	'team:set admin': (data: {scout: Scout, admin: boolean}) => void;
+    'team:get scouts': () => void;
+    'team:get forms': () => void;
+    'team:update password': (data: {
         login: string;
         newPassword: string;
     }) => void;
-    'organization:create scout': (data: {
+    'team:create scout': (data: {
         login: string;
         name: string;
     }) => void;
-    'organization:delete scout': (login: string) => void;
-    'organization:update form': (data: {
+    'team:delete scout': (login: string) => void;
+    'team:update form': (data: {
         id: string;
         name: string;
         sections: Section[];
     }) => void;
-    'organization:delete form': (data: {id: string}) => void;
-    'organization:get url': () => void;
+    'team:delete form': (data: {id: string}) => void;
+    'team:get url': () => void;
 
-	'data:respond': (response: ResponseClass) => void;
+	'data:respond': (response: Response) => void;
 	'data:get responses': () => void;
 
     'login': (data: {
         login: string;
         password: string;
-        org: string;
+        team?: string;
     }) => void;
     'register': (data: {
         email: string;

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Accordion, Button, Card, CloseButton, Collapse, Dropdown, Form, InputGroup, Stack, Table } from 'react-bootstrap';
+import { Accordion, Button, Card, Form, InputGroup, Stack } from 'react-bootstrap';
 
 import DataEntry from 'app/components/DataEntry';
-import FormClass from 'shared/dataClasses/FormClass';
-import ResponseClass from 'shared/dataClasses/ResponseClass';
+import { Form as FormType } from 'shared/dataClasses/Form';
+import { Response as ResponseType } from 'shared/dataClasses/Response';
 import { AddingFormModal } from './AddingFormModal';
 import {QRCodeModal} from './QRCodeModal';
 import uniqueId from 'shared/uniqueId';
@@ -13,8 +13,8 @@ import { moveToSubmitQueue, submit, createResponse, deleteResponse, updateRespon
 import _ from 'lodash';
 
 function Response(props: {
-	form?: FormClass;
-	response: ResponseClass;
+	form?: FormType;
+	response: ResponseType;
 }) {
 	const scout = useSelector(state => state.user.scout, _.isEqual);
 	const dispatch = useDispatch();
@@ -76,13 +76,13 @@ export default function FormsList() {
 
 	return <>
 		<AddingFormModal show={addingForm} onClose={response => {
-			if (response) {
+			if (response && scout && response.form) {
 				dispatch(createResponse({
 					data: {},
 					form: response.form,
 					id: uniqueId(),
 					name: response.name,
-					org: scout.org,
+					team: scout.team,
 					scout: scout.login
 				}));
 			}
@@ -93,7 +93,7 @@ export default function FormsList() {
 			<Card.Body>
 				{signedIn ? (activeResponses.length ? <Accordion>
 					{activeResponses
-						.map((response, idx) =>
+						.map(response =>
 							<Accordion.Item key={response.id} eventKey={response.id}>
 								<Accordion.Header>
 									{response.name}

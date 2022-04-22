@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {Form, Button, Container, Card, Alert} from 'react-bootstrap';
 import { useSelector, useSocketEffect, useDispatch } from 'app/hooks';
+import {isEqual} from 'lodash';
 
 import { closeAlert } from 'app/store/reducers/alerts';
 
@@ -13,9 +14,12 @@ export default function RegisterPage() {
 	const [password2, setPassword2] = useState<string>('');
 	const dispatch = useDispatch();
 
-	const alerts = useSelector(state => state.alerts['register'] ?? []);
+	const alerts = useSelector(state => state.alerts?.register ?? [], (a, b) => {
+		console.log(a, b);
+		return false;
+	});
 
-	const onSubmit = (e) => {
+	const onSubmit = (e: any) => {
 		socket.emit('register', {email: e.target?.email?.value, password: e.target?.password?.value, name: e.target?.team?.value});
 		e.preventDefault();
 		return false;
@@ -26,9 +30,10 @@ export default function RegisterPage() {
 	});
 
 	return (<Container>
-		{alerts.map(alert =>
+		{alerts?.map?.(alert =>
 			<Alert variant={alert.type} key={alert.id} dismissible onClose={() => dispatch(closeAlert(alert))}>
-				<Alert.Heading>{alert}</Alert.Heading>
+				<Alert.Heading>{alert.message}</Alert.Heading>
+				{alert.body ?? ''}
 			</Alert>
 		)});
 		<Card>

@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from 'react';
 import DataEntry from 'app/components/DataEntry';
+import { Form as FormType, Row as RowType } from 'shared/dataClasses/Form';
 import {
 	Button,
 	Col,
@@ -14,14 +15,13 @@ import {
 import { useEffect, useState } from 'react';
 import { FormBuilderProps, OnChangeParams } from './types';
 import SectionBuilder from './SectionBuilder';
-import FormClass, { Row as RowType } from 'shared/dataClasses/FormClass';
 
 class ErrorBoundary extends React.Component {
-	constructor(props) {
+	constructor(props: Record<string, never>) {
 		super(props);
 	}
 
-	componentDidCatch(error, errorInfo) {
+	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
 		console.log(error, errorInfo);
 	}
 	render() {
@@ -29,7 +29,7 @@ class ErrorBoundary extends React.Component {
 	}
 }
 export default function FormBuilder(props: FormBuilderProps) {
-	const [form, setForm] = useState<FormClass>(undefined);
+	const [form, setForm] = useState<FormType>(props.form);
 	useEffect(() => setForm(JSON.parse(JSON.stringify(props.form))), [props.form]);
 	const onChange = React.useCallback((params: OnChangeParams) => {
 		setForm((form) => {

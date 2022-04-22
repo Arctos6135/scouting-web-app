@@ -31,7 +31,7 @@ export default function EditSelection(props: EditSelectionProps) {
 					className="form-control-sm" />
 				<Button
 					variant="outline-secondary"
-					onClick={() => props.onChange(selection, edit)}
+					onClick={() => props.onChange(selection ?? '', edit)}
 				>
 					{props.buttonText}
 				</Button>

@@ -33,17 +33,22 @@ socket.on('data:get responses', (resps) => {
 	store.dispatch(user.setResponses(resps));
 });
 
-socket.on('organization:get forms', f => store.dispatch(user.setForms(f)));
+socket.on('team:get forms', f => store.dispatch(user.setForms(f)));
 
-socket.on('organization:get scouts', scouts => store.dispatch(admin.setScouts(scouts)));
-socket.on('organization:get url', url => store.dispatch(admin.setURL(url)));
+socket.on('team:get scouts', scouts => store.dispatch(admin.setScouts(scouts)));
+socket.on('team:get url', url => store.dispatch(admin.setURL(url)));
 
 socket.on('status', (data) => {
-	if (data.scout?.org != store.getState().user?.scout?.org) socket.emit('organization:get forms');
+	if (data.scout?.team != store.getState().user?.scout?.team) socket.emit('team:get forms');
+	console.log(data);
 	store.dispatch(user.setScout(data.scout));
 });
 
-socket.emit('organization:get forms');
+socket.emit('team:get forms');
 socket.emit('data:get responses');
+
+socket.on('alert', (alert) => {
+	store.dispatch(alerts.addAlert(alert));
+});
 
 socket.emit('status');

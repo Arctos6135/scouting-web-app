@@ -1,8 +1,8 @@
 import app from './server';
 import webpack from 'webpack';
 import dev from 'webpack-dev-middleware';
-import config from '../webpack.config.js';
+import config from '../webpack.config';
 
 const compiler = webpack(config(process.env));
 
-app.use(dev(compiler, {writeToDisk: true}));
+app.use(dev(compiler, { writeToDisk: true }));

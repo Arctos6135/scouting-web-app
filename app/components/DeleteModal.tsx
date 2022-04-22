@@ -9,7 +9,9 @@ export default function DeleteModal(props: {
 	bodyText: string;
 	titleText?: string;
 }) {
-	return <Modal centered show={props.show} onHide={props.onClose.bind(false)}>
+	return <Modal centered show={props.show} onHide={() => {
+		props.onClose(false);
+	}}>
 		<Modal.Header closeButton>
 			<Modal.Title>
 				{props.titleText ?? 'Are you sure you want to delete?'}
@@ -19,7 +21,9 @@ export default function DeleteModal(props: {
 			{props.bodyText}
 		</Modal.Body>
 		<Modal.Footer>
-			<Button onClick={props.onClose.bind(true)} variant="danger">Yes</Button>
+			<Button onClick={() => {
+				props.onClose(true);
+			}} variant="danger">Yes</Button>
 		</Modal.Footer>
 	</Modal>;
 }
