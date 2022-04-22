@@ -2,14 +2,14 @@
   "name": "scouting-app",
   "version": "0.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "build/cjs/backend/server.js",
   "scripts": {
     "predev": "mongod --replSet rs0 --dbpath ./data > data/logfile &",
-    "dev": "trap 'exit 0' SIGINT; ts-node-dev backend/dev-server.ts",
+    "dev": "trap 'exit 0' SIGINT; ts-node-dev --project tsconfig.server.json backend/dev-server.ts",
     "postdev": "mongo admin --eval 'db.shutdownServer()' > /dev/null",
-    "build": "tsc -b && webpack build --env production",
+    "build": "tsc --project tsconfig.server.json && webpack build --env production",
     "test": "jest",
-    "start": "node build/backend/server.js"
+    "start": "ts-node --project tsconfig.server.json backend/server.ts --transpile-only"
   },
   "author": "Alex Waese-Perlman",
   "license": "MIT",
@@ -50,7 +50,8 @@
     "workbox-strategies": "^6.5.1",
     "workbox-webpack-plugin": "^6.5.1",
     "workbox-window": "^6.5.1",
-    "zod": "^3.14.4"
+    "zod": "^3.14.4",
+    "tsconfig-paths": "^3.14.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
