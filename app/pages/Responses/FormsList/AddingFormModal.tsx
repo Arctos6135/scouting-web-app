@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Button, DropdownButton, Form, InputGroup, Modal } from 'react-bootstrap';
 import { useSelector } from 'app/hooks';
-import _ from 'lodash';
+import _, { isString } from 'lodash';
 
 export function AddingFormModal(props: {
 	show: boolean;
@@ -25,8 +25,9 @@ export function AddingFormModal(props: {
 		}
 	}, [name]);
 
-	const handleClose = (res?: {name: string, form?: string, error: boolean}) => {
-		props.onClose(res);
+	const handleClose = (res?: {name: string, form: string | undefined, error: boolean}) => {
+		if (res && isString(res.form)) props.onClose(res as { name: string, form: string, error: boolean });
+		else props.onClose();
 		setTimeout(() => {
 			setName('');
 			setForm(forms[0].id);
