@@ -23,8 +23,10 @@ function RowBuilder(props: RowBuilderProps) {
 				{row.components.map((component, index) => (
 					<Col key={index} className='py-2 border'>
 						<Button onClick={() => {
-							row.components.splice(index, 1);
-							onChange(row);
+							onChange({
+								...row, 
+								components: [...row.components.slice(0, index-1), ...row.components.slice(index+1)]
+							});
 						}}>Delete Group</Button>
 						<GroupBuilder
 							sectionIndex={props.sectionIndex}
@@ -50,7 +52,10 @@ function RowBuilder(props: RowBuilderProps) {
 						component: component,
 					};
 					row.components.push(group);
-					onChange(row);
+					onChange({ 
+						...row,
+						components: [...row.components, group]
+					});
 				}}
 				label=" New Group"
 				buttonText="Add Group"
