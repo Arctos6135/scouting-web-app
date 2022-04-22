@@ -14,7 +14,7 @@ export default function QRReader() {
 	const [deviceId, setDeviceId] = React.useState<string | undefined>(undefined);
 	const videoRef = React.useRef<HTMLVideoElement>(null);
 	const forms = useSelector(state => state.user.forms.schemas.list, _.isEqual);
-	const scoutOrg = useSelector(state => state.user.scout?.team);
+	const scoutTeam = useSelector(state => state.user.scout?.team);
 	const [scanning, setScanning] = React.useState(false);
 	const [scanned, setScanned] = React.useState(false);
 	const [invalidQR, setInvalidQR] = React.useState(false);
@@ -30,17 +30,18 @@ export default function QRReader() {
 				if (result && scanning) {
 					try {
 						const text = result.getText();
-						const [formIdBigInt, scoutId, serializedResponse] = text.split(';');
+						const [submissionIDBigInt, name,  formIdBigInt, scoutId, serializedResponse] = text.split(';');
 						const formId = BigInt(formIdBigInt).toString(16);
+						const submissionId = BigInt(submissionIDBigInt).toString(16);
 						const form = forms.find((form) => form.id.replace(/-/g, '') === formId);
-						if (!form || !scoutOrg) return;
+						if (!form || !scoutTeam) return;
 						const data = deserialize(BigInt(serializedResponse), form.sections);
 						const response: Response = {
 							data: data,
 							form: form.id,
-							id: uniqueID(),
-							name: '',
-							team: scoutOrg,
+							id: submissionId,
+							name: name,
+							team: scoutTeam,
 							scout: scoutId
 						};
 						dispatch(addToSubmitQueue(response));
@@ -49,7 +50,7 @@ export default function QRReader() {
 						setScanned(true);
 						setTimeout(() => setScanned(false), 5000);
 					} catch (err) {
-						console.log(err);
+						console.error(err);
 						setInvalidQR(true);
 						setTimeout(() => setInvalidQR(false), 5000);
 					}
