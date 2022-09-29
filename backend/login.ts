@@ -24,7 +24,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		if (req.session && req.session.scout) 
 			req.session.scout = await models.Scout.collection.findOne({ login: req.session.scout?.login, team: req.session.scout.team }) ?? undefined;
 		socket.emit('status', { scout: req.session?.scout });
-		req.session?.save();
+		req.session?.save?.();
 	};
 
 	socket.on('login', async (data) => {

@@ -32,6 +32,7 @@ const app = express();
 
 const server = http.createServer(app);
 const io = new socketio.Server<ClientToServerEvents, ServerToClientEvents>(server);
+
 app.use(express.static('./dist'));
 app.use(sess);
 app.use(bodyParser.urlencoded());
@@ -41,10 +42,20 @@ io.use((socket, next) => {
 	sess(req, req.res || {}, next as any);
 });
 
-io.on('connection', (socket) => {
+io.on('connection', (socket: Socket) => {
 	login(socket, io);
 	admin(socket, io);
 	data(socket, io);
+	if (socket.request.session?.justVerified) {
+		console.log('sending verification');
+		socket.emit('alert', {
+			type: 'success',
+			message: 'Email verified',
+			page: 'login',
+		});
+		socket.request.session.justVerified = false;
+		socket.request.session.save();
+	}
 });
 
 server.listen(parseInt(process.env.PORT ?? '8080'), '0.0.0.0');
@@ -61,9 +72,19 @@ declare module 'express-session' {
 	interface SessionData {
 		scout: Scout;
 		loggedIn: boolean;
+		justVerified: boolean;
 	}
 }
 
+app.get('/verify/:code', (req, res) => {
+	console.log(req.params);
+	models.Team.verify(req.params['code']).then(res => {
+		if (res) req.session.justVerified = true;
+		req.session.save();
+	});
+	res.redirect('/login');
+	console.log(req.sessionID);
+});
 app.get('*', function (req, res) {
 	res.sendFile(path.resolve(process.cwd(), './dist/index.html'));
 });

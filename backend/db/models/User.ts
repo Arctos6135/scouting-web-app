@@ -3,6 +3,17 @@ import { Scout } from './Scouting';
 import { Team as TeamSchema, RegisterResult } from 'shared/dataClasses/Team';
 import { VerificationCode as VerificationCodeSchema } from 'shared/dataClasses/VerificationCode';
 import { Collection } from 'mongodb';
+import * as nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+	host: process.env.EMAIL_HOST,
+	port: 465,
+	secure: true,
+	auth: {
+		user: process.env.EMAIL_ADDRESS,
+		pass: process.env.EMAIL_PASSWORD,
+	},
+});
 
 export class Team {
 	static collection: Collection<TeamSchema>;
@@ -15,12 +26,23 @@ export class Team {
 			return false;
 		}
 	}
-	public static async verify(team: TeamSchema, password: string): Promise<boolean> {
-		if (team.verified) return true;
-		const code = VerificationCode.getUserCode(team.email);
+	public static async sendVerificationEmail(team: TeamSchema): Promise<void> {
+		if (team.verified) return;
+		const code = await VerificationCode.getUserCode(team.email);
 
-		// TODO: Send verification email
-		// For now we can just verify manually
+		await transporter.sendMail({
+			to: team.email,
+			from: process.env.EMAIL_ADDRESS,
+			subject: 'Scouting App email verification',
+			html: `This email has been registered with the arctos scouting app. Your verification link is 
+				<a href="${process.env.ADDRESS}/verify/${code}">${process.env.ADDRESS}/verify/${code}</a>`
+		});
+	}
+
+	public static async verify(code: string): Promise<boolean> {
+		const row = await VerificationCode.collection.findOne({code});
+		if (!row) return false;
+		await this.collection.findOneAndUpdate({email: row.email}, {$set: {verified: true}});
 		return true;
 	}
 
@@ -35,13 +57,15 @@ export class Team {
 				email, teamName: name
 			});
 			if (!(this.collection.insertOne(user))) return RegisterResult.Invalid;
-			await Scout.register(email, password, user.teamID, 'admin');
-			await Scout.collection.findOneAndUpdate({email, team: user.teamID}, { $set: { admin: true } });
 			// TODO: Potentially handle errors by deleting the team
 			// If for some reason the admin user is not created then the team is inaccessible
+			await this.sendVerificationEmail(user);
+			await Scout.register(email, password, user.teamID, 'admin');
+			await Scout.collection.findOneAndUpdate({login: email, team: user.teamID}, { $set: { admin: true } });
 		} 
 		catch (e) {
 			console.log(e);
+			await this.collection.deleteOne({ email });
 			return RegisterResult.Invalid;
 		}
 		return RegisterResult.Successful;
@@ -62,7 +86,7 @@ export class VerificationCode {
 	public static async getUserCode(email: string) {
 		let code: VerificationCodeSchema | null = await this.collection.findOne({ email });
 		if (!code) {
-			code = VerificationCodeSchema.parse({ code: crypto.randomBytes(128).toString('base64'), email });
+			code = VerificationCodeSchema.parse({ code: crypto.randomBytes(8).toString('hex'), email });
 			await this.collection.insertOne(code);
 		}
 
