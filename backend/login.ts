@@ -27,7 +27,8 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 		req.session?.save?.();
 	};
 
-	socket.on('login', async (data) => {
+	socket.on('login', async (login) => {
+		const {password, ...data} = login;
 		logger.info('Scout login', { data, ip: socket.handshake.address });
 		let teamID: string;
 		if (data.team) teamID = data.team;
@@ -40,7 +41,7 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 				return;
 			}
 		}
-		const result = await models.Scout.login(teamID, data.login, data.password);
+		const result = await models.Scout.login(teamID, data.login, password);
 		switch (result) {
 		case LoginResult.Successful:
 			if (!req.session) {
@@ -52,21 +53,22 @@ export default async function addListeners(socket: Socket, io: IOServer) {
 			break;
 		case LoginResult.Unverified:
 			socket.emit('alert', { message: 'You are attempting to login with an unverified email address.', page: 'login', type: 'danger' });
-			logger.verbose('Unverified login attempt', { data: { ...data, password: '' }, ip: socket.handshake.address });
+			logger.verbose('Unverified login attempt', { data, ip: socket.handshake.address });
 			break;
 		//TODO: Add alerts for more types of message
 		default:
 			socket.emit('alert', { message: 'Unable to login.', page: 'login', type: 'danger' });
 			console.log(result);
-			logger.verbose('Failed login attempt', { data: { ...data, password: '' }, result, ip: socket.handshake.address });
+			logger.verbose('Failed login attempt', { data, result, ip: socket.handshake.address });
 			break;
 		}
 		syncStatus();
 	});
 
-	socket.on('register', async (data) => {
+	socket.on('register', async (register) => {
+		const {password, ...data} = register;
 		logger.verbose('Register team', { data, ip: socket.handshake.address });
-		const result = await models.Team.register(data.email, data.password, data.name);
+		const result = await models.Team.register(data.email, password, data.name);
 		switch (result) {
 		case RegisterResult.Successful:
 			socket.emit('register', true);
